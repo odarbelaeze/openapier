@@ -8,6 +8,10 @@ import (
 
 var _ Comment = &serversDescriptionComment{}
 
+func init() {
+	Register(NewServersDescriptionComment())
+}
+
 type serversDescriptionComment struct{}
 
 // NewServersDescriptionComment creates a new serversDescriptionComment.

@@ -8,6 +8,10 @@ import (
 
 var _ Comment = &hostComment{}
 
+func init() {
+	Register(NewHostComment())
+}
+
 type hostComment struct{}
 
 // NewHostComment creates a new hostComment.

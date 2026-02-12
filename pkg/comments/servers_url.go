@@ -12,6 +12,10 @@ var (
 	_ Comment = &serversURLComment{}
 )
 
+func init() {
+	Register(NewServersURLComment())
+}
+
 type serversURLComment struct{}
 
 // NewServersURLComment creates a new serversURLComment.
