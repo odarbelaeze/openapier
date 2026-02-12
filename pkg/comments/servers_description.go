@@ -16,11 +16,11 @@ func NewServersDescriptionComment() *serversDescriptionComment {
 }
 
 // ParseInto implements Comment.
-func (*serversDescriptionComment) ParseInto(c string, s openapi.OpenAPI) error {
-	if len(s.Servers) == 0 {
+func (*serversDescriptionComment) ParseInto(c string, s *openapi.Extendable[openapi.OpenAPI]) error {
+	if len(s.Spec.Servers) == 0 {
 		return errors.New("use @servers.url before you use @servers.description")
 	}
-	server := s.Servers[len(s.Servers)-1]
+	server := s.Spec.Servers[len(s.Spec.Servers)-1]
 	server.Spec.Description = c
 	return nil
 }

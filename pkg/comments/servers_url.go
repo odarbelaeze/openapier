@@ -7,8 +7,7 @@ import (
 )
 
 var (
-	serversURLPattern       = regexp.MustCompile(`\{([^}]+)\}`)
-	serversVariablesPattern = regexp.MustCompile(`^(\w+)\s+(.+)$`)
+	serversURLPattern = regexp.MustCompile(`\{([^}]+)\}`)
 
 	_ Comment = &serversURLComment{}
 )
@@ -21,14 +20,14 @@ func NewServersURLComment() *serversURLComment {
 }
 
 // ParseInto implements Comment.
-func (*serversURLComment) ParseInto(c string, s openapi.OpenAPI) error {
+func (*serversURLComment) ParseInto(c string, s *openapi.Extendable[openapi.OpenAPI]) error {
 	builder := openapi.NewServerBuilder().URL(c)
 	matches := serversURLPattern.FindAllStringSubmatch(c, -1)
 	for _, match := range matches {
 		name := match[1]
 		builder.AddVariable(name, openapi.NewServerVariableBuilder().Build())
 	}
-	s.Servers = append(s.Servers, builder.Build())
+	s.Spec.Servers = append(s.Spec.Servers, builder.Build())
 	return nil
 }
 

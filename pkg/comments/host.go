@@ -16,7 +16,7 @@ func NewHostComment() *hostComment {
 }
 
 // ParseInto implements Comment.
-func (h *hostComment) ParseInto(c string, s openapi.OpenAPI) error {
+func (h *hostComment) ParseInto(c string, s *openapi.Extendable[openapi.OpenAPI]) error {
 	return errors.New("@host is not supported use @servers.url instead")
 }
 
