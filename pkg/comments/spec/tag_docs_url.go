@@ -1,4 +1,4 @@
-package comments
+package spec
 
 import (
 	"fmt"

@@ -1,9 +1,9 @@
-package comments_test
+package spec_test
 
 import (
 	"testing"
 
-	"github.com/odarbelaeze/openapier/pkg/comments"
+	"github.com/odarbelaeze/openapier/pkg/comments/spec"
 	"github.com/stretchr/testify/assert"
 	"github.com/sv-tools/openapi"
 )
@@ -31,7 +31,7 @@ func TestServersURL_ParseInto(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			comment := comments.NewServersURLComment()
+			comment := spec.NewServersURLComment()
 			o := openapi.NewOpenAPIBuilder().Build()
 
 			err := comment.ParseInto(tt.url, o)
@@ -58,11 +58,11 @@ func TestServersURL_ParseInto(t *testing.T) {
 }
 
 func TestServersURL_Tag(t *testing.T) {
-	comment := comments.NewServersURLComment()
+	comment := spec.NewServersURLComment()
 	assert.Equal(t, "servers.url", comment.Tag())
 }
 
 func TestServersURL_Usage(t *testing.T) {
-	comment := comments.NewServersURLComment()
+	comment := spec.NewServersURLComment()
 	assert.NotEmpty(t, comment.Usage())
 }

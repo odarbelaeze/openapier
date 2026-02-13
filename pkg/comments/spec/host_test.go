@@ -1,15 +1,15 @@
-package comments_test
+package spec_test
 
 import (
 	"testing"
 
-	"github.com/odarbelaeze/openapier/pkg/comments"
+	"github.com/odarbelaeze/openapier/pkg/comments/spec"
 	"github.com/stretchr/testify/assert"
 	"github.com/sv-tools/openapi"
 )
 
 func TestHost_ParseInto(t *testing.T) {
-	comment := comments.NewHostComment()
+	comment := spec.NewHostComment()
 	o := openapi.NewOpenAPIBuilder().Build()
 	err := comment.ParseInto("some host", o)
 	assert.Error(t, err)
@@ -17,11 +17,11 @@ func TestHost_ParseInto(t *testing.T) {
 }
 
 func TestHost_Tag(t *testing.T) {
-	comment := comments.NewHostComment()
+	comment := spec.NewHostComment()
 	assert.Equal(t, "host", comment.Tag())
 }
 
 func TestHost_Usage(t *testing.T) {
-	comment := comments.NewHostComment()
+	comment := spec.NewHostComment()
 	assert.Equal(t, "// @host <host>", comment.Usage())
 }

@@ -1,14 +1,14 @@
-package comments_test
+package spec_test
 
 import (
 	"testing"
 
-	"github.com/odarbelaeze/openapier/pkg/comments"
+	"github.com/odarbelaeze/openapier/pkg/comments/spec"
 	"github.com/stretchr/testify/assert"
 	"github.com/sv-tools/openapi"
 )
 
-func TestServersVariablesDescription_ParseInto(t *testing.T) {
+func TestServersVariablesDefault_ParseInto(t *testing.T) {
 	tests := []struct {
 		name     string
 		comment  string
@@ -18,13 +18,13 @@ func TestServersVariablesDescription_ParseInto(t *testing.T) {
 	}{
 		{
 			name:    "no server",
-			comment: "var1 some description",
+			comment: "var1 value1",
 			setup:   func(o *openapi.Extendable[openapi.OpenAPI]) {},
 			wantErr: true,
 		},
 		{
 			name:    "variable not found",
-			comment: "var1 some description",
+			comment: "var1 value1",
 			setup: func(o *openapi.Extendable[openapi.OpenAPI]) {
 				server := openapi.NewServerBuilder().Build()
 				server.Spec.Variables = make(map[string]*openapi.Extendable[openapi.ServerVariable])
@@ -34,7 +34,7 @@ func TestServersVariablesDescription_ParseInto(t *testing.T) {
 		},
 		{
 			name:    "variables are not detected",
-			comment: "var1 some description",
+			comment: "var1 value1",
 			setup: func(o *openapi.Extendable[openapi.OpenAPI]) {
 				server := openapi.NewServerBuilder().Build()
 				o.Spec.Servers = append(o.Spec.Servers, server)
@@ -54,14 +54,14 @@ func TestServersVariablesDescription_ParseInto(t *testing.T) {
 		},
 		{
 			name:    "success",
-			comment: "var1 some description",
+			comment: "var1 value1",
 			setup: func(o *openapi.Extendable[openapi.OpenAPI]) {
 				server := openapi.NewServerBuilder().
 					AddVariable("var1", openapi.NewServerVariableBuilder().Build()).
 					Build()
 				o.Spec.Servers = append(o.Spec.Servers, server)
 			},
-			expected: "some description",
+			expected: "value1",
 			wantErr:  false,
 		},
 	}
@@ -70,25 +70,25 @@ func TestServersVariablesDescription_ParseInto(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			o := openapi.NewOpenAPIBuilder().Build()
 			tt.setup(o)
-			comment := comments.NewServersVariablesDescriptionComment()
+			comment := spec.NewServersVariablesDefaultComment()
 			err := comment.ParseInto(tt.comment, o)
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
 				server := o.Spec.Servers[len(o.Spec.Servers)-1]
-				assert.Equal(t, tt.expected, server.Spec.Variables["var1"].Spec.Description)
+				assert.Equal(t, tt.expected, server.Spec.Variables["var1"].Spec.Default)
 			}
 		})
 	}
 }
 
-func TestServersVariablesDescription_Tag(t *testing.T) {
-	comment := comments.NewServersVariablesDescriptionComment()
-	assert.Equal(t, "servers.variables.description", comment.Tag())
+func TestServersVariablesDefault_Tag(t *testing.T) {
+	comment := spec.NewServersVariablesDefaultComment()
+	assert.Equal(t, "servers.variables.default", comment.Tag())
 }
 
-func TestServersVariablesDescription_Usage(t *testing.T) {
-	comment := comments.NewServersVariablesDescriptionComment()
-	assert.Equal(t, "// @servers.variables.description <variable> <description>", comment.Usage())
+func TestServersVariablesDefault_Usage(t *testing.T) {
+	comment := spec.NewServersVariablesDefaultComment()
+	assert.Equal(t, "// @servers.variables.default <variable> <default>", comment.Usage())
 }

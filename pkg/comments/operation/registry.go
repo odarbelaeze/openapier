@@ -1,4 +1,4 @@
-package comments
+package operation
 
 import (
 	"fmt"
@@ -20,7 +20,7 @@ func Register(c Comment) {
 // Registry allows to register and parse comments.
 type Registry interface {
 	Register(c Comment)
-	Parse(line string, s *openapi.Extendable[openapi.OpenAPI]) error
+	Parse(line string, s *openapi.Extendable[openapi.Operation]) error
 }
 
 type standardRegistry struct {
@@ -38,7 +38,7 @@ func (r *standardRegistry) Register(c Comment) {
 	r.comments[c.Tag()] = c
 }
 
-func (r *standardRegistry) Parse(line string, s *openapi.Extendable[openapi.OpenAPI]) error {
+func (r *standardRegistry) Parse(line string, s *openapi.Extendable[openapi.Operation]) error {
 	matches := commentPattern.FindStringSubmatch(line)
 	if len(matches) < 3 {
 		return nil

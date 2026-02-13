@@ -1,16 +1,16 @@
-package comments_test
+package spec_test
 
 import (
 	"testing"
 
-	"github.com/odarbelaeze/openapier/pkg/comments"
+	"github.com/odarbelaeze/openapier/pkg/comments/spec"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/sv-tools/openapi"
 )
 
 func TestTagDocsDescriptionComment_ParseInto(t *testing.T) {
-	c := comments.NewTagDocsDescriptionComment()
+	c := spec.NewTagDocsDescriptionComment()
 	s := openapi.NewOpenAPIBuilder().Build()
 
 	// Should fail if no tags exist
@@ -34,11 +34,11 @@ func TestTagDocsDescriptionComment_ParseInto(t *testing.T) {
 }
 
 func TestTagDocsDescriptionComment_Tag(t *testing.T) {
-	c := comments.NewTagDocsDescriptionComment()
+	c := spec.NewTagDocsDescriptionComment()
 	assert.Equal(t, "tag.docs.description", c.Tag())
 }
 
 func TestTagDocsDescriptionComment_Usage(t *testing.T) {
-	c := comments.NewTagDocsDescriptionComment()
+	c := spec.NewTagDocsDescriptionComment()
 	assert.Equal(t, "// @tag.docs.description <description>", c.Usage())
 }

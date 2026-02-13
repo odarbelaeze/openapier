@@ -1,16 +1,16 @@
-package comments_test
+package spec_test
 
 import (
 	"testing"
 
-	"github.com/odarbelaeze/openapier/pkg/comments"
+	"github.com/odarbelaeze/openapier/pkg/comments/spec"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/sv-tools/openapi"
 )
 
 func TestTagDocsURLComment_ParseInto(t *testing.T) {
-	c := comments.NewTagDocsURLComment()
+	c := spec.NewTagDocsURLComment()
 	s := openapi.NewOpenAPIBuilder().Build()
 
 	// Should fail if no tags exist
@@ -28,11 +28,11 @@ func TestTagDocsURLComment_ParseInto(t *testing.T) {
 }
 
 func TestTagDocsURLComment_Tag(t *testing.T) {
-	c := comments.NewTagDocsURLComment()
+	c := spec.NewTagDocsURLComment()
 	assert.Equal(t, "tag.docs.url", c.Tag())
 }
 
 func TestTagDocsURLComment_Usage(t *testing.T) {
-	c := comments.NewTagDocsURLComment()
+	c := spec.NewTagDocsURLComment()
 	assert.Equal(t, "// @tag.docs.url <url>", c.Usage())
 }
