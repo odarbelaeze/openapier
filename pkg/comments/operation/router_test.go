@@ -76,3 +76,13 @@ func TestRouterComment_Usage(t *testing.T) {
 	comment := operation.NewRouterComment()
 	assert.Equal(t, "// @router <path> [method]", comment.Usage())
 }
+
+func TestRouterComment_Integration(t *testing.T) {
+	op := operation.NewOperation()
+	err := operation.DefaultRegistry.Parse("// @router /user [get]", op)
+	require.NoError(t, err)
+
+	require.Len(t, op.Routes, 1)
+	assert.Equal(t, "/user", op.Routes[0].Path)
+	assert.Equal(t, "get", op.Routes[0].Method)
+}
