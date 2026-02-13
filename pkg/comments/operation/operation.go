@@ -22,7 +22,7 @@ func NewOperation() *Operation {
 }
 
 // Attach attaches the operation to the given openapi spec.
-func (o *Operation) Attach(spec *openapi.OpenAPI) error {
+func (o *Operation) Attach(spec *openapi.Extendable[openapi.OpenAPI]) error {
 	operation := o.Builder.Build()
 	summary := o.Routes.Summarize()
 	for path, methods := range summary {
@@ -48,7 +48,7 @@ func (o *Operation) Attach(spec *openapi.OpenAPI) error {
 			default:
 				return fmt.Errorf("unsupported method: %s", method)
 			}
-			spec.Paths.Spec.Add(path, pathItemBuilder.Build())
+			spec.Spec.Paths.Spec.Add(path, pathItemBuilder.Build())
 		}
 	}
 	return nil
