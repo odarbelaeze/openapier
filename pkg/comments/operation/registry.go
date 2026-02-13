@@ -3,8 +3,6 @@ package operation
 import (
 	"fmt"
 	"regexp"
-
-	"github.com/sv-tools/openapi"
 )
 
 var (
@@ -20,7 +18,7 @@ func Register(c Comment) {
 // Registry allows to register and parse comments.
 type Registry interface {
 	Register(c Comment)
-	Parse(line string, spec *openapi.Extendable[openapi.OpenAPI], s *openapi.Extendable[openapi.Operation]) error
+	Parse(line string, op *Operation) error
 }
 
 type standardRegistry struct {
@@ -38,7 +36,7 @@ func (r *standardRegistry) Register(c Comment) {
 	r.comments[c.Tag()] = c
 }
 
-func (r *standardRegistry) Parse(line string, spec *openapi.Extendable[openapi.OpenAPI], s *openapi.Extendable[openapi.Operation]) error {
+func (r *standardRegistry) Parse(line string, op *Operation) error {
 	matches := commentPattern.FindStringSubmatch(line)
 	if len(matches) < 3 {
 		return nil
@@ -47,7 +45,7 @@ func (r *standardRegistry) Parse(line string, spec *openapi.Extendable[openapi.O
 	content := matches[2]
 
 	if handler, ok := r.comments[tag]; ok {
-		return handler.ParseInto(content, spec, s)
+		return handler.ParseInto(content, op)
 	}
 	return fmt.Errorf("unknown comment tag: %s", tag)
 }
