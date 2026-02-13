@@ -20,7 +20,7 @@ func Register(c Comment) {
 // Registry allows to register and parse comments.
 type Registry interface {
 	Register(c Comment)
-	Parse(line string, s *openapi.Extendable[openapi.Operation]) error
+	Parse(line string, spec *openapi.Extendable[openapi.OpenAPI], s *openapi.Extendable[openapi.Operation]) error
 }
 
 type standardRegistry struct {
@@ -38,7 +38,7 @@ func (r *standardRegistry) Register(c Comment) {
 	r.comments[c.Tag()] = c
 }
 
-func (r *standardRegistry) Parse(line string, s *openapi.Extendable[openapi.Operation]) error {
+func (r *standardRegistry) Parse(line string, spec *openapi.Extendable[openapi.OpenAPI], s *openapi.Extendable[openapi.Operation]) error {
 	matches := commentPattern.FindStringSubmatch(line)
 	if len(matches) < 3 {
 		return nil
@@ -47,7 +47,7 @@ func (r *standardRegistry) Parse(line string, s *openapi.Extendable[openapi.Oper
 	content := matches[2]
 
 	if handler, ok := r.comments[tag]; ok {
-		return handler.ParseInto(content, s)
+		return handler.ParseInto(content, spec, s)
 	}
 	return fmt.Errorf("unknown comment tag: %s", tag)
 }

@@ -6,5 +6,5 @@ import "github.com/sv-tools/openapi"
 type Comment interface {
 	Tag() string
 	Usage() string
-	ParseInto(c string, target *openapi.Extendable[openapi.Operation]) error
+	ParseInto(c string, spec *openapi.Extendable[openapi.OpenAPI], target *openapi.Extendable[openapi.Operation]) error
 }
