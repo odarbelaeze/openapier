@@ -32,3 +32,13 @@ func TestTagDocsDescriptionComment_ParseInto(t *testing.T) {
 
 	assert.Equal(t, "Docs description", s.Spec.Tags[0].Spec.ExternalDocs.Spec.Description)
 }
+
+func TestTagDocsDescriptionComment_Tag(t *testing.T) {
+	c := comments.NewTagDocsDescriptionComment()
+	assert.Equal(t, "tag.docs.description", c.Tag())
+}
+
+func TestTagDocsDescriptionComment_Usage(t *testing.T) {
+	c := comments.NewTagDocsDescriptionComment()
+	assert.Equal(t, "// @tag.docs.description <description>", c.Usage())
+}

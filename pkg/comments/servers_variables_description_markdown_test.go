@@ -37,9 +37,31 @@ func TestServersVariablesDescriptionMarkdown_ParseInto(t *testing.T) {
 			name:    "variable not found",
 			comment: "var1 test.md",
 			setup: func(o *openapi.Extendable[openapi.OpenAPI]) {
-				o.Spec.Servers = append(o.Spec.Servers, openapi.NewServerBuilder().Build())
+				server := openapi.NewServerBuilder().Build()
+				server.Spec.Variables = make(map[string]*openapi.Extendable[openapi.ServerVariable])
+				o.Spec.Servers = append(o.Spec.Servers, server)
 			},
 			wantErr: true,
+		},
+		{
+			name:    "variables are not detected",
+			comment: "var1 test.md",
+			setup: func(o *openapi.Extendable[openapi.OpenAPI]) {
+				server := openapi.NewServerBuilder().Build()
+				o.Spec.Servers = append(o.Spec.Servers, server)
+			},
+			wantErr: true,
+		},
+		{
+			name:    "regex mismatch",
+			comment: "invalid-format",
+			setup: func(o *openapi.Extendable[openapi.OpenAPI]) {
+				server := openapi.NewServerBuilder().
+					AddVariable("var1", openapi.NewServerVariableBuilder().Build()).
+					Build()
+				o.Spec.Servers = append(o.Spec.Servers, server)
+			},
+			wantErr: false,
 		},
 		{
 			name:    "success",

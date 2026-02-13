@@ -26,3 +26,13 @@ func TestTagDocsURLComment_ParseInto(t *testing.T) {
 	assert.NotNil(t, s.Spec.Tags[0].Spec.ExternalDocs)
 	assert.Equal(t, "http://example.com", s.Spec.Tags[0].Spec.ExternalDocs.Spec.URL)
 }
+
+func TestTagDocsURLComment_Tag(t *testing.T) {
+	c := comments.NewTagDocsURLComment()
+	assert.Equal(t, "tag.docs.url", c.Tag())
+}
+
+func TestTagDocsURLComment_Usage(t *testing.T) {
+	c := comments.NewTagDocsURLComment()
+	assert.Equal(t, "// @tag.docs.url <url>", c.Usage())
+}

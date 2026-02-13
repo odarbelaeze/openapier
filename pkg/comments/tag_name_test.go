@@ -25,3 +25,13 @@ func TestTagNameComment_ParseInto(t *testing.T) {
 	require.Len(t, s.Spec.Tags, 2)
 	assert.Equal(t, "AnotherTag", s.Spec.Tags[1].Spec.Name)
 }
+
+func TestTagNameComment_Tag(t *testing.T) {
+	c := comments.NewTagNameComment()
+	assert.Equal(t, "tag.name", c.Tag())
+}
+
+func TestTagNameComment_Usage(t *testing.T) {
+	c := comments.NewTagNameComment()
+	assert.Equal(t, "// @tag.name <name>", c.Usage())
+}
