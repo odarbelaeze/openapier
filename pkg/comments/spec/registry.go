@@ -3,6 +3,7 @@ package spec
 import (
 	"fmt"
 	"regexp"
+	"strings"
 
 	"github.com/sv-tools/openapi"
 )
@@ -43,11 +44,12 @@ func (r *standardRegistry) Parse(line string, s *openapi.Extendable[openapi.Open
 	if len(matches) < 3 {
 		return nil
 	}
-	tag := matches[1]
+	tag := strings.ToLower(matches[1])
 	content := matches[2]
 
 	if handler, ok := r.comments[tag]; ok {
 		return handler.ParseInto(content, s)
 	}
-	return fmt.Errorf("unknown comment tag: %s", tag)
+	fmt.Printf("unknown spec tag: %s\n", tag)
+	return nil
 }

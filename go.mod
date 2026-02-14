@@ -25,5 +25,6 @@ require (
 	github.com/go-openapi/swag/yamlutils v0.25.4 // indirect
 	github.com/stretchr/testify v1.11.1
 	github.com/sv-tools/openapi v1.2.0
+	github.com/urfave/cli/v3 v3.6.2
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 )

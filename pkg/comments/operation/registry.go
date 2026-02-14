@@ -47,5 +47,6 @@ func (r *standardRegistry) Parse(line string, op *Operation) error {
 	if handler, ok := r.comments[tag]; ok {
 		return handler.ParseInto(content, op)
 	}
-	return fmt.Errorf("unknown comment tag: %s", tag)
+	fmt.Printf("unknown operation tag: %s\n", tag)
+	return nil
 }
