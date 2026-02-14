@@ -7,13 +7,17 @@ import (
 
 	"github.com/odarbelaeze/openapier/pkg/comments/spec"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/sv-tools/openapi"
 )
 
 func TestServersVariablesDescriptionMarkdown_ParseInto(t *testing.T) {
 	tempDir, err := os.MkdirTemp("", "openapier-test-*")
 	assert.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	defer func() {
+		err := os.RemoveAll(tempDir)
+		require.NoError(t, err)
+	}()
 
 	markdownFile := "test.md"
 	markdownContent := "This is a markdown description."
