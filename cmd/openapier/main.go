@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 
 	"github.com/odarbelaeze/openapier/pkg/parser"
 	"github.com/urfave/cli/v3"
+	"go.yaml.in/yaml/v4"
 )
 
 func main() {
@@ -30,7 +32,9 @@ func main() {
 		},
 		Action: func(ctx context.Context, c *cli.Command) error {
 			p := parser.NewParser()
-			_, err := p.Parse(c.String("root"), c.String("main"))
+			spec, err := p.Parse(c.String("root"), c.String("main"))
+			bytes, err := yaml.Marshal(spec)
+			fmt.Println(string(bytes))
 			return err
 		},
 	}

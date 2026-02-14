@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"encoding/json"
 	"fmt"
 	"go/ast"
 	goparser "go/parser"
@@ -63,11 +62,6 @@ func (p *parser) Parse(root string, main string) (*openapi.Extendable[openapi.Op
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse operations: %w", err)
 	}
-	bytes, err := json.Marshal(spec)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal spec: %w", err)
-	}
-	fmt.Println(string(bytes))
 	return spec, nil
 }
 

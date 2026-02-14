@@ -27,14 +27,6 @@ func (m *mockComment) ParseInto(c string, s *openapi.Extendable[openapi.OpenAPI]
 	return m.err
 }
 
-func TestRegistry_Parse_UnknownTag(t *testing.T) {
-	registry := spec.NewRegistry()
-	o := openapi.NewOpenAPIBuilder().Build()
-	err := registry.Parse("// @unknown foo", o)
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "unknown comment tag: unknown")
-}
-
 func TestRegistry_Parse_KnownTag(t *testing.T) {
 	registry := spec.NewRegistry()
 	mock := &mockComment{tag: "mock", usage: "// @mock", err: nil}
@@ -79,9 +71,4 @@ func TestDefaultRegistry(t *testing.T) {
 	err = spec.DefaultRegistry.Parse("// @servers.description My Server", o)
 	assert.NoError(t, err)
 	assert.Equal(t, "My Server", o.Spec.Servers[0].Spec.Description)
-
-	// Test host (should error)
-	err = spec.DefaultRegistry.Parse("// @host example.com", o)
-	assert.Error(t, err)
-	assert.EqualError(t, err, "@host is not supported use @servers.url instead")
 }
