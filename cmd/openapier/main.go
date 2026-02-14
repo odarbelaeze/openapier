@@ -33,6 +33,9 @@ func main() {
 		Action: func(ctx context.Context, c *cli.Command) error {
 			p := parser.NewParser()
 			spec, err := p.Parse(c.String("root"), c.String("main"))
+			if err != nil {
+				return fmt.Errorf("failed to parse: %w", err)
+			}
 			bytes, err := yaml.Marshal(spec)
 			fmt.Println(string(bytes))
 			return err

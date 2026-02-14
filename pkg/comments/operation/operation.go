@@ -3,6 +3,7 @@ package operation
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/sv-tools/openapi"
 )
@@ -28,7 +29,7 @@ func (o *Operation) Attach(spec *openapi.Extendable[openapi.OpenAPI]) error {
 	for path, methods := range summary {
 		pathItemBuilder := openapi.NewPathItemBuilder()
 		for _, method := range methods {
-			switch method {
+			switch strings.ToUpper(method) {
 			case http.MethodGet:
 				pathItemBuilder.Get(operation)
 			case http.MethodHead:
@@ -48,8 +49,11 @@ func (o *Operation) Attach(spec *openapi.Extendable[openapi.OpenAPI]) error {
 			default:
 				return fmt.Errorf("unsupported method: %s", method)
 			}
-			spec.Spec.Paths.Spec.Add(path, pathItemBuilder.Build())
 		}
+		if spec.Spec.Paths == nil {
+			spec.Spec.Paths = openapi.NewPaths()
+		}
+		spec.Spec.Paths.Spec.Add(path, pathItemBuilder.Build())
 	}
 	return nil
 }
