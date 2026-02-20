@@ -1,6 +1,15 @@
 info:
+    contact:
+        email: support@swagger.io
+        name: API Support
+        url: http://www.swagger.io/support
+    description: This is a sample server Petstore server.
+    license:
+        name: Apache 2.0
+        url: http://www.apache.org/licenses/LICENSE-2.0.html
+    termsOfService: http://swagger.io/terms/
     title: Swagger Example API
-    version: ""
+    version: "1.0"
 jsonSchemaDialect: https://spec.openapis.org/oas/3.1/dialect/base
 openapi: 3.1.1
 paths:
