@@ -18,6 +18,9 @@ import (
 // @info.license.name Apache 2.0
 // @info.license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
+// @externalDocs.url http://www.swagger.io/support
+// @externalDocs.description Find more info here
+
 // @servers.url https://petstore.swagger.io/v2
 
 // @securityDefinitions.basic BasicAuth
