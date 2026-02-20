@@ -1,7 +1,7 @@
 package spec
 
 import (
-	"fmt"
+	"log/slog"
 	"regexp"
 	"strings"
 
@@ -21,7 +21,7 @@ func Register(c Comment) {
 // Registry allows to register and parse comments.
 type Registry interface {
 	Register(c Comment)
-	Parse(line string, s *openapi.Extendable[openapi.OpenAPI]) error
+	Parse(line string, spec *openapi.Extendable[openapi.OpenAPI]) error
 }
 
 type standardRegistry struct {
@@ -46,10 +46,9 @@ func (r *standardRegistry) Parse(line string, s *openapi.Extendable[openapi.Open
 	}
 	tag := strings.ToLower(matches[1])
 	content := matches[2]
-
 	if handler, ok := r.comments[tag]; ok {
 		return handler.ParseInto(content, s)
 	}
-	fmt.Printf("unknown spec tag: %s\n", tag)
+	slog.Warn("unknown spec tag", "tag", tag)
 	return nil
 }

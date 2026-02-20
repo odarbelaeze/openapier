@@ -1,7 +1,7 @@
 package operation
 
 import (
-	"fmt"
+	"log/slog"
 	"regexp"
 	"strings"
 )
@@ -48,6 +48,6 @@ func (r *standardRegistry) Parse(line string, op *Operation) error {
 	if handler, ok := r.comments[tag]; ok {
 		return handler.ParseInto(content, op)
 	}
-	fmt.Printf("unknown operation tag: %s\n", tag)
+	slog.Warn("unknown operation tag", "tag", tag)
 	return nil
 }

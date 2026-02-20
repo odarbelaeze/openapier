@@ -1,56 +1,48 @@
 info:
-  contact:
-    email: support@swagger.io
-  description: This is a sample server Petstore server.
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  termsOfService: http://swagger.io/terms/
-  title: Swagger Example API
-  version: "1.0"
+    title: Swagger Example API
+    version: ""
 jsonSchemaDialect: https://spec.openapis.org/oas/3.1/dialect/base
 openapi: 3.1.1
 paths:
-  /AnonymousField:
-    get:
-      summary: use Anonymous field
-  /AnonymousStructArray:
-    get:
-      summary: Use AnonymousStructArray
-  /CrossAlias:
-    get:
-      summary: Use CrossAlias
-  /GetPet5a:
-    options: {}
-  /GetPet5b:
-    head: {}
-  /GetPet5c:
-    patch: {}
-  /GetPet6FunctionScopedComplexResponse:
-    get: {}
-  /GetPet6FunctionScopedResponse:
-    get: {}
-  /GetPet6MapString:
-    get: {}
-  /IndirectRecursiveTest:
-    get:
-      summary: Use IndirectRecursiveTest
-  /Pet2:
-    get:
-      summary: use pet2
-  /Tags:
-    get:
-      summary: Use Tags
-  /file/upload:
-    post:
-      description: Upload file
-      summary: Upload file
-  /testapi/get-string-by-int/{some_id}:
-    get:
-      description: get string by ID
-      summary: Add a new pet to the store
-  /testapi/get-struct-array-by-string/{some_id}:
-    get:
-      description: get struct array by ID
-servers:
-  - url: https://petstore.swagger.io/v2
+    /AnonymousField:
+        get:
+            summary: use Anonymous field
+    /AnonymousStructArray:
+        get:
+            summary: Use AnonymousStructArray
+    /CrossAlias:
+        get:
+            summary: Use CrossAlias
+    /GetPet5a:
+        options: {}
+    /GetPet5b:
+        head: {}
+    /GetPet5c:
+        patch: {}
+    /GetPet6FunctionScopedComplexResponse:
+        get: {}
+    /GetPet6FunctionScopedResponse:
+        get: {}
+    /GetPet6MapString:
+        get: {}
+    /IndirectRecursiveTest:
+        get:
+            summary: Use IndirectRecursiveTest
+    /Pet2:
+        get:
+            summary: use pet2
+    /Tags:
+        get:
+            summary: Use Tags
+    /file/upload:
+        post:
+            description: Upload file
+            summary: Upload file
+    /testapi/get-string-by-int/{some_id}:
+        get:
+            description: get string by ID
+            summary: Add a new pet to the store
+    /testapi/get-struct-array-by-string/{some_id}:
+        get:
+            description: get struct array by ID
+

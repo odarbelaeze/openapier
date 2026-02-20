@@ -6,17 +6,17 @@ import (
 	"github.com/swaggo/swag/v2/testdata/simple/api"
 )
 
-// @title Swagger Example API
-// @version 1.0
-// @description This is a sample server Petstore server.
-// @termsOfService http://swagger.io/terms/
+// @info.title Swagger Example API
+// @info.version 1.0
+// @info.description This is a sample server Petstore server.
+// @info.termsOfService http://swagger.io/terms/
 
-// @contact.name API Support
-// @contact.url http://www.swagger.io/support
-// @contact.email support@swagger.io
+// @info.contact.name API Support
+// @info.contact.url http://www.swagger.io/support
+// @info.contact.email support@swagger.io
 
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @info.license.name Apache 2.0
+// @info.license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @servers.url https://petstore.swagger.io/v2
 

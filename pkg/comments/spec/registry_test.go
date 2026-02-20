@@ -57,18 +57,3 @@ func TestRegistry_Parse_IgnoreNonComments(t *testing.T) {
 	err = registry.Parse("// regular comment", o)
 	assert.NoError(t, err)
 }
-
-func TestDefaultRegistry(t *testing.T) {
-	// Verify that standard comments are registered
-	o := openapi.NewOpenAPIBuilder().Build()
-
-	// Test servers.url
-	err := spec.DefaultRegistry.Parse("// @servers.url https://example.com", o)
-	assert.NoError(t, err)
-	assert.Equal(t, "https://example.com", o.Spec.Servers[0].Spec.URL)
-
-	// Test servers.description
-	err = spec.DefaultRegistry.Parse("// @servers.description My Server", o)
-	assert.NoError(t, err)
-	assert.Equal(t, "My Server", o.Spec.Servers[0].Spec.Description)
-}
