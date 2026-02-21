@@ -58,21 +58,31 @@ paths:
         get:
             description: get struct array by ID
             security:
-                - ApiKeyAuth: null
-                - BasicAuth: null
+                - ApiKeyAuth:
+                    - scope1
+                    - scope2
+                - BasicAuth:
+                    - scope1
+                    - scope2
                 - OAuth2Application:
                     - write
+                    - scope3
                 - OAuth2Implicit:
                     - read
                     - admin
+                    - scope4
                 - OAuth2AccessCode:
                     - read
+                    - scope5
                 - OAuth2Password:
                     - admin
+                    - scope6
                 - OAuth2Implicit:
                     - read
                     - write
-                - Firebase: null
+                    - scope7
+                - Firebase:
+                    - scope8
 tags:
     - description: These are some sample pets
       externalDocs:
@@ -81,3 +91,4 @@ tags:
       name: pets
     - description: These are some sample users
       name: users
+
