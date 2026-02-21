@@ -57,4 +57,10 @@ paths:
     /testapi/get-struct-array-by-string/{some_id}:
         get:
             description: get struct array by ID
+tags:
+    - description: These are some sample pets
+      externalDocs:
+        description: Find more info here
+        url: http://swagger.io/petstore
+      name: pets
 
