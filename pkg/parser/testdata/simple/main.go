@@ -21,7 +21,13 @@ import (
 // @externalDocs.url http://www.swagger.io/support
 // @externalDocs.description Find more info here
 
-// @servers.url https://petstore.swagger.io/v2
+// @server.url https://petstore.swagger.io/v2
+
+// @server.url {scheme}://petstore.swagger.io/v2
+// @server.description Production Server
+// @server.variable.default scheme http
+// @server.variable.enum scheme http https
+// @server.variable.description scheme description
 
 // @tag.name pets
 // @tag.description These are some sample pets

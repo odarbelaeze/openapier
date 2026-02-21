@@ -83,6 +83,17 @@ paths:
                     - scope7
                 - Firebase:
                     - scope8
+servers:
+    - url: https://petstore.swagger.io/v2
+    - description: Production Server
+      url: '{scheme}://petstore.swagger.io/v2'
+      variables:
+        scheme:
+            default: http
+            description: description
+            enum:
+                - http
+                - https
 tags:
     - description: These are some sample pets
       externalDocs:
