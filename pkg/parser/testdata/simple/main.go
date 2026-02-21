@@ -27,6 +27,9 @@ import (
 // @tag.description These are some sample pets
 // @tag.externalDocs.url http://swagger.io/petstore
 // @tag.externalDocs.description Find more info here
+
+// @tag.name users
+// @tag.description These are some sample users
 func main() {
 	http.HandleFunc("/testapi/get-string-by-int/", api.GetStringByInt)
 	http.HandleFunc("/testapi/get-struct-array-by-string/", api.GetStructArrayByString)

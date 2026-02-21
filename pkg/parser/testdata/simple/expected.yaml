@@ -63,4 +63,6 @@ tags:
         description: Find more info here
         url: http://swagger.io/petstore
       name: pets
+    - description: These are some sample users
+      name: users
 
