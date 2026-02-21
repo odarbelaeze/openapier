@@ -9,11 +9,11 @@ import (
 	"github.com/sv-tools/openapi"
 )
 
-func TestDescriptionComment(t *testing.T) {
-	comment := operation.NewDescriptionComment()
+func TestIDComment(t *testing.T) {
+	comment := operation.NewIDComment()
 
-	assert.Equal(t, "description", comment.Tag())
-	assert.Equal(t, "@description <description>", comment.Usage())
+	assert.Equal(t, "id", comment.Tag())
+	assert.Equal(t, "@id <operationId>", comment.Usage())
 
 	tests := []struct {
 		name     string
@@ -21,17 +21,17 @@ func TestDescriptionComment(t *testing.T) {
 		expected string
 	}{
 		{
-			name:     "valid description",
-			content:  "This endpoint uploads a new file.",
-			expected: "This endpoint uploads a new file.",
+			name:     "valid id",
+			content:  "UploadFile",
+			expected: "UploadFile",
 		},
 		{
-			name:     "description with spaces",
-			content:  "   Detailed user fetch logic   ",
-			expected: "Detailed user fetch logic",
+			name:     "id with spaces",
+			content:  "   GetUsers   ",
+			expected: "GetUsers",
 		},
 		{
-			name:     "empty description",
+			name:     "empty id",
 			content:  "",
 			expected: "",
 		},
@@ -46,7 +46,7 @@ func TestDescriptionComment(t *testing.T) {
 			err := comment.ParseInto(tt.content, op)
 			require.NoError(t, err)
 
-			assert.Equal(t, tt.expected, op.Builder.Build().Spec.Description)
+			assert.Equal(t, tt.expected, op.Builder.Build().Spec.OperationID)
 		})
 	}
 }

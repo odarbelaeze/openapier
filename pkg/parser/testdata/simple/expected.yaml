@@ -49,14 +49,17 @@ paths:
     /file/upload:
         post:
             description: Upload file
+            operationId: file.upload
             summary: Upload file
     /testapi/get-string-by-int/{some_id}:
         get:
             description: get string by ID
+            operationId: get-string-by-int
             summary: Add a new pet to the store
     /testapi/get-struct-array-by-string/{some_id}:
         get:
             description: get struct array by ID
+            operationId: get-struct-array-by-string
             security:
                 - ApiKeyAuth:
                     - scope1

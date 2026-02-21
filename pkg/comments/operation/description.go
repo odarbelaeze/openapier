@@ -1,27 +1,32 @@
 package operation
 
-import "strings"
+import (
+	"strings"
+)
 
 func init() {
 	Register(NewDescriptionComment())
 }
 
-// DescriptionComment is a comment that updates the description of an operation.
+// DescriptionComment sets the description of an operation.
 type DescriptionComment struct{}
 
 func NewDescriptionComment() *DescriptionComment {
 	return &DescriptionComment{}
 }
 
-func (d *DescriptionComment) Tag() string {
+func (c *DescriptionComment) Tag() string {
 	return "description"
 }
 
-func (d *DescriptionComment) Usage() string {
+func (c *DescriptionComment) Usage() string {
 	return "@description <description>"
 }
 
-func (d *DescriptionComment) ParseInto(content string, op *Operation) error {
-	op.Builder.Description(strings.TrimSpace(content))
+func (c *DescriptionComment) ParseInto(content string, op *Operation) error {
+	desc := strings.TrimSpace(content)
+	if desc != "" {
+		op.Builder.Description(desc)
+	}
 	return nil
 }

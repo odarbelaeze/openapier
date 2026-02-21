@@ -1,27 +1,32 @@
 package operation
 
-import "strings"
+import (
+	"strings"
+)
 
 func init() {
 	Register(NewSummaryComment())
 }
 
-// SummaryComment is a comment that updates the summary of an operation.
+// SummaryComment sets the summary of an operation.
 type SummaryComment struct{}
 
 func NewSummaryComment() *SummaryComment {
 	return &SummaryComment{}
 }
 
-func (s *SummaryComment) Tag() string {
+func (c *SummaryComment) Tag() string {
 	return "summary"
 }
 
-func (s *SummaryComment) Usage() string {
+func (c *SummaryComment) Usage() string {
 	return "@summary <summary>"
 }
 
-func (s *SummaryComment) ParseInto(content string, op *Operation) error {
-	op.Builder.Summary(strings.TrimSpace(content))
+func (c *SummaryComment) ParseInto(content string, op *Operation) error {
+	summary := strings.TrimSpace(content)
+	if summary != "" {
+		op.Builder.Summary(summary)
+	}
 	return nil
 }
