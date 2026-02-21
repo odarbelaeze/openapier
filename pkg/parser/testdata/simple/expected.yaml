@@ -57,6 +57,22 @@ paths:
     /testapi/get-struct-array-by-string/{some_id}:
         get:
             description: get struct array by ID
+            security:
+                - ApiKeyAuth: null
+                - BasicAuth: null
+                - OAuth2Application:
+                    - write
+                - OAuth2Implicit:
+                    - read
+                    - admin
+                - OAuth2AccessCode:
+                    - read
+                - OAuth2Password:
+                    - admin
+                - OAuth2Implicit:
+                    - read
+                    - write
+                - Firebase: null
 tags:
     - description: These are some sample pets
       externalDocs:
@@ -65,4 +81,3 @@ tags:
       name: pets
     - description: These are some sample users
       name: users
-

@@ -37,11 +37,12 @@ func GetStringByInt(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} web.APIError "Can not find ID"
 // @Security ApiKeyAuth
 // @Security BasicAuth
-// @Security OAuth2Application[write]
-// @Security OAuth2Implicit[read, admin]
-// @Security OAuth2AccessCode[read]
-// @Security OAuth2Password[admin]
-// @Security OAuth2Implicit[read, write] || Firebase
+// @Security OAuth2Application write
+// @Security OAuth2Implicit read admin
+// @Security OAuth2AccessCode read
+// @Security OAuth2Password admin
+// @Security OAuth2Implicit read write
+// @Security Firebase
 // @Router /testapi/get-struct-array-by-string/{some_id} [get]
 func GetStructArrayByString(w http.ResponseWriter, r *http.Request) {
 	//write your code
