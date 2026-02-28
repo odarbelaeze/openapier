@@ -3,7 +3,6 @@ package operation
 import (
 	"log/slog"
 	"regexp"
-	"strings"
 )
 
 var (
@@ -42,7 +41,7 @@ func (r *standardRegistry) Parse(line string, op *Operation) error {
 	if len(matches) < 3 {
 		return nil
 	}
-	tag := strings.ToLower(matches[1])
+	tag := matches[1]
 	content := matches[2]
 
 	if handler, ok := r.comments[tag]; ok {

@@ -16,7 +16,7 @@ type TagExternalDocsURLComment struct{}
 
 // Tag implements [Comment].
 func (c *TagExternalDocsURLComment) Tag() string {
-	return "tag.externaldocs.url"
+	return "tag.externalDocs.url"
 }
 
 // Usage implements [Comment].

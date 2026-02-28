@@ -3,7 +3,6 @@ package spec
 import (
 	"log/slog"
 	"regexp"
-	"strings"
 
 	"github.com/sv-tools/openapi"
 )
@@ -44,7 +43,7 @@ func (r *standardRegistry) Parse(line string, s *openapi.Extendable[openapi.Open
 	if len(matches) < 3 {
 		return nil
 	}
-	tag := strings.ToLower(matches[1])
+	tag := matches[1]
 	content := matches[2]
 	if handler, ok := r.comments[tag]; ok {
 		return handler.ParseInto(content, s)

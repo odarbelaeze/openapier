@@ -11,7 +11,7 @@ import (
 
 func TestInfoTermsOfServiceComment_Tag(t *testing.T) {
 	comment := &spec.InfoTermsOfServiceComment{}
-	assert.Equal(t, "info.termsofservice", comment.Tag())
+	assert.Equal(t, "info.termsOfService", comment.Tag())
 }
 
 func TestInfoTermsOfServiceComment_Usage(t *testing.T) {

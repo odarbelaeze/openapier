@@ -11,7 +11,7 @@ import (
 
 func TestTagExternalDocsDescriptionComment_Tag(t *testing.T) {
 	comment := &spec.TagExternalDocsDescriptionComment{}
-	assert.Equal(t, "tag.externaldocs.description", comment.Tag())
+	assert.Equal(t, "tag.externalDocs.description", comment.Tag())
 }
 
 func TestTagExternalDocsDescriptionComment_Usage(t *testing.T) {

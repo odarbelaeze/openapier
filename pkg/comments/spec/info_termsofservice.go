@@ -12,7 +12,7 @@ type InfoTermsOfServiceComment struct{}
 
 // Tag implements [Comment].
 func (c *InfoTermsOfServiceComment) Tag() string {
-	return "info.termsofservice" // case insensitive match in registry, so this must be lowercase
+	return "info.termsOfService"
 }
 
 // Usage implements [Comment].
