@@ -11,6 +11,7 @@ import (
 // @Description get string by ID
 // @ID get-string-by-int
 // @Param   some_id int path
+// @Param.description some_id the ID of the string to return
 // @Router /testapi/get-string-by-int/{some_id} [get]
 func GetStringByInt(w http.ResponseWriter, r *http.Request) {
 	_ = Cross{}

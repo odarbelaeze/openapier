@@ -53,7 +53,8 @@ paths:
             description: get string by ID
             operationId: get-string-by-int
             parameters:
-                - in: path
+                - description: the ID of the string to return
+                  in: path
                   name: some_id
                   required: true
                   schema:
@@ -134,3 +135,4 @@ tags:
       name: pets
     - description: These are some sample users
       name: users
+

@@ -5,9 +5,11 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/odarbelaeze/openapier/pkg/parser"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/sv-tools/openapi"
 	"go.yaml.in/yaml/v4"
 )
 
@@ -30,13 +32,16 @@ func TestParser_Parse(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, spec)
 
-			expected, err := os.ReadFile(filepath.Join(tt.root, "expected.yaml"))
-			require.NoError(t, err)
-			
-			actualYaml, err := yaml.Marshal(spec)
+			expectedString, err := os.ReadFile(filepath.Join(tt.root, "expected.yaml"))
 			require.NoError(t, err)
 
-			assert.Equal(t, string(expected), string(actualYaml))
+			expectedSpec := &openapi.Extendable[openapi.OpenAPI]{}
+			err = yaml.Unmarshal(expectedString, expectedSpec)
+			require.NoError(t, err)
+
+			if diff := cmp.Diff(expectedSpec, spec, cmpopts.EquateEmpty()); diff != "" {
+				t.Errorf("spec mismatch (-want +got):\n%s", diff)
+			}
 		})
 	}
 }
