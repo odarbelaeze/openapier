@@ -8,7 +8,6 @@ import (
 	"github.com/odarbelaeze/openapier/pkg/parser"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/sv-tools/openapi"
 	"go.yaml.in/yaml/v4"
 )
 
@@ -33,11 +32,11 @@ func TestParser_Parse(t *testing.T) {
 
 			expected, err := os.ReadFile(filepath.Join(tt.root, "expected.yaml"))
 			require.NoError(t, err)
-			var expectedSpec *openapi.Extendable[openapi.OpenAPI]
-			err = yaml.Unmarshal(expected, &expectedSpec)
+			
+			actualYaml, err := yaml.Marshal(spec)
 			require.NoError(t, err)
 
-			assert.Equal(t, expectedSpec, spec)
+			assert.Equal(t, string(expected), string(actualYaml))
 		})
 	}
 }

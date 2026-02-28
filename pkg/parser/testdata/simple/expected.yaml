@@ -47,19 +47,48 @@ paths:
         get:
             summary: Use Tags
     /file/upload:
-        post:
-            description: Upload file
-            operationId: file.upload
-            summary: Upload file
+        post: {}
     /testapi/get-string-by-int/{some_id}:
         get:
             description: get string by ID
             operationId: get-string-by-int
+            parameters:
+                - in: path
+                  name: some_id
+                  required: true
+                  schema:
+                    format: int32
+                    type: integer
             summary: Add a new pet to the store
     /testapi/get-struct-array-by-string/{some_id}:
         get:
             description: get struct array by ID
             operationId: get-struct-array-by-string
+            parameters:
+                - in: path
+                  name: some_id
+                  required: true
+                  schema:
+                    type: string
+                - in: query
+                  name: category
+                  schema:
+                    format: int32
+                    type: integer
+                - in: query
+                  name: offset
+                  schema:
+                    format: int32
+                    type: integer
+                - in: query
+                  name: limit
+                  schema:
+                    format: int32
+                    type: integer
+                - in: query
+                  name: q
+                  schema:
+                    type: string
             security:
                 - ApiKeyAuth:
                     - scope1
@@ -105,4 +134,3 @@ tags:
       name: pets
     - description: These are some sample users
       name: users
-

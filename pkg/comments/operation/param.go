@@ -1,0 +1,53 @@
+package operation
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/odarbelaeze/openapier/pkg/schema"
+	"github.com/sv-tools/openapi"
+)
+
+func init() {
+	Register(NewParamComment())
+}
+
+// ParamComment adds a parameter to an operation.
+type ParamComment struct{}
+
+func NewParamComment() *ParamComment {
+	return &ParamComment{}
+}
+
+func (c *ParamComment) Tag() string {
+	return "param"
+}
+
+func (c *ParamComment) Usage() string {
+	return "@param <name> <type> <in>"
+}
+
+func (c *ParamComment) ParseInto(content string, op *Operation) error {
+	fields := strings.Fields(content)
+	if len(fields) < 3 {
+		return fmt.Errorf("invalid @param format, expected: %s", c.Usage())
+	}
+	name := fields[0]
+	typ := fields[1]
+	in := fields[2]
+
+	paramSchema := schema.ParseType(typ)
+
+	builder := openapi.NewParameterBuilder().
+		Name(name).
+		In(in).
+		Schema(paramSchema)
+
+	if in == openapi.InPath {
+		builder.Required(true)
+	}
+
+	op.Builder.AddParameters(builder.Build())
+
+	return nil
+}

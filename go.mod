@@ -3,6 +3,7 @@ module github.com/odarbelaeze/openapier
 go 1.25.7
 
 require (
+	github.com/google/go-cmp v0.7.0
 	github.com/stretchr/testify v1.11.1
 	github.com/sv-tools/openapi v1.2.0
 	github.com/urfave/cli/v3 v3.6.2
