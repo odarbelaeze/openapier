@@ -74,6 +74,16 @@ func TestParseType(t *testing.T) {
 			expected: openapi.NewSchemaBuilder().Build(),
 		},
 		{
+			name:     "array of int type",
+			typeStr:  "[]int",
+			expected: openapi.NewSchemaBuilder().AddType("array").Items(openapi.NewBoolOrSchema(openapi.NewSchemaBuilder().AddType("integer").Format("int32").Build())).Build(),
+		},
+		{
+			name:     "array of array of string type",
+			typeStr:  "[][]string",
+			expected: openapi.NewSchemaBuilder().AddType("array").Items(openapi.NewBoolOrSchema(openapi.NewSchemaBuilder().AddType("array").Items(openapi.NewBoolOrSchema(openapi.NewSchemaBuilder().AddType("string").Build())).Build())).Build(),
+		},
+		{
 			name:     "unknown type",
 			typeStr:  "someUnknownType",
 			expected: openapi.NewSchemaBuilder().Build(),

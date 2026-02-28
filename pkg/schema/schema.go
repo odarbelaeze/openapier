@@ -1,9 +1,17 @@
 package schema
 
-import "github.com/sv-tools/openapi"
+import (
+	"strings"
+
+	"github.com/sv-tools/openapi"
+)
 
 // ParseType converts a string type representation to an OpenAPI schema object
 func ParseType(t string) *openapi.RefOrSpec[openapi.Schema] {
+	if strings.HasPrefix(t, "[]") {
+		return openapi.NewSchemaBuilder().AddType("array").Items(openapi.NewBoolOrSchema(ParseType(t[2:]))).Build()
+	}
+
 	b := openapi.NewSchemaBuilder()
 	switch t {
 	case "int", "int32", "uint", "uint32":
