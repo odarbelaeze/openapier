@@ -8,6 +8,7 @@ require (
 	github.com/sv-tools/openapi v1.2.0
 	github.com/urfave/cli/v3 v3.6.2
 	go.yaml.in/yaml/v4 v4.0.0-rc.1
+	golang.org/x/mod v0.8.0
 )
 
 require (

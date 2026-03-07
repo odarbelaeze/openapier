@@ -6,6 +6,7 @@ import (
 	goparser "go/parser"
 	"go/token"
 	"io/fs"
+	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -14,6 +15,7 @@ import (
 	"github.com/odarbelaeze/openapier/pkg/comments/spec"
 	"github.com/odarbelaeze/openapier/pkg/schema"
 	"github.com/sv-tools/openapi"
+	"golang.org/x/mod/modfile"
 )
 
 type Parser interface {
@@ -90,27 +92,33 @@ func (p *parser) parseSpec(main string, spec *openapi.Extendable[openapi.OpenAPI
 }
 
 func (p *parser) parseTypes(root string) (schema.TypeSpecCache, error) {
+	gomodPath := path.Join(root, "go.mod")
+	gomodData, err := os.ReadFile(gomodPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("go.mod file not found in root directory: %s", gomodPath)
+		}
+		return nil, fmt.Errorf("failed to open go.mod file: %w", err)
+	}
+	f, err := modfile.ParseLax(gomodPath, gomodData, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse go.mod file: %w", err)
+	}
+	if f.Module == nil {
+		return nil, fmt.Errorf("module declaration not found in go.mod file")
+	}
 	cache := schema.NewTypeSpecCache()
 	fileSet := token.NewFileSet()
-	err := filepath.Walk(root, func(path string, info fs.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if info.IsDir() {
-			return nil
-		}
-		if !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
-			return nil
-		}
-		node, err := goparser.ParseFile(fileSet, path, nil, goparser.ParseComments)
+	err = p.walkGoFiles(root, func(p string) error {
+		node, err := goparser.ParseFile(fileSet, p, nil, goparser.ParseComments)
 		if err != nil {
 			return fmt.Errorf("failed to parse file: %w", err)
 		}
-		realPath, err := filepath.Rel(root, path)
+		realPath, err := filepath.Rel(root, p)
 		if err != nil {
 			return fmt.Errorf("failed to get relative path: %w", err)
 		}
-		realPath = filepath.Dir(realPath)
+		realPath = path.Join(f.Module.Mod.Path, filepath.Dir(realPath))
 		cache.Collect(realPath, node)
 		return nil
 	})
@@ -122,16 +130,7 @@ func (p *parser) parseTypes(root string) (schema.TypeSpecCache, error) {
 
 func (p *parser) parseOperations(root string, spec *openapi.Extendable[openapi.OpenAPI]) error {
 	fileSet := token.NewFileSet()
-	err := filepath.Walk(root, func(path string, info fs.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if info.IsDir() {
-			return nil
-		}
-		if !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
-			return nil
-		}
+	err := p.walkGoFiles(root, func(path string) error {
 		node, err := goparser.ParseFile(fileSet, path, nil, goparser.ParseComments)
 		if err != nil {
 			return fmt.Errorf("failed to parse file: %w", err)
@@ -168,4 +167,19 @@ func (p *parser) parseOperations(root string, spec *openapi.Extendable[openapi.O
 		return fmt.Errorf("failed to walk directory: %w", err)
 	}
 	return nil
+}
+
+func (p *parser) walkGoFiles(root string, fn func(path string) error) error {
+	return filepath.Walk(root, func(path string, info fs.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		if !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
+			return nil
+		}
+		return fn(path)
+	})
 }
