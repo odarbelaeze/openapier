@@ -9,7 +9,11 @@ import (
 // ParseType converts a string type representation to an OpenAPI schema object
 func ParseType(t string) *openapi.RefOrSpec[openapi.Schema] {
 	if strings.HasPrefix(t, "[]") {
-		return openapi.NewSchemaBuilder().AddType("array").Items(openapi.NewBoolOrSchema(ParseType(t[2:]))).Build()
+		return openapi.
+			NewSchemaBuilder().
+			AddType("array").
+			Items(openapi.NewBoolOrSchema(ParseType(t[2:]))).
+			Build()
 	}
 
 	b := openapi.NewSchemaBuilder()

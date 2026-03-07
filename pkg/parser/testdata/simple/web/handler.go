@@ -5,7 +5,6 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/shopspring/decimal"
-	"github.com/swaggo/swag/v2/testdata/simple/cross"
 )
 
 type Pet struct {
@@ -52,8 +51,6 @@ type AnonymousStructArray []struct {
 	Foo string `json:"foo"`
 }
 
-type CrossAlias cross.Cross
-
 type Pet2 struct {
 	ID         int        `json:"id"`
 	MiddleName *string    `json:"middlename" extensions:"x-nullable,x-abc=def,!x-omitempty"`
@@ -78,9 +75,7 @@ type RevValueBase struct {
 type RevValue struct {
 	RevValueBase `json:"rev_value_base"`
 
-	Data    int           `json:"Data"`
-	Cross   cross.Cross   `json:"cross"`
-	Crosses []cross.Cross `json:"crosses"`
+	Data int `json:"Data"`
 }
 
 // Below we have Pet5b as base type and Pet5a and Pet5c both have Pet5b as anonymous field, inheriting it's properties

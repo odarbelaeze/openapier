@@ -1,11 +1,6 @@
 package api
 
-import (
-	"net/http"
-
-	. "github.com/swaggo/swag/v2/testdata/simple/cross"
-	_ "github.com/swaggo/swag/v2/testdata/simple/web"
-)
+import "net/http"
 
 // @summary Add a new pet to the store
 // @description get string by ID
@@ -14,7 +9,6 @@ import (
 // @param.description some_id the ID of the string to return
 // @router /testapi/get-string-by-int/{some_id} [get]
 func GetStringByInt(w http.ResponseWriter, r *http.Request) {
-	_ = Cross{}
 	//write your code
 }
 
