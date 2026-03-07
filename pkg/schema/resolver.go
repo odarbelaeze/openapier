@@ -1,11 +1,15 @@
 package schema
 
-import "github.com/sv-tools/openapi"
+import (
+	"fmt"
+
+	"github.com/sv-tools/openapi"
+)
 
 // Resolves types into a schema.
 type Resolver interface {
 	// Resolve resolves the given type into a schema.
-	Resolve(l Locator) (openapi.Ref, error)
+	Resolve(l Locator) (*openapi.Ref, error)
 
 	// Definitions returns the definitions that have been resolved.
 	Definitions() map[string]*openapi.RefOrSpec[openapi.Schema]
@@ -29,8 +33,16 @@ func (r *resolver) Definitions() map[string]*openapi.RefOrSpec[openapi.Schema] {
 }
 
 // Resolve implements [Resolver].
-func (r *resolver) Resolve(l Locator) (openapi.Ref, error) {
-	return openapi.Ref{
-		Ref: "#/components/schemas/" + l.Name,
-	}, nil
+func (r *resolver) Resolve(l Locator) (*openapi.Ref, error) {
+	path := fmt.Sprintf("#/components/schemas/%s", l)
+	if _, ok := r.definitions[l.Name]; !ok {
+		ref := openapi.NewRefOrSpec[openapi.Schema](path)
+		return ref.Ref, nil
+	}
+	return r.resolve(l)
+}
+
+// resolve resolves the given type into a schema, and adds it to the definitions.
+func (r *resolver) resolve(Locator) (*openapi.Ref, error) {
+	return nil, fmt.Errorf("not implemented")
 }

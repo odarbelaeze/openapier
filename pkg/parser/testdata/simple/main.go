@@ -6,6 +6,9 @@ import (
 	"github.com/odarbelaeze/test/simple/api"
 )
 
+// Unused type to test that the parser ignores it
+type Unused int
+
 // @info.title Swagger Example API
 // @info.version 1.0
 // @info.description This is a sample server Petstore server.

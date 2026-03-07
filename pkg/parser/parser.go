@@ -12,6 +12,7 @@ import (
 
 	"github.com/odarbelaeze/openapier/pkg/comments/operation"
 	"github.com/odarbelaeze/openapier/pkg/comments/spec"
+	"github.com/odarbelaeze/openapier/pkg/schema"
 	"github.com/sv-tools/openapi"
 )
 
@@ -58,6 +59,12 @@ func (p *parser) Parse(root string, main string) (*openapi.Extendable[openapi.Op
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse spec: %w", err)
 	}
+
+	_, err = p.parseTypes(root)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse types: %w", err)
+	}
+
 	err = p.parseOperations(root, spec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse operations: %w", err)
@@ -80,6 +87,37 @@ func (p *parser) parseSpec(main string, spec *openapi.Extendable[openapi.OpenAPI
 		}
 	}
 	return nil
+}
+
+func (p *parser) parseTypes(root string) (schema.TypeSpecCache, error) {
+	cache := schema.NewTypeSpecCache()
+	fileSet := token.NewFileSet()
+	err := filepath.Walk(root, func(path string, info fs.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		if !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
+			return nil
+		}
+		node, err := goparser.ParseFile(fileSet, path, nil, goparser.ParseComments)
+		if err != nil {
+			return fmt.Errorf("failed to parse file: %w", err)
+		}
+		realPath, err := filepath.Rel(root, path)
+		if err != nil {
+			return fmt.Errorf("failed to get relative path: %w", err)
+		}
+		realPath = filepath.Dir(realPath)
+		cache.Collect(realPath, node)
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to walk directory: %w", err)
+	}
+	return cache, nil
 }
 
 func (p *parser) parseOperations(root string, spec *openapi.Extendable[openapi.OpenAPI]) error {

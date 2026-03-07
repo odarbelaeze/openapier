@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 
 	"github.com/odarbelaeze/openapier/pkg/parser"
@@ -29,8 +29,15 @@ func main() {
 				DefaultText: "current working directory",
 				TakesFile:   false,
 			},
+			&cli.BoolFlag{
+				Name:  "debug",
+				Usage: "Enable debug logging",
+			},
 		},
 		Action: func(ctx context.Context, c *cli.Command) error {
+			if c.Bool("debug") {
+				slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelDebug})))
+			}
 			p := parser.NewParser()
 			spec, err := p.Parse(c.String("root"), c.String("main"))
 			if err != nil {
@@ -43,6 +50,7 @@ func main() {
 	}
 
 	if err := cli.Run(context.Background(), os.Args); err != nil {
-		log.Fatal(err)
+		slog.Error("fatal error running application", err)
+		os.Exit(1)
 	}
 }
