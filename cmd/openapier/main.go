@@ -50,7 +50,7 @@ func main() {
 	}
 
 	if err := cli.Run(context.Background(), os.Args); err != nil {
-		slog.Error("fatal error running application", err)
+		slog.Error("fatal error running application", "err", err)
 		os.Exit(1)
 	}
 }
