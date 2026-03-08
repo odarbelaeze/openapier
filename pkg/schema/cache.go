@@ -14,28 +14,28 @@ type TypeDef struct {
 	File *ast.File
 }
 
-type TypeSpecCache interface {
+type TypeDefCache interface {
 	// Get returns the cached type definition for the given locator, or nil if not found.
-	Get(locator Locator) *TypeDef
+	Get(locator *Locator) *TypeDef
 
 	// Collect collects the type definitions for the given path and file, and caches them.
 	Collect(path string, file *ast.File)
 }
 
-type typeSpecCache struct {
+type typeDefCache struct {
 	// cache is a map of locators to type definitions.
 	cache map[string]*TypeDef
 }
 
 // NewTypeSpecCache creates a new type specification cache.
-func NewTypeSpecCache() TypeSpecCache {
-	return &typeSpecCache{
+func NewTypeSpecCache() TypeDefCache {
+	return &typeDefCache{
 		cache: make(map[string]*TypeDef),
 	}
 }
 
-// Collect implements [TypeSpecCache].
-func (t *typeSpecCache) Collect(path string, file *ast.File) {
+// Collect implements [TypeDefCache].
+func (t *typeDefCache) Collect(path string, file *ast.File) {
 	for _, decl := range file.Decls {
 		genDecl, ok := decl.(*ast.GenDecl)
 		if !ok || genDecl.Tok != token.TYPE {
@@ -60,8 +60,8 @@ func (t *typeSpecCache) Collect(path string, file *ast.File) {
 	}
 }
 
-// Get implements [TypeSpecCache].
-func (t *typeSpecCache) Get(locator Locator) *TypeDef {
+// Get implements [TypeDefCache].
+func (t *typeDefCache) Get(locator *Locator) *TypeDef {
 	if def, ok := t.cache[locator.String()]; ok {
 		slog.Debug("cache hit for type definition", "locator", locator)
 		return def

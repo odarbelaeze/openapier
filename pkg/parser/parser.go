@@ -91,7 +91,7 @@ func (p *parser) parseSpec(main string, spec *openapi.Extendable[openapi.OpenAPI
 	return nil
 }
 
-func (p *parser) parseTypes(root string) (schema.TypeSpecCache, error) {
+func (p *parser) parseTypes(root string) (schema.TypeDefCache, error) {
 	gomodPath := path.Join(root, "go.mod")
 	gomodData, err := os.ReadFile(gomodPath)
 	if err != nil {
