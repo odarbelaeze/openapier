@@ -10,21 +10,27 @@ import (
 
 // Operation holds an operation being built
 type Operation struct {
-	Builder *openapi.OperationBuilder
-	Routes  Routes
+	Builder          *openapi.OperationBuilder
+	ResponsesBuilder *openapi.ResponsesBuilder
+	Routes           Routes
 }
 
 // NewOperation builds a new operation
 func NewOperation() *Operation {
 	return &Operation{
-		Builder: openapi.NewOperationBuilder(),
-		Routes:  make(Routes, 0),
+		Builder:          openapi.NewOperationBuilder(),
+		ResponsesBuilder: openapi.NewResponsesBuilder(),
+		Routes:           make(Routes, 0),
 	}
 }
 
 // Attach attaches the operation to the given openapi spec.
 func (o *Operation) Attach(spec *openapi.Extendable[openapi.OpenAPI]) error {
 	operation := o.Builder.Build()
+	responses := o.ResponsesBuilder.Build()
+	if responses.Spec.Spec.Response != nil {
+		operation.Spec.Responses = responses.Spec
+	}
 	summary := o.Routes.Summarize()
 	for path, methods := range summary {
 		pathItemBuilder := openapi.NewPathItemBuilder()

@@ -39,6 +39,8 @@ func GetStructArrayByString(w http.ResponseWriter, r *http.Request) {
 // @summary Upload file
 // @description Upload file
 // @id file.upload
+// @requestBody application/json string The request body
+// @response 200 application/json string The response body
 // @router /file/upload [post]
 func Upload(w http.ResponseWriter, r *http.Request) {
 	//write your code

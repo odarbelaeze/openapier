@@ -50,6 +50,20 @@ paths:
         post:
             description: Upload file
             operationId: file.upload
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: string
+                description: The request body
+                required: true
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                    description: The response body
             summary: Upload file
     /testapi/get-string-by-int/{some_id}:
         get:
