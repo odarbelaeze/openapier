@@ -91,7 +91,7 @@ func (p *parser) parseSpec(main string, spec *openapi.Extendable[openapi.OpenAPI
 	return nil
 }
 
-func (p *parser) parseTypes(root string) (schema.TypeDefCache, error) {
+func (p *parser) parseTypes(root string) (schema.Resolver, error) {
 	gomodPath := path.Join(root, "go.mod")
 	gomodData, err := os.ReadFile(gomodPath)
 	if err != nil {
@@ -107,7 +107,7 @@ func (p *parser) parseTypes(root string) (schema.TypeDefCache, error) {
 	if f.Module == nil {
 		return nil, fmt.Errorf("module declaration not found in go.mod file")
 	}
-	cache := schema.NewTypeSpecCache()
+	cache := schema.NewResolver()
 	fileSet := token.NewFileSet()
 	err = p.walkGoFiles(root, func(p string) error {
 		node, err := goparser.ParseFile(fileSet, p, nil, goparser.ParseComments)
