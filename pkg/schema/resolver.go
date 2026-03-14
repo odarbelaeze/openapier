@@ -5,6 +5,8 @@ import (
 	"go/ast"
 	"go/token"
 	"log/slog"
+	"path"
+	"strings"
 
 	"github.com/sv-tools/openapi"
 )
@@ -15,6 +17,9 @@ type TypeDef struct {
 
 	// File is the file where the type definition is located.
 	File *ast.File
+
+	// Locator is the locator of the type definition.
+	Locator *Locator
 }
 
 // Resolves types into a schema.
@@ -23,7 +28,7 @@ type Resolver interface {
 	Collect(path string, file *ast.File)
 
 	// Resolve resolves the given type into a schema.
-	Resolve(l *Locator) (*openapi.Ref, error)
+	Resolve(typeName string, file *ast.File) (*openapi.Ref, error)
 
 	// Definitions returns the definitions that have been resolved.
 	Definitions() map[string]*openapi.RefOrSpec[openapi.Schema]
@@ -66,6 +71,7 @@ func (r *resolver) Collect(path string, file *ast.File) {
 			r.cache[locator.String()] = &TypeDef{
 				TypeSpec: typeSpec,
 				File:     file,
+				Locator:  &locator,
 			}
 		}
 	}
@@ -77,23 +83,64 @@ func (r *resolver) Definitions() map[string]*openapi.RefOrSpec[openapi.Schema] {
 }
 
 // Resolve implements [Resolver].
-func (r *resolver) Resolve(l *Locator) (*openapi.Ref, error) {
-	path := fmt.Sprintf("#/components/schemas/%s", l)
-	if _, ok := r.definitions[l.Name]; !ok {
-		ref := openapi.NewRefOrSpec[openapi.Schema](path)
-		return ref.Ref, nil
+func (r *resolver) Resolve(typeName string, file *ast.File) (*openapi.Ref, error) {
+	candidates, err := r.candidates(typeName, file)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find any candidates: %w", err)
 	}
-	return r.resolve(l)
+	for _, loc := range candidates {
+		schemasPath := fmt.Sprintf("#/components/schemas/%s", loc)
+		if _, ok := r.definitions[loc.Name]; !ok {
+			ref := openapi.NewRefOrSpec[openapi.Schema](schemasPath)
+			return ref.Ref, nil
+		}
+	}
+	return nil, fmt.Errorf("failed to resolve type: %s", typeName)
 }
 
-// resolve resolves the given type into a schema, and adds it to the definitions.
-func (r *resolver) resolve(l *Locator) (*openapi.Ref, error) {
-	if def, ok := r.cache[l.String()]; ok {
-		slog.Debug("cache hit for type definition", "locator", l)
-		_ = def // Just to avoid unused var
+func (r *resolver) candidates(typeName string, file *ast.File) ([]*Locator, error) {
+	var candidates []*Locator
+
+	parts := strings.Split(typeName, ".")
+	var pkgName, name string
+	loc := &Locator{}
+
+	if len(parts) == 1 {
+		pkgName = file.Name.Name
+		name = parts[0]
+		for _, def := range r.cache {
+			if def.File == file {
+				loc.Path = def.Locator.Path
+				break
+			}
+			if def.Locator.Package == pkgName {
+				loc.Path = def.Locator.Path
+			}
+		}
+	} else if len(parts) == 2 {
+		pkgName = parts[0]
+		name = parts[1]
+		for _, imp := range file.Imports {
+			if imp.Path == nil {
+				continue
+			}
+			importPath := strings.Trim(imp.Path.Value, `"`)
+			if imp.Name != nil && imp.Name.Name == pkgName {
+				loc.Path = importPath
+				break
+			} else if imp.Name == nil && path.Base(importPath) == pkgName {
+				loc.Path = importPath
+				break
+			}
+		}
 	} else {
-		slog.Debug("cache miss for type definition", "locator", l)
+		return nil, fmt.Errorf("invalid type name: %s", typeName)
 	}
 
-	return nil, fmt.Errorf("not implemented")
+	loc.Package = pkgName
+	loc.Name = name
+
+	candidates = append(candidates, loc)
+
+	return candidates, nil
 }
