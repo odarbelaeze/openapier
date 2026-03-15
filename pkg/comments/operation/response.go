@@ -2,6 +2,7 @@ package operation
 
 import (
 	"fmt"
+	"go/ast"
 	"strings"
 
 	"github.com/odarbelaeze/openapier/pkg/schema"
@@ -27,7 +28,7 @@ func (c *ResponseComment) Usage() string {
 	return "@response <status_code> <content_type> <type> [description]"
 }
 
-func (c *ResponseComment) ParseInto(content string, op *Operation) error {
+func (c *ResponseComment) ParseInto(content string, f *ast.File, op *Operation) error {
 	fields := strings.Fields(content)
 	if len(fields) < 3 {
 		return fmt.Errorf("invalid @response format, expected: %s", c.Usage())

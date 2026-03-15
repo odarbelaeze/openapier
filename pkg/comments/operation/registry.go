@@ -1,6 +1,7 @@
 package operation
 
 import (
+	"go/ast"
 	"log/slog"
 	"regexp"
 )
@@ -18,7 +19,7 @@ func Register(c Comment) {
 // Registry allows to register and parse comments.
 type Registry interface {
 	Register(c Comment)
-	Parse(line string, op *Operation) error
+	Parse(line string, f *ast.File, op *Operation) error
 }
 
 type standardRegistry struct {
@@ -36,7 +37,7 @@ func (r *standardRegistry) Register(c Comment) {
 	r.comments[c.Tag()] = c
 }
 
-func (r *standardRegistry) Parse(line string, op *Operation) error {
+func (r *standardRegistry) Parse(line string, f *ast.File, op *Operation) error {
 	matches := commentPattern.FindStringSubmatch(line)
 	if len(matches) < 3 {
 		return nil
@@ -45,7 +46,7 @@ func (r *standardRegistry) Parse(line string, op *Operation) error {
 	content := matches[2]
 
 	if handler, ok := r.comments[tag]; ok {
-		return handler.ParseInto(content, op)
+		return handler.ParseInto(content, f, op)
 	}
 	slog.Warn("unknown operation tag", "tag", tag)
 	return nil

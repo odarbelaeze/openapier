@@ -2,6 +2,7 @@ package operation
 
 import (
 	"fmt"
+	"go/ast"
 	"regexp"
 )
 
@@ -21,7 +22,7 @@ func NewRouterComment() *routerComment {
 }
 
 // ParseInto implements [Comment].
-func (r routerComment) ParseInto(c string, op *Operation) error {
+func (r routerComment) ParseInto(c string, f *ast.File, op *Operation) error {
 	matches := routerPattern.FindStringSubmatch(c)
 	if len(matches) != 3 {
 		return fmt.Errorf("invalid router comment format: %s", c)

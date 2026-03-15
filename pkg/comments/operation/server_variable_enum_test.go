@@ -66,7 +66,7 @@ func TestServerVariableEnumComment_ParseInto(t *testing.T) {
 				op.Builder.AddServers(openapi.NewServerBuilder().URL("https://example.com:{port}").Build())
 			}
 
-			err := comment.ParseInto(tt.content, op)
+			err := comment.ParseInto(tt.content, nil, op)
 
 			if tt.expectError != "" {
 				require.Error(t, err)
@@ -97,10 +97,10 @@ func TestServerVariableEnumComment_ParseInto_MultipleAppends(t *testing.T) {
 
 	op.Builder.AddServers(openapi.NewServerBuilder().URL("https://example.com:{port}").Build())
 
-	err1 := comment.ParseInto("port 8080", op)
+	err1 := comment.ParseInto("port 8080", nil, op)
 	require.NoError(t, err1)
 
-	err2 := comment.ParseInto("port 8443", op)
+	err2 := comment.ParseInto("port 8443", nil, op)
 	require.NoError(t, err2)
 
 	vars := op.Builder.Build().Spec.Servers[0].Spec.Variables

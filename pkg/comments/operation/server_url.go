@@ -1,6 +1,7 @@
 package operation
 
 import (
+	"go/ast"
 	"strings"
 
 	"github.com/sv-tools/openapi"
@@ -26,7 +27,7 @@ func (c *ServerURLComment) Usage() string {
 }
 
 // ParseInto implements Comment.
-func (c *ServerURLComment) ParseInto(content string, op *Operation) error {
+func (c *ServerURLComment) ParseInto(content string, f *ast.File, op *Operation) error {
 	url := strings.TrimSpace(content)
 	if url == "" {
 		return nil

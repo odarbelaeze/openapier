@@ -2,6 +2,7 @@ package operation
 
 import (
 	"fmt"
+	"go/ast"
 	"strings"
 
 	"github.com/odarbelaeze/openapier/pkg/schema"
@@ -27,7 +28,7 @@ func (c *RequestBodyComment) Usage() string {
 	return "@requestBody <content_type> <type> [description]"
 }
 
-func (c *RequestBodyComment) ParseInto(content string, op *Operation) error {
+func (c *RequestBodyComment) ParseInto(content string, f *ast.File, op *Operation) error {
 	fields := strings.Fields(content)
 	if len(fields) < 2 {
 		return fmt.Errorf("invalid @requestBody format, expected: %s", c.Usage())

@@ -73,7 +73,7 @@ func TestServerVariableDescriptionComment_ParseInto(t *testing.T) {
 				op.Builder.AddServers(openapi.NewServerBuilder().URL("https://example.com:{port}").Build())
 			}
 
-			err := comment.ParseInto(tt.content, op)
+			err := comment.ParseInto(tt.content, nil, op)
 
 			if tt.expectError != "" {
 				require.Error(t, err)
@@ -101,7 +101,7 @@ func TestServerVariableDescriptionComment_ParseInto_PreservesExisting(t *testing
 	serverBuilder.AddVariable("port", openapi.NewServerVariableBuilder().Default("8080").Build())
 	op.Builder.AddServers(serverBuilder.Build())
 
-	err := comment.ParseInto("port API Port", op)
+	err := comment.ParseInto("port API Port", nil, op)
 	require.NoError(t, err)
 
 	vars := op.Builder.Build().Spec.Servers[0].Spec.Variables

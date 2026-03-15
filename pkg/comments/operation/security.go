@@ -1,6 +1,7 @@
 package operation
 
 import (
+	"go/ast"
 	"strings"
 
 	"github.com/sv-tools/openapi"
@@ -25,7 +26,7 @@ func (d *SecurityComment) Usage() string {
 	return "@security <name> [scope1] [scope2] ..."
 }
 
-func (d *SecurityComment) ParseInto(content string, op *Operation) error {
+func (d *SecurityComment) ParseInto(content string, f *ast.File, op *Operation) error {
 	parts := strings.Fields(content)
 	if len(parts) == 0 {
 		return nil

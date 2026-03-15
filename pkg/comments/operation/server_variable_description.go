@@ -2,6 +2,7 @@ package operation
 
 import (
 	"errors"
+	"go/ast"
 	"strings"
 
 	"github.com/sv-tools/openapi"
@@ -27,7 +28,7 @@ func (c *ServerVariableDescriptionComment) Usage() string {
 }
 
 // ParseInto implements Comment.
-func (c *ServerVariableDescriptionComment) ParseInto(content string, op *Operation) error {
+func (c *ServerVariableDescriptionComment) ParseInto(content string, f *ast.File, op *Operation) error {
 	parts := strings.SplitN(strings.TrimSpace(content), " ", 2)
 	if len(parts) != 2 {
 		return errors.New("invalid format for @server.variable.description, expected: <variable> <description>")

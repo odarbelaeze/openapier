@@ -2,6 +2,7 @@ package operation
 
 import (
 	"fmt"
+	"go/ast"
 	"strings"
 )
 
@@ -24,7 +25,7 @@ func (c *ParamDescriptionComment) Usage() string {
 	return "@param.description <name> <description>"
 }
 
-func (c *ParamDescriptionComment) ParseInto(content string, op *Operation) error {
+func (c *ParamDescriptionComment) ParseInto(content string, f *ast.File, op *Operation) error {
 	fields := strings.Fields(content)
 	if len(fields) < 2 {
 		return fmt.Errorf("invalid @param.description format, expected: %s", c.Usage())

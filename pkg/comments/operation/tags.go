@@ -1,6 +1,7 @@
 package operation
 
 import (
+	"go/ast"
 	"strings"
 )
 
@@ -23,7 +24,7 @@ func (c *TagsComment) Usage() string {
 	return "@tags <tag1> [tag2]..."
 }
 
-func (c *TagsComment) ParseInto(content string, op *Operation) error {
+func (c *TagsComment) ParseInto(content string, f *ast.File, op *Operation) error {
 	fields := strings.Fields(content)
 	if len(fields) > 0 {
 		op.Builder.AddTags(fields...)

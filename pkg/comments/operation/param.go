@@ -2,6 +2,7 @@ package operation
 
 import (
 	"fmt"
+	"go/ast"
 	"strings"
 
 	"github.com/odarbelaeze/openapier/pkg/schema"
@@ -27,7 +28,7 @@ func (c *ParamComment) Usage() string {
 	return "@param <name> <type> <in>"
 }
 
-func (c *ParamComment) ParseInto(content string, op *Operation) error {
+func (c *ParamComment) ParseInto(content string, f *ast.File, op *Operation) error {
 	fields := strings.Fields(content)
 	if len(fields) < 3 {
 		return fmt.Errorf("invalid @param format, expected: %s", c.Usage())

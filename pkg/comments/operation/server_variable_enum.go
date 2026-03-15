@@ -2,6 +2,7 @@ package operation
 
 import (
 	"errors"
+	"go/ast"
 	"strings"
 
 	"github.com/sv-tools/openapi"
@@ -27,7 +28,7 @@ func (c *ServerVariableEnumComment) Usage() string {
 }
 
 // ParseInto implements Comment.
-func (c *ServerVariableEnumComment) ParseInto(content string, op *Operation) error {
+func (c *ServerVariableEnumComment) ParseInto(content string, f *ast.File, op *Operation) error {
 	parts := strings.Fields(content)
 	if len(parts) < 1 { // Variable name is implicitly required, further values are optional in parser logic but swaggo prefers it
 		return nil

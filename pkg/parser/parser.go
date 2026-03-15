@@ -143,7 +143,7 @@ func (p *parser) parseOperations(root string, spec *openapi.Extendable[openapi.O
 					return false
 				}
 				for _, comment := range function.Doc.List {
-					err = p.operationRegistry.Parse(comment.Text, operation)
+					err = p.operationRegistry.Parse(comment.Text, node, operation)
 					if err != nil {
 						opErr = err
 						return false

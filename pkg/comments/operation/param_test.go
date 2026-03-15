@@ -58,7 +58,7 @@ func TestParamComment(t *testing.T) {
 				Builder: openapi.NewOperationBuilder(),
 			}
 
-			err := comment.ParseInto(tt.content, op)
+			err := comment.ParseInto(tt.content, nil, op)
 			if tt.expectError {
 				require.Error(t, err)
 			} else {

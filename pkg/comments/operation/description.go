@@ -1,6 +1,7 @@
 package operation
 
 import (
+	"go/ast"
 	"strings"
 )
 
@@ -23,7 +24,7 @@ func (c *DescriptionComment) Usage() string {
 	return "@description <description>"
 }
 
-func (c *DescriptionComment) ParseInto(content string, op *Operation) error {
+func (c *DescriptionComment) ParseInto(content string, f *ast.File, op *Operation) error {
 	desc := strings.TrimSpace(content)
 	if desc != "" {
 		op.Builder.Description(desc)

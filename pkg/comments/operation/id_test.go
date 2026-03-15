@@ -43,7 +43,7 @@ func TestIDComment(t *testing.T) {
 				Builder: openapi.NewOperationBuilder(),
 			}
 
-			err := comment.ParseInto(tt.content, op)
+			err := comment.ParseInto(tt.content, nil, op)
 			require.NoError(t, err)
 
 			assert.Equal(t, tt.expected, op.Builder.Build().Spec.OperationID)

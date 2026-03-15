@@ -1,6 +1,7 @@
 package operation
 
 import (
+	"go/ast"
 	"strings"
 
 	"github.com/sv-tools/openapi"
@@ -25,7 +26,7 @@ func (c *ExternalDocsDescriptionComment) Usage() string {
 	return "@externalDocs.description <description>"
 }
 
-func (c *ExternalDocsDescriptionComment) ParseInto(content string, op *Operation) error {
+func (c *ExternalDocsDescriptionComment) ParseInto(content string, f *ast.File, op *Operation) error {
 	desc := strings.TrimSpace(content)
 	if desc != "" {
 		if op.Builder.Build().Spec.ExternalDocs == nil {

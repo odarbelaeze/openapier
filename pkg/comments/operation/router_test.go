@@ -53,7 +53,7 @@ func TestRouterComment_ParseInto(t *testing.T) {
 			op := operation.NewOperation()
 			comment := operation.NewRouterComment()
 
-			err := comment.ParseInto(tt.comment, op)
+			err := comment.ParseInto(tt.comment, nil, op)
 
 			if tt.expectedError != "" {
 				assert.EqualError(t, err, tt.expectedError)
@@ -79,7 +79,7 @@ func TestRouterComment_Usage(t *testing.T) {
 
 func TestRouterComment_Integration(t *testing.T) {
 	op := operation.NewOperation()
-	err := operation.DefaultRegistry.Parse("// @router /user [get]", op)
+	err := operation.DefaultRegistry.Parse("// @router /user [get]", nil, op)
 	require.NoError(t, err)
 
 	require.Len(t, op.Routes, 1)

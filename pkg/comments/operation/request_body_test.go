@@ -59,7 +59,7 @@ func TestRequestBodyComment(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			op := operation.NewOperation()
-			err := comment.ParseInto(tt.content, op)
+			err := comment.ParseInto(tt.content, nil, op)
 			if tt.expectError {
 				require.Error(t, err)
 			} else {

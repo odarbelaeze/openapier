@@ -21,7 +21,7 @@ func TestDeprecatedComment(t *testing.T) {
 
 	assert.False(t, op.Builder.Build().Spec.Deprecated)
 
-	err := comment.ParseInto("", op)
+	err := comment.ParseInto("", nil, op)
 	require.NoError(t, err)
 
 	assert.True(t, op.Builder.Build().Spec.Deprecated)

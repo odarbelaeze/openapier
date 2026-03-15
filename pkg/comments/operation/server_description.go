@@ -2,6 +2,7 @@ package operation
 
 import (
 	"errors"
+	"go/ast"
 	"strings"
 )
 
@@ -25,7 +26,7 @@ func (c *ServerDescriptionComment) Usage() string {
 }
 
 // ParseInto implements Comment.
-func (c *ServerDescriptionComment) ParseInto(content string, op *Operation) error {
+func (c *ServerDescriptionComment) ParseInto(content string, f *ast.File, op *Operation) error {
 	desc := strings.TrimSpace(content)
 	if desc == "" {
 		return nil

@@ -48,7 +48,7 @@ func TestTagsComment(t *testing.T) {
 				Builder: openapi.NewOperationBuilder(),
 			}
 
-			err := comment.ParseInto(tt.content, op)
+			err := comment.ParseInto(tt.content, nil, op)
 			require.NoError(t, err)
 
 			actual := op.Builder.Build().Spec.Tags
@@ -68,10 +68,10 @@ func TestTagsComment_MultipleAppends(t *testing.T) {
 		Builder: openapi.NewOperationBuilder(),
 	}
 
-	err1 := comment.ParseInto("users", op)
+	err1 := comment.ParseInto("users", nil, op)
 	require.NoError(t, err1)
 
-	err2 := comment.ParseInto("admins auth", op)
+	err2 := comment.ParseInto("admins auth", nil, op)
 	require.NoError(t, err2)
 
 	assert.Equal(t, []string{"users", "admins", "auth"}, op.Builder.Build().Spec.Tags)

@@ -1,6 +1,7 @@
 package operation
 
 import (
+	"go/ast"
 	"strings"
 
 	"github.com/sv-tools/openapi"
@@ -25,7 +26,7 @@ func (c *ExternalDocsURLComment) Usage() string {
 	return "@externalDocs.url <url>"
 }
 
-func (c *ExternalDocsURLComment) ParseInto(content string, op *Operation) error {
+func (c *ExternalDocsURLComment) ParseInto(content string, f *ast.File, op *Operation) error {
 	url := strings.TrimSpace(content)
 	if url != "" {
 		if op.Builder.Build().Spec.ExternalDocs == nil {

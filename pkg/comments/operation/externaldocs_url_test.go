@@ -59,7 +59,7 @@ func TestExternalDocsURLComment(t *testing.T) {
 				op.Builder.ExternalDocs(openapi.NewExternalDocsBuilder().Description("Existing description").Build())
 			}
 
-			err := comment.ParseInto(tt.content, op)
+			err := comment.ParseInto(tt.content, nil, op)
 			require.NoError(t, err)
 
 			actual := op.Builder.Build().Spec.ExternalDocs

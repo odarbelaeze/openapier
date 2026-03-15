@@ -1,6 +1,7 @@
 package operation
 
 import (
+	"go/ast"
 	"strings"
 )
 
@@ -23,7 +24,7 @@ func (c *SummaryComment) Usage() string {
 	return "@summary <summary>"
 }
 
-func (c *SummaryComment) ParseInto(content string, op *Operation) error {
+func (c *SummaryComment) ParseInto(content string, f *ast.File, op *Operation) error {
 	summary := strings.TrimSpace(content)
 	if summary != "" {
 		op.Builder.Summary(summary)

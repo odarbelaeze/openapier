@@ -2,6 +2,7 @@ package operation
 
 import (
 	"fmt"
+	"go/ast"
 	"strings"
 
 	"github.com/sv-tools/openapi"
@@ -21,7 +22,7 @@ func (c *paramBoolComment) Usage() string {
 	return fmt.Sprintf("@%s <param> [param]...", c.tag)
 }
 
-func (c *paramBoolComment) ParseInto(content string, op *Operation) error {
+func (c *paramBoolComment) ParseInto(content string, f *ast.File, op *Operation) error {
 	fields := strings.Fields(content)
 	if len(fields) == 0 {
 		return fmt.Errorf("invalid @%s format, expected: %s", c.tag, c.Usage())

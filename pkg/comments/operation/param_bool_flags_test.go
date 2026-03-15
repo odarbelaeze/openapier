@@ -119,7 +119,7 @@ func TestParamBoolFlags(t *testing.T) {
 
 			op := tt.setupOp()
 
-			err := tt.comment.ParseInto(tt.content, op)
+			err := tt.comment.ParseInto(tt.content, nil, op)
 			if tt.expectError {
 				require.Error(t, err)
 			} else {

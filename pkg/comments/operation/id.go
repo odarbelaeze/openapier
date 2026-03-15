@@ -1,6 +1,7 @@
 package operation
 
 import (
+	"go/ast"
 	"strings"
 )
 
@@ -23,7 +24,7 @@ func (c *IDComment) Usage() string {
 	return "@id <operationId>"
 }
 
-func (c *IDComment) ParseInto(content string, op *Operation) error {
+func (c *IDComment) ParseInto(content string, f *ast.File, op *Operation) error {
 	id := strings.TrimSpace(content)
 	if id != "" {
 		op.Builder.OperationID(id)

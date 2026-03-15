@@ -49,7 +49,7 @@ func TestServerURLComment_ParseInto(t *testing.T) {
 				Builder: openapi.NewOperationBuilder(),
 			}
 
-			err := comment.ParseInto(tt.content, op)
+			err := comment.ParseInto(tt.content, nil, op)
 			require.NoError(t, err)
 
 			actualServers := op.Builder.Build().Spec.Servers
@@ -71,10 +71,10 @@ func TestServerURLComment_ParseInto_Multiple(t *testing.T) {
 		Builder: openapi.NewOperationBuilder(),
 	}
 
-	err1 := comment.ParseInto("https://dev.example.com", op)
+	err1 := comment.ParseInto("https://dev.example.com", nil, op)
 	require.NoError(t, err1)
 
-	err2 := comment.ParseInto("https://prod.example.com", op)
+	err2 := comment.ParseInto("https://prod.example.com", nil, op)
 	require.NoError(t, err2)
 
 	actualServers := op.Builder.Build().Spec.Servers

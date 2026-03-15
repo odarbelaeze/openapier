@@ -1,5 +1,7 @@
 package operation
 
+import "go/ast"
+
 func init() {
 	Register(NewDeprecatedComment())
 }
@@ -19,7 +21,7 @@ func (c *DeprecatedComment) Usage() string {
 	return "@deprecated"
 }
 
-func (c *DeprecatedComment) ParseInto(content string, op *Operation) error {
+func (c *DeprecatedComment) ParseInto(content string, f *ast.File, op *Operation) error {
 	op.Builder.Deprecated(true)
 	return nil
 }

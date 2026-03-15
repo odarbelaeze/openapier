@@ -61,7 +61,7 @@ func TestParamDescriptionComment(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			op := tt.setupOp()
 
-			err := comment.ParseInto(tt.content, op)
+			err := comment.ParseInto(tt.content, nil, op)
 			if tt.expectError {
 				require.Error(t, err)
 			} else {

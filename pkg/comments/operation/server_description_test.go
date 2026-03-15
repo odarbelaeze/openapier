@@ -68,7 +68,7 @@ func TestServerDescriptionComment_ParseInto(t *testing.T) {
 				op.Builder.AddServers(openapi.NewServerBuilder().URL("https://example.com").Build())
 			}
 
-			err := comment.ParseInto(tt.content, op)
+			err := comment.ParseInto(tt.content, nil, op)
 
 			if tt.expectError {
 				require.Error(t, err)
@@ -94,7 +94,7 @@ func TestServerDescriptionComment_ParseInto_AppliesToLastServer(t *testing.T) {
 		openapi.NewServerBuilder().URL("https://prod.example.com").Build(),
 	)
 
-	err := comment.ParseInto("Production API", op)
+	err := comment.ParseInto("Production API", nil, op)
 	require.NoError(t, err)
 
 	actualServers := op.Builder.Build().Spec.Servers

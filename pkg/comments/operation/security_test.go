@@ -57,7 +57,7 @@ func TestSecurityComment_ParseInto(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			comment := operation.NewSecurityComment()
 			op := operation.NewOperation()
-			err := comment.ParseInto(tt.line, op)
+			err := comment.ParseInto(tt.line, nil, op)
 
 			require.NoError(t, err)
 
@@ -74,9 +74,9 @@ func TestSecurityComment_ParseInto(t *testing.T) {
 
 func TestSecurityComment_Integration(t *testing.T) {
 	op := operation.NewOperation()
-	err1 := operation.DefaultRegistry.Parse("// @security apiKey", op)
+	err1 := operation.DefaultRegistry.Parse("// @security apiKey", nil, op)
 	require.NoError(t, err1)
-	err2 := operation.DefaultRegistry.Parse("// @security oauth2 read:users write:users", op)
+	err2 := operation.DefaultRegistry.Parse("// @security oauth2 read:users write:users", nil, op)
 	require.NoError(t, err2)
 
 	spec := op.Builder.Build()
