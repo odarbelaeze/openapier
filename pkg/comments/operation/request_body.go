@@ -44,7 +44,7 @@ func (c *RequestBodyComment) ParseInto(content string, f *ast.File, op *Operatio
 		description = strings.TrimSpace(content[strings.Index(content, typ)+len(typ):])
 	}
 
-	s := schema.ParseType(typ)
+	s := schema.ParseBasicType(typ)
 	mediaType := openapi.NewMediaTypeBuilder().Schema(s).Build()
 	requestBody := openapi.NewRequestBodyBuilder().
 		Required(true).

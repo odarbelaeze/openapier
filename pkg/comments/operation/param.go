@@ -37,7 +37,7 @@ func (c *ParamComment) ParseInto(content string, f *ast.File, op *Operation) err
 	typ := fields[1]
 	in := fields[2]
 
-	paramSchema := schema.ParseType(typ)
+	paramSchema := schema.ParseBasicType(typ)
 
 	builder := openapi.NewParameterBuilder().
 		Name(name).

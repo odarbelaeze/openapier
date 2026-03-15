@@ -28,7 +28,7 @@ type Resolver interface {
 	Collect(path string, file *ast.File)
 
 	// Resolve resolves the given type into a schema.
-	Resolve(typeName string, file *ast.File) (*openapi.Ref, error)
+	Resolve(typeName string, file *ast.File) (*openapi.RefOrSpec[openapi.Schema], error)
 
 	// Definitions returns the definitions that have been resolved.
 	Definitions() map[string]*openapi.RefOrSpec[openapi.Schema]
@@ -89,7 +89,25 @@ func (r *resolver) Definitions() map[string]*openapi.RefOrSpec[openapi.Schema] {
 }
 
 // Resolve implements [Resolver].
-func (r *resolver) Resolve(typeName string, file *ast.File) (*openapi.Ref, error) {
+func (r *resolver) Resolve(typeName string, file *ast.File) (*openapi.RefOrSpec[openapi.Schema], error) {
+	if strings.HasPrefix(typeName, "[]") {
+		itemTypeName := typeName[2:]
+		itemRef, err := r.Resolve(itemTypeName, file)
+		if err != nil {
+			return nil, fmt.Errorf("failed to resolve item type: %w", err)
+		}
+		return openapi.
+			NewSchemaBuilder().
+			AddType("array").
+			Items(openapi.NewBoolOrSchema(itemRef)).
+			Build(), nil
+	}
+
+	basicSchema := ParseBasicType(typeName)
+	if basicSchema != nil {
+		return basicSchema, nil
+	}
+
 	candidates, err := r.candidates(typeName, file)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find any candidates: %w", err)
@@ -98,13 +116,13 @@ func (r *resolver) Resolve(typeName string, file *ast.File) (*openapi.Ref, error
 		schemasPath := fmt.Sprintf("#/components/schemas/%s", loc)
 		if _, ok := r.definitions[loc.Name]; !ok {
 			ref := openapi.NewRefOrSpec[openapi.Schema](schemasPath)
-			return ref.Ref, nil
+			return ref, nil
 		}
 		if t, ok := r.cache[loc.String()]; ok {
 			spec := r.spec(t)
 			r.definitions[schemasPath] = spec
 			ref := openapi.NewRefOrSpec[openapi.Schema](schemasPath)
-			return ref.Ref, nil
+			return ref, nil
 		}
 	}
 	return nil, fmt.Errorf("failed to resolve type: %s", typeName)

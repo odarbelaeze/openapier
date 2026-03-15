@@ -29,8 +29,7 @@ paths:
         options:
             requestBody:
                 content:
-                    application/json:
-                        schema: {}
+                    application/json: {}
                 description: The request body
                 required: true
     /GetPet5b:

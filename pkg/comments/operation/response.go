@@ -44,7 +44,7 @@ func (c *ResponseComment) ParseInto(content string, f *ast.File, op *Operation) 
 		description = strings.TrimSpace(content[strings.Index(content, typ)+len(typ):])
 	}
 
-	s := schema.ParseType(typ)
+	s := schema.ParseBasicType(typ)
 	mediaType := openapi.NewMediaTypeBuilder().Schema(s).Build()
 	response := openapi.NewResponseBuilder().
 		Description(description).

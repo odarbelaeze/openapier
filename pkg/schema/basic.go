@@ -1,21 +1,9 @@
 package schema
 
-import (
-	"strings"
+import "github.com/sv-tools/openapi"
 
-	"github.com/sv-tools/openapi"
-)
-
-// ParseType converts a string type representation to an OpenAPI schema object
-func ParseType(t string) *openapi.RefOrSpec[openapi.Schema] {
-	if strings.HasPrefix(t, "[]") {
-		return openapi.
-			NewSchemaBuilder().
-			AddType("array").
-			Items(openapi.NewBoolOrSchema(ParseType(t[2:]))).
-			Build()
-	}
-
+// ParseBasicType converts a string type representation to an OpenAPI schema object
+func ParseBasicType(t string) *openapi.RefOrSpec[openapi.Schema] {
 	b := openapi.NewSchemaBuilder()
 	switch t {
 	case "int", "int32", "uint", "uint32":
@@ -34,6 +22,9 @@ func ParseType(t string) *openapi.RefOrSpec[openapi.Schema] {
 		b.AddType("string").Format("binary")
 	case "any":
 		// empty schema for any
+	default:
+		// this is not a basic type, let the caller figure it out
+		return nil
 	}
 	return b.Build()
 }
