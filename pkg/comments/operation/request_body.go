@@ -5,7 +5,6 @@ import (
 	"go/ast"
 	"strings"
 
-	"github.com/odarbelaeze/openapier/pkg/schema"
 	"github.com/sv-tools/openapi"
 )
 
@@ -44,7 +43,11 @@ func (c *RequestBodyComment) ParseInto(content string, f *ast.File, op *Operatio
 		description = strings.TrimSpace(content[strings.Index(content, typ)+len(typ):])
 	}
 
-	s := schema.ParseBasicType(typ)
+	s, err := op.Resolver.Resolve(typ, f)
+	if err != nil {
+		return fmt.Errorf("failed to resolve type %q: %w", typ, err)
+	}
+
 	mediaType := openapi.NewMediaTypeBuilder().Schema(s).Build()
 	requestBody := openapi.NewRequestBodyBuilder().
 		Required(true).

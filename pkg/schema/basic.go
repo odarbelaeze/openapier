@@ -2,8 +2,8 @@ package schema
 
 import "github.com/sv-tools/openapi"
 
-// ParseBasicType converts a string type representation to an OpenAPI schema object
-func ParseBasicType(t string) *openapi.RefOrSpec[openapi.Schema] {
+// parseBasicType converts a string type representation to an OpenAPI schema object
+func parseBasicType(t string) *openapi.RefOrSpec[openapi.Schema] {
 	b := openapi.NewSchemaBuilder()
 	switch t {
 	case "int", "int32", "uint", "uint32":

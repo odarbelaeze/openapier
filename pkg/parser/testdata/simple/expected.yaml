@@ -1,3 +1,15 @@
+components:
+    schemas:
+        github_com_odarbelaeze_test_simple_api:api.Pet3:
+            properties:
+                field:
+                    type: string
+            type: object
+        github_com_odarbelaeze_test_simple_cross:cross.Cross:
+            properties:
+                field:
+                    type: string
+            type: object
 externalDocs:
     description: Find more info here
     url: http://www.swagger.io/support
@@ -29,13 +41,33 @@ paths:
         options:
             requestBody:
                 content:
-                    application/json: {}
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/github_com_odarbelaeze_test_simple_api:api.Pet3'
                 description: The request body
                 required: true
     /GetPet5b:
-        head: {}
+        head:
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            items:
+                                $ref: '#/components/schemas/github_com_odarbelaeze_test_simple_api:api.Pet3'
+                            type: array
+                description: The request body
+                required: true
     /GetPet5c:
-        patch: {}
+        patch:
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            items:
+                                $ref: '#/components/schemas/github_com_odarbelaeze_test_simple_cross:cross.Cross'
+                            type: array
+                description: The request body
+                required: true
     /GetPet6FunctionScopedComplexResponse:
         get: {}
     /GetPet6FunctionScopedResponse:

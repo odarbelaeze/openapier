@@ -5,7 +5,6 @@ import (
 	"go/ast"
 	"strings"
 
-	"github.com/odarbelaeze/openapier/pkg/schema"
 	"github.com/sv-tools/openapi"
 )
 
@@ -37,7 +36,10 @@ func (c *ParamComment) ParseInto(content string, f *ast.File, op *Operation) err
 	typ := fields[1]
 	in := fields[2]
 
-	paramSchema := schema.ParseBasicType(typ)
+	paramSchema, err := op.Resolver.Resolve(typ, f)
+	if err != nil {
+		return fmt.Errorf("failed to resolve type %q: %w", typ, err)
+	}
 
 	builder := openapi.NewParameterBuilder().
 		Name(name).

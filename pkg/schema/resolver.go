@@ -96,14 +96,17 @@ func (r *resolver) Resolve(typeName string, file *ast.File) (*openapi.RefOrSpec[
 		if err != nil {
 			return nil, fmt.Errorf("failed to resolve item type: %w", err)
 		}
+		items := openapi.NewBoolOrSchema(itemRef)
+		// NOTE: Setting allowed to true here makes the tests pass
+		items.Allowed = true
 		return openapi.
 			NewSchemaBuilder().
 			AddType("array").
-			Items(openapi.NewBoolOrSchema(itemRef)).
+			Items(items).
 			Build(), nil
 	}
 
-	basicSchema := ParseBasicType(typeName)
+	basicSchema := parseBasicType(typeName)
 	if basicSchema != nil {
 		return basicSchema, nil
 	}
@@ -113,15 +116,15 @@ func (r *resolver) Resolve(typeName string, file *ast.File) (*openapi.RefOrSpec[
 		return nil, fmt.Errorf("failed to find any candidates: %w", err)
 	}
 	for _, loc := range candidates {
-		schemasPath := fmt.Sprintf("#/components/schemas/%s", loc)
-		if _, ok := r.definitions[loc.Name]; !ok {
-			ref := openapi.NewRefOrSpec[openapi.Schema](schemasPath)
+		schemaPath := fmt.Sprintf("#/components/schemas/%s", loc)
+		if _, ok := r.definitions[loc.String()]; ok {
+			ref := openapi.NewRefOrSpec[openapi.Schema](schemaPath)
 			return ref, nil
 		}
 		if t, ok := r.cache[loc.String()]; ok {
 			spec := r.spec(t)
-			r.definitions[schemasPath] = spec
-			ref := openapi.NewRefOrSpec[openapi.Schema](schemasPath)
+			r.definitions[loc.String()] = spec
+			ref := openapi.NewRefOrSpec[openapi.Schema](schemaPath)
 			return ref, nil
 		}
 	}

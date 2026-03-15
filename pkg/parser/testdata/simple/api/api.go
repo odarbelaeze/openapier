@@ -1,6 +1,10 @@
 package api
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/odarbelaeze/test/simple/cross"
+)
 
 // @summary Add a new pet to the store
 // @description get string by ID
@@ -82,20 +86,22 @@ type Pet3 struct {
 	ID int `json:"id"`
 }
 
-// @router /GetPet5a [options]
 // @requestBody application/json Pet3 The request body
+// @router /GetPet5a [options]
 func GetPet5a() {
 
 }
 
+// @requestBody application/json []Pet3 The request body
 // @router /GetPet5b [head]
 func GetPet5b() {
 
 }
 
+// @requestBody application/json []cross.Cross The request body
 // @router /GetPet5c [patch]
 func GetPet5c() {
-
+	_ = cross.Cross{}
 }
 
 type SwagReturn []map[string]string
