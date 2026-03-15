@@ -11,7 +11,7 @@ import (
 	"github.com/sv-tools/openapi"
 )
 
-type TypeDef struct {
+type typeDef struct {
 	// TypeSpec is the type specification of the type definition.
 	TypeSpec *ast.TypeSpec
 
@@ -19,7 +19,7 @@ type TypeDef struct {
 	File *ast.File
 
 	// Locator is the locator of the type definition.
-	Locator *Locator
+	Locator *locator
 }
 
 // Resolves types into a schema.
@@ -38,8 +38,8 @@ type resolver struct {
 	// definitions is a map of the definitions that have been resolved.
 	definitions map[string]*openapi.RefOrSpec[openapi.Schema]
 
-	// cache is a map of locators to type definitions.
-	cache map[string]*TypeDef
+	// cacheByPkg maps package names to type names to type definitions.
+	cacheByPkg map[string]map[string]*typeDef
 
 	// loaded is a set of package paths that have been loaded.
 	loaded map[string]struct{}
@@ -49,7 +49,7 @@ type resolver struct {
 func NewResolver() Resolver {
 	return &resolver{
 		definitions: make(map[string]*openapi.RefOrSpec[openapi.Schema]),
-		cache:       make(map[string]*TypeDef),
+		cacheByPkg:  make(map[string]map[string]*typeDef),
 		loaded:      make(map[string]struct{}),
 	}
 }
@@ -66,17 +66,22 @@ func (r *resolver) Collect(path string, file *ast.File) {
 			if !ok {
 				continue
 			}
-			locator := Locator{
+			locator := locator{
 				Path:    path,
 				Package: file.Name.Name,
 				Name:    typeSpec.Name.Name,
 			}
 			slog.Debug("caching type definition", "locator", locator)
-			r.cache[locator.String()] = &TypeDef{
+			def := &typeDef{
 				TypeSpec: typeSpec,
 				File:     file,
 				Locator:  &locator,
 			}
+			
+			if r.cacheByPkg[locator.Package] == nil {
+				r.cacheByPkg[locator.Package] = make(map[string]*typeDef)
+			}
+			r.cacheByPkg[locator.Package][locator.Name] = def
 		}
 	}
 	// Mark the path as loaded.
@@ -121,33 +126,36 @@ func (r *resolver) Resolve(typeName string, file *ast.File) (*openapi.RefOrSpec[
 			ref := openapi.NewRefOrSpec[openapi.Schema](schemaPath)
 			return ref, nil
 		}
-		if t, ok := r.cache[loc.String()]; ok {
-			spec := r.spec(t)
-			r.definitions[loc.String()] = spec
-			ref := openapi.NewRefOrSpec[openapi.Schema](schemaPath)
-			return ref, nil
+		if pkgCache, pkgOk := r.cacheByPkg[loc.Package]; pkgOk {
+			if t, ok := pkgCache[loc.Name]; ok {
+				spec := r.spec(t)
+				r.definitions[loc.String()] = spec
+				ref := openapi.NewRefOrSpec[openapi.Schema](schemaPath)
+				return ref, nil
+			}
 		}
 	}
 	return nil, fmt.Errorf("failed to resolve type: %s", typeName)
 }
 
-func (r *resolver) candidates(typeName string, file *ast.File) ([]*Locator, error) {
-	var candidates []*Locator
+func (r *resolver) candidates(typeName string, file *ast.File) ([]*locator, error) {
+	var candidates []*locator
 
 	parts := strings.Split(typeName, ".")
 	var pkgName, name string
-	loc := &Locator{}
+	loc := &locator{}
 
 	if len(parts) == 1 {
 		pkgName = file.Name.Name
 		name = parts[0]
-		for _, def := range r.cache {
-			if def.File == file {
+		if pkgCache, ok := r.cacheByPkg[pkgName]; ok {
+			if def, ok := pkgCache[name]; ok {
 				loc.Path = def.Locator.Path
-				break
-			}
-			if def.Locator.Package == pkgName {
-				loc.Path = def.Locator.Path
+			} else {
+				for _, def := range pkgCache {
+					loc.Path = def.Locator.Path
+					break
+				}
 			}
 		}
 	} else if len(parts) == 2 {
@@ -185,7 +193,7 @@ func (r *resolver) loadExternal(importPath string) {
 	slog.Debug("loading external package", "importPath", importPath)
 }
 
-func (r *resolver) spec(t *TypeDef) *openapi.RefOrSpec[openapi.Schema] {
+func (r *resolver) spec(t *typeDef) *openapi.RefOrSpec[openapi.Schema] {
 	slog.Debug("finding spec for", "typeName", t.TypeSpec.Name.Name)
 	return openapi.NewSchemaBuilder().
 		AddType("object").

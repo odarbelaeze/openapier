@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-type Locator struct {
+type locator struct {
 	// Path is the path to the type.
 	Path string
 
@@ -16,7 +16,7 @@ type Locator struct {
 	Name string
 }
 
-func (l Locator) String() string {
+func (l locator) String() string {
 	prefix := strings.ReplaceAll(l.Path, "/", "_")
 	prefix = strings.ReplaceAll(prefix, ".", "_")
 	return fmt.Sprintf("%s:%s.%s", prefix, l.Package, l.Name)
