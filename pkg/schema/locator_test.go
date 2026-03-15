@@ -1,7 +1,6 @@
 package schema_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/odarbelaeze/openapier/pkg/schema"
@@ -26,7 +25,7 @@ func TestLocator_String(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := fmt.Sprintf("%s", tt.locator)
+			got := tt.locator.String()
 			assert.Equal(t, tt.want, got)
 		})
 	}

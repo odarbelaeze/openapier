@@ -26,7 +26,13 @@ paths:
         get:
             summary: Use CrossAlias
     /GetPet5a:
-        options: {}
+        options:
+            requestBody:
+                content:
+                    application/json:
+                        schema: {}
+                description: The request body
+                required: true
     /GetPet5b:
         head: {}
     /GetPet5c:

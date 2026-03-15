@@ -40,6 +40,9 @@ type resolver struct {
 
 	// cache is a map of locators to type definitions.
 	cache map[string]*TypeDef
+
+	// loaded is a set of package paths that have been loaded.
+	loaded map[string]struct{}
 }
 
 // NewResolver creates a new resolver.
@@ -47,6 +50,7 @@ func NewResolver() Resolver {
 	return &resolver{
 		definitions: make(map[string]*openapi.RefOrSpec[openapi.Schema]),
 		cache:       make(map[string]*TypeDef),
+		loaded:      make(map[string]struct{}),
 	}
 }
 
@@ -75,6 +79,8 @@ func (r *resolver) Collect(path string, file *ast.File) {
 			}
 		}
 	}
+	// Mark the path as loaded.
+	r.loaded[path] = struct{}{}
 }
 
 // Definitions implements [Resolver].
@@ -91,6 +97,12 @@ func (r *resolver) Resolve(typeName string, file *ast.File) (*openapi.Ref, error
 	for _, loc := range candidates {
 		schemasPath := fmt.Sprintf("#/components/schemas/%s", loc)
 		if _, ok := r.definitions[loc.Name]; !ok {
+			ref := openapi.NewRefOrSpec[openapi.Schema](schemasPath)
+			return ref.Ref, nil
+		}
+		if t, ok := r.cache[loc.String()]; ok {
+			spec := r.spec(t)
+			r.definitions[schemasPath] = spec
 			ref := openapi.NewRefOrSpec[openapi.Schema](schemasPath)
 			return ref.Ref, nil
 		}
@@ -125,6 +137,9 @@ func (r *resolver) candidates(typeName string, file *ast.File) ([]*Locator, erro
 				continue
 			}
 			importPath := strings.Trim(imp.Path.Value, `"`)
+			if _, ok := r.loaded[importPath]; !ok {
+				r.loadExternal(importPath)
+			}
 			if imp.Name != nil && imp.Name.Name == pkgName {
 				loc.Path = importPath
 				break
@@ -143,4 +158,16 @@ func (r *resolver) candidates(typeName string, file *ast.File) ([]*Locator, erro
 	candidates = append(candidates, loc)
 
 	return candidates, nil
+}
+
+func (r *resolver) loadExternal(importPath string) {
+	slog.Debug("loading external package", "importPath", importPath)
+}
+
+func (r *resolver) spec(t *TypeDef) *openapi.RefOrSpec[openapi.Schema] {
+	slog.Debug("finding spec for", "typeName", t.TypeSpec.Name.Name)
+	return openapi.NewSchemaBuilder().
+		AddType("object").
+		AddProperty("field", openapi.NewSchemaBuilder().AddType("string").Build()).
+		Build()
 }

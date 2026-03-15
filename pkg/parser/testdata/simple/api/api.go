@@ -83,6 +83,7 @@ type Pet3 struct {
 }
 
 // @router /GetPet5a [options]
+// @requestBody application/json Pet3 The request body
 func GetPet5a() {
 
 }
