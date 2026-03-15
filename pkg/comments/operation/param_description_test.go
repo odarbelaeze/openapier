@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/odarbelaeze/openapier/pkg/comments/operation"
+	"github.com/odarbelaeze/openapier/pkg/schema"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/sv-tools/openapi"
@@ -26,7 +27,7 @@ func TestParamDescriptionComment(t *testing.T) {
 			name:    "valid param description",
 			content: "id the unique identifier of the item",
 			setupOp: func() *operation.Operation {
-				op := operation.NewOperation()
+				op := operation.NewOperation(schema.NewResolver())
 				op.Builder.AddParameters(openapi.NewParameterBuilder().Name("id").Build())
 				return op
 			},
@@ -41,7 +42,7 @@ func TestParamDescriptionComment(t *testing.T) {
 			name:    "parameter not found",
 			content: "limit the maximum number of items",
 			setupOp: func() *operation.Operation {
-				op := operation.NewOperation()
+				op := operation.NewOperation(schema.NewResolver())
 				op.Builder.AddParameters(openapi.NewParameterBuilder().Name("id").Build())
 				return op
 			},
@@ -51,7 +52,7 @@ func TestParamDescriptionComment(t *testing.T) {
 			name:    "invalid format",
 			content: "id",
 			setupOp: func() *operation.Operation {
-				return operation.NewOperation()
+				return operation.NewOperation(schema.NewResolver())
 			},
 			expectError: true,
 		},

@@ -5,13 +5,14 @@ import (
 	"testing"
 
 	"github.com/odarbelaeze/openapier/pkg/comments/operation"
+	"github.com/odarbelaeze/openapier/pkg/schema"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/sv-tools/openapi"
 )
 
 func TestNewOperation(t *testing.T) {
-	op := operation.NewOperation()
+	op := operation.NewOperation(schema.NewResolver())
 	assert.NotNil(t, op)
 	assert.NotNil(t, op.Builder)
 	assert.NotNil(t, op.Routes)
@@ -89,7 +90,7 @@ func TestOperation_Attach(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			op := operation.NewOperation()
+			op := operation.NewOperation(schema.NewResolver())
 			op.Routes = tt.routes
 			if tt.setupBuilder != nil {
 				tt.setupBuilder(op.Builder)

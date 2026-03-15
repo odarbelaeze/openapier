@@ -62,12 +62,12 @@ func (p *parser) Parse(root string, main string) (*openapi.Extendable[openapi.Op
 		return nil, fmt.Errorf("failed to parse spec: %w", err)
 	}
 
-	_, err = p.parseTypes(root)
+	resolver, err := p.parseTypes(root)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse types: %w", err)
 	}
 
-	err = p.parseOperations(root, spec)
+	err = p.parseOperations(root, resolver, spec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse operations: %w", err)
 	}
@@ -128,7 +128,7 @@ func (p *parser) parseTypes(root string) (schema.Resolver, error) {
 	return cache, nil
 }
 
-func (p *parser) parseOperations(root string, spec *openapi.Extendable[openapi.OpenAPI]) error {
+func (p *parser) parseOperations(root string, resolver schema.Resolver, spec *openapi.Extendable[openapi.OpenAPI]) error {
 	fileSet := token.NewFileSet()
 	err := p.walkGoFiles(root, func(path string) error {
 		node, err := goparser.ParseFile(fileSet, path, nil, goparser.ParseComments)
@@ -138,7 +138,7 @@ func (p *parser) parseOperations(root string, spec *openapi.Extendable[openapi.O
 		var opErr error
 		ast.Inspect(node, func(n ast.Node) bool {
 			if function, ok := n.(*ast.FuncDecl); ok {
-				operation := operation.NewOperation()
+				operation := operation.NewOperation(resolver)
 				if function.Doc == nil {
 					return false
 				}
@@ -165,6 +165,10 @@ func (p *parser) parseOperations(root string, spec *openapi.Extendable[openapi.O
 	})
 	if err != nil {
 		return fmt.Errorf("failed to walk directory: %w", err)
+	}
+	if len(resolver.Definitions()) > 0 {
+		spec.Spec.Components = openapi.NewComponents()
+		spec.Spec.Components.Spec.Schemas = resolver.Definitions()
 	}
 	return nil
 }

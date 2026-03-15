@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/odarbelaeze/openapier/pkg/comments/operation"
+	"github.com/odarbelaeze/openapier/pkg/schema"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/sv-tools/openapi"
@@ -56,7 +57,7 @@ func TestResponseComment(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			op := operation.NewOperation()
+			op := operation.NewOperation(schema.NewResolver())
 			err := comment.ParseInto(tt.content, nil, op)
 			if tt.expectError {
 				require.Error(t, err)

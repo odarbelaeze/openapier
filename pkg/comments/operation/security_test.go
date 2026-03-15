@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/odarbelaeze/openapier/pkg/comments/operation"
+	"github.com/odarbelaeze/openapier/pkg/schema"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/sv-tools/openapi"
@@ -56,7 +57,7 @@ func TestSecurityComment_ParseInto(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			comment := operation.NewSecurityComment()
-			op := operation.NewOperation()
+			op := operation.NewOperation(schema.NewResolver())
 			err := comment.ParseInto(tt.line, nil, op)
 
 			require.NoError(t, err)
@@ -73,7 +74,7 @@ func TestSecurityComment_ParseInto(t *testing.T) {
 }
 
 func TestSecurityComment_Integration(t *testing.T) {
-	op := operation.NewOperation()
+	op := operation.NewOperation(schema.NewResolver())
 	err1 := operation.DefaultRegistry.Parse("// @security apiKey", nil, op)
 	require.NoError(t, err1)
 	err2 := operation.DefaultRegistry.Parse("// @security oauth2 read:users write:users", nil, op)
