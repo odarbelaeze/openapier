@@ -24,6 +24,11 @@ func TestParser_Parse(t *testing.T) {
 			root: "./testdata/simple",
 			main: "main.go",
 		},
+		{
+			name: "should parse types in a spec",
+			root: "./testdata/types",
+			main: "main.go",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

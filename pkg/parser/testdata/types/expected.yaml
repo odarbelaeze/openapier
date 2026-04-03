@@ -1,0 +1,58 @@
+components:
+  schemas:
+    github_com_odarbelaeze_test_types:main.CreateTodoPayload:
+      properties:
+        Title:
+          type: string
+      type: object
+    github_com_odarbelaeze_test_types:main.PaginatedTodos:
+      properties:
+        Meta:
+          $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.Pagination'
+        Todos:
+          items:
+            $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.Todo'
+          type: array
+      type: object
+    github_com_odarbelaeze_test_types:main.Pagination:
+      properties:
+        Cursor:
+          type: string
+        HasMore:
+          type: boolean
+      type: object
+    github_com_odarbelaeze_test_types:main.Todo:
+      properties:
+        Completed:
+          type: string
+        ID:
+          type: string
+        Title:
+          type: string
+      type: object
+info:
+  description: This is a sample API that exposes types.
+  termsOfService: http://swagger.io/terms/
+  title: API that exposes types
+  version: "1.0"
+jsonSchemaDialect: https://spec.openapis.org/oas/3.1/dialect/base
+openapi: 3.1.1
+paths:
+  /todos:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.CreateTodoPayload'
+        description: The payload to create the todo
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.Todo'
+          description: The recently created todo
+      summary: List todos
+

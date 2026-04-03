@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"log/slog"
@@ -43,11 +44,14 @@ func main() {
 			if err != nil {
 				return fmt.Errorf("failed to parse: %w", err)
 			}
-			bytes, err := yaml.Marshal(spec)
+			var buff bytes.Buffer
+			encoder := yaml.NewEncoder(&buff)
+			encoder.SetIndent(2)
+			err = encoder.Encode(spec)
 			if err != nil {
 				return fmt.Errorf("failed to marshal spec: %w", err)
 			}
-			fmt.Println(string(bytes))
+			fmt.Println(buff.String())
 			return nil
 		},
 	}

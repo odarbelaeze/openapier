@@ -77,7 +77,7 @@ func (r *resolver) Collect(path string, file *ast.File) {
 				File:     file,
 				Locator:  &locator,
 			}
-			
+
 			if r.cacheByPkg[locator.Package] == nil {
 				r.cacheByPkg[locator.Package] = make(map[string]*typeDef)
 			}
@@ -195,6 +195,42 @@ func (r *resolver) loadExternal(importPath string) {
 
 func (r *resolver) spec(t *typeDef) *openapi.RefOrSpec[openapi.Schema] {
 	slog.Debug("finding spec for", "typeName", t.TypeSpec.Name.Name)
+	switch ty := t.TypeSpec.Type.(type) {
+	case *ast.StructType:
+		{
+			builder := openapi.NewSchemaBuilder().AddType("object")
+			for _, field := range ty.Fields.List {
+				for _, name := range field.Names {
+					switch fieldType := field.Type.(type) {
+					case *ast.Ident:
+						{
+							ref, err := r.Resolve(fieldType.Name, t.File)
+							if err != nil {
+								panic(err)
+							}
+							builder.AddProperty(name.Name, ref)
+
+						}
+					case *ast.ArrayType:
+						{
+							elt := fieldType.Elt
+							switch eltType := elt.(type) {
+							case *ast.Ident:
+								{
+									ref, err := r.Resolve(fmt.Sprintf("[]%s", eltType.Name), t.File)
+									if err != nil {
+										panic(err)
+									}
+									builder.AddProperty(name.Name, ref)
+								}
+							}
+						}
+					}
+				}
+			}
+			return builder.Build()
+		}
+	}
 	return openapi.NewSchemaBuilder().
 		AddType("object").
 		AddProperty("field", openapi.NewSchemaBuilder().AddType("string").Build()).
