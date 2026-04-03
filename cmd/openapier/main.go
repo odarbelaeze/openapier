@@ -44,8 +44,11 @@ func main() {
 				return fmt.Errorf("failed to parse: %w", err)
 			}
 			bytes, err := yaml.Marshal(spec)
+			if err != nil {
+				return fmt.Errorf("failed to marshal spec: %w", err)
+			}
 			fmt.Println(string(bytes))
-			return err
+			return nil
 		},
 	}
 
