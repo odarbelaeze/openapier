@@ -128,7 +128,10 @@ func (r *resolver) Resolve(typeName string, file *ast.File) (*openapi.RefOrSpec[
 		}
 		if pkgCache, pkgOk := r.cacheByPkg[loc.Package]; pkgOk {
 			if t, ok := pkgCache[loc.Name]; ok {
-				spec := r.spec(t)
+				spec, err := r.spec(t)
+				if err != nil {
+					return nil, fmt.Errorf("failed to build spec: %w", err)
+				}
 				r.definitions[loc.String()] = spec
 				ref := openapi.NewRefOrSpec[openapi.Schema](schemaPath)
 				return ref, nil
@@ -193,46 +196,11 @@ func (r *resolver) loadExternal(importPath string) {
 	slog.Debug("loading external package", "importPath", importPath)
 }
 
-func (r *resolver) spec(t *typeDef) *openapi.RefOrSpec[openapi.Schema] {
+func (r *resolver) spec(t *typeDef) (*openapi.RefOrSpec[openapi.Schema], error) {
 	slog.Debug("finding spec for", "typeName", t.TypeSpec.Name.Name)
-	switch ty := t.TypeSpec.Type.(type) {
-	case *ast.StructType:
-		{
-			builder := openapi.NewSchemaBuilder().AddType("object")
-			for _, field := range ty.Fields.List {
-				for _, name := range field.Names {
-					switch fieldType := field.Type.(type) {
-					case *ast.Ident:
-						{
-							ref, err := r.Resolve(fieldType.Name, t.File)
-							if err != nil {
-								panic(err)
-							}
-							builder.AddProperty(name.Name, ref)
-
-						}
-					case *ast.ArrayType:
-						{
-							elt := fieldType.Elt
-							switch eltType := elt.(type) {
-							case *ast.Ident:
-								{
-									ref, err := r.Resolve(fmt.Sprintf("[]%s", eltType.Name), t.File)
-									if err != nil {
-										panic(err)
-									}
-									builder.AddProperty(name.Name, ref)
-								}
-							}
-						}
-					}
-				}
-			}
-			return builder.Build()
-		}
+	builder := schemaBuilder{
+		resolver: r,
+		file:     t.File,
 	}
-	return openapi.NewSchemaBuilder().
-		AddType("object").
-		AddProperty("field", openapi.NewSchemaBuilder().AddType("string").Build()).
-		Build()
+	return builder.build(t.TypeSpec.Type)
 }
