@@ -16,6 +16,22 @@ func main() {
 	http.ListenAndServe(":8080", nil)
 }
 
+type RestError struct {
+	// Code is the HTTP status code
+	Code int `json:"code"`
+
+	// Message is the error message
+	Message string `json:"message"`
+}
+
+func errorResponse(w http.ResponseWriter, code int) {
+	w.WriteHeader(code)
+	err := json.NewEncoder(w).Encode(RestError{Code: code, Message: http.StatusText(code)})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 // Todo is a model for to do items
 type Todo struct {
 	// ID is the unique identifier for the todo
@@ -54,12 +70,13 @@ type PaginatedTodos struct {
 
 // @summary List todos
 // @response 200 application/json PaginatedTodos Paginated list of todos
+// @response 500 application/json RestError Internal server error
 // @router /todos [get]
 func TodoList(w http.ResponseWriter, r *http.Request) {
 	var paginatedTodos PaginatedTodos
 	bytes, err := json.Marshal(paginatedTodos)
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		errorResponse(w, http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -75,12 +92,13 @@ type TodoCreatePayload struct {
 // @summary Create a todo
 // @requestBody application/json TodoCreatePayload The payload to create the todo
 // @response 201 application/json Todo The recently created todo
+// @response 500 application/json RestError Internal server error
 // @router /todos [post]
 func TodoCreate(w http.ResponseWriter, r *http.Request) {
 	var createdTodo Todo
 	bytes, err := json.Marshal(createdTodo)
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		errorResponse(w, http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -90,13 +108,19 @@ func TodoCreate(w http.ResponseWriter, r *http.Request) {
 // @summary Get a todo
 // @param id uuid.UUID path Todo ID
 // @response 200 application/json Todo The requested todo
+// @response 404 application/json RestError Todo not found
+// @response 500 application/json RestError Internal server error
 // @router /todos/{id} [get]
 func TodoGet(w http.ResponseWriter, r *http.Request) {
-	id := uuid.MustParse(r.PathValue("id"))
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		errorResponse(w, http.StatusNotFound)
+		return
+	}
 	todo := Todo{ID: id}
 	bytes, err := json.Marshal(todo)
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		errorResponse(w, http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -116,13 +140,19 @@ type TodoUpdatePayload struct {
 // @param id uuid.UUID path Todo ID
 // @requestBody application/json TodoUpdatePayload The payload to update the todo
 // @response 200 application/json Todo The updated todo
+// @response 404 application/json RestError Todo not found
+// @response 500 application/json RestError Internal server error
 // @router /todos/{id} [put]
 func TodoUpdate(w http.ResponseWriter, r *http.Request) {
-	id := uuid.MustParse(r.PathValue("id"))
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		errorResponse(w, http.StatusNotFound)
+		return
+	}
 	todo := Todo{ID: id}
 	bytes, err := json.Marshal(todo)
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		errorResponse(w, http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -142,13 +172,19 @@ type TodoPatchPayload struct {
 // @param id uuid.UUID path Todo ID
 // @requestBody application/json TodoPatchPayload The payload to update the todo
 // @response 200 application/json Todo The updated todo
+// @response 404 application/json RestError Todo not found
+// @response 500 application/json RestError Internal server error
 // @router /todos/{id} [patch]
 func TodoPatch(w http.ResponseWriter, r *http.Request) {
-	id := uuid.MustParse(r.PathValue("id"))
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		errorResponse(w, http.StatusNotFound)
+		return
+	}
 	todo := Todo{ID: id}
 	bytes, err := json.Marshal(todo)
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		errorResponse(w, http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

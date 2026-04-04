@@ -30,6 +30,21 @@ components:
         - cursor
         - hasMore
       type: object
+    github_com_odarbelaeze_test_types:main.RestError:
+      properties:
+        code:
+          description: |
+            Code is the HTTP status code
+          format: int32
+          type: integer
+        message:
+          description: |
+            Message is the error message
+          type: string
+      required:
+        - code
+        - message
+      type: object
     github_com_odarbelaeze_test_types:main.Todo:
       properties:
         completed:
@@ -113,6 +128,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.PaginatedTodos'
           description: Paginated list of todos
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.RestError'
+          description: Internal server error
       summary: List todos
     post:
       requestBody:
@@ -129,6 +150,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.Todo'
           description: The recently created todo
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.RestError'
+          description: Internal server error
       summary: Create a todo
   /todos/{id}:
     get:
@@ -147,6 +174,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.Todo'
           description: The requested todo
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.RestError'
+          description: Todo not found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.RestError'
+          description: Internal server error
       summary: Get a todo
     patch:
       parameters:
@@ -171,6 +210,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.Todo'
           description: The updated todo
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.RestError'
+          description: Todo not found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.RestError'
+          description: Internal server error
       summary: Patch a todo
     put:
       parameters:
@@ -195,5 +246,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.Todo'
           description: The updated todo
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.RestError'
+          description: Todo not found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.RestError'
+          description: Internal server error
       summary: Update a todo
 
