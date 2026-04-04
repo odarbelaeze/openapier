@@ -3,7 +3,7 @@ package schema
 import "github.com/sv-tools/openapi"
 
 // parseBasicType converts a string type representation to an OpenAPI schema object
-func parseBasicType(t string) *openapi.RefOrSpec[openapi.Schema] {
+func parseBasicType(t string, options ...SchemaOption) *openapi.RefOrSpec[openapi.Schema] {
 	b := openapi.NewSchemaBuilder()
 	switch t {
 	case "int", "int32", "uint", "uint32":
@@ -25,6 +25,9 @@ func parseBasicType(t string) *openapi.RefOrSpec[openapi.Schema] {
 	default:
 		// this is not a basic type, let the caller figure it out
 		return nil
+	}
+	for _, option := range options {
+		option(b)
 	}
 	return b.Build()
 }

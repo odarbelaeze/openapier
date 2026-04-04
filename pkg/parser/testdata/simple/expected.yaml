@@ -5,6 +5,8 @@ components:
         id:
           format: int32
           type: integer
+      required:
+        - id
       type: object
     github_com_odarbelaeze_test_simple_cross:cross.Cross:
       properties:
@@ -14,6 +16,9 @@ components:
           type: array
         String:
           type: string
+      required:
+        - Array
+        - String
       type: object
 externalDocs:
   description: Find more info here

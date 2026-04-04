@@ -28,7 +28,7 @@ type Resolver interface {
 	Collect(path string, file *ast.File)
 
 	// Resolve resolves the given type into a schema.
-	Resolve(typeName string, file *ast.File) (*openapi.RefOrSpec[openapi.Schema], error)
+	Resolve(typeName string, file *ast.File, options ...SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error)
 
 	// Definitions returns the definitions that have been resolved.
 	Definitions() map[string]*openapi.RefOrSpec[openapi.Schema]
@@ -94,7 +94,7 @@ func (r *resolver) Definitions() map[string]*openapi.RefOrSpec[openapi.Schema] {
 }
 
 // Resolve implements [Resolver].
-func (r *resolver) Resolve(typeName string, file *ast.File) (*openapi.RefOrSpec[openapi.Schema], error) {
+func (r *resolver) Resolve(typeName string, file *ast.File, options ...SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
 	if strings.HasPrefix(typeName, "[]") {
 		itemTypeName := typeName[2:]
 		itemRef, err := r.Resolve(itemTypeName, file)
@@ -102,16 +102,17 @@ func (r *resolver) Resolve(typeName string, file *ast.File) (*openapi.RefOrSpec[
 			return nil, fmt.Errorf("failed to resolve item type: %w", err)
 		}
 		items := openapi.NewBoolOrSchema(itemRef)
-		// NOTE: Setting allowed to true here makes the tests pass
 		items.Allowed = true
-		return openapi.
-			NewSchemaBuilder().
+		builder := openapi.NewSchemaBuilder().
 			AddType("array").
-			Items(items).
-			Build(), nil
+			Items(items)
+		for _, option := range options {
+			option(builder)
+		}
+		return builder.Build(), nil
 	}
 
-	basicSchema := parseBasicType(typeName)
+	basicSchema := parseBasicType(typeName, options...)
 	if basicSchema != nil {
 		return basicSchema, nil
 	}
@@ -128,7 +129,7 @@ func (r *resolver) Resolve(typeName string, file *ast.File) (*openapi.RefOrSpec[
 		}
 		if pkgCache, pkgOk := r.cacheByPkg[loc.Package]; pkgOk {
 			if t, ok := pkgCache[loc.Name]; ok {
-				spec, err := r.spec(t)
+				spec, err := r.spec(t, options...)
 				if err != nil {
 					return nil, fmt.Errorf("failed to build spec: %w", err)
 				}
@@ -196,11 +197,11 @@ func (r *resolver) loadExternal(importPath string) {
 	slog.Debug("loading external package", "importPath", importPath)
 }
 
-func (r *resolver) spec(t *typeDef) (*openapi.RefOrSpec[openapi.Schema], error) {
+func (r *resolver) spec(t *typeDef, options ...SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
 	slog.Debug("finding spec for", "typeName", t.TypeSpec.Name.Name)
 	builder := schemaBuilder{
 		resolver: r,
 		file:     t.File,
 	}
-	return builder.build(t.TypeSpec.Type)
+	return builder.build(t.TypeSpec.Type, options...)
 }

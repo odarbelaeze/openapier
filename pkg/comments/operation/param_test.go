@@ -14,7 +14,7 @@ func TestParamComment(t *testing.T) {
 	comment := operation.NewParamComment()
 
 	assert.Equal(t, "param", comment.Tag())
-	assert.Equal(t, "@param <name> <type> <in>", comment.Usage())
+	assert.Equal(t, "@param <name> <type> <in> [description...]", comment.Usage())
 
 	tests := []struct {
 		name        string

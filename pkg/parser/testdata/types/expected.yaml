@@ -5,44 +5,83 @@ components:
         meta:
           $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.Pagination'
         todos:
+          description: |
+            Todos is the list of todos
           items:
             $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.Todo'
           type: array
+      required:
+        - todos
+        - meta
       type: object
     github_com_odarbelaeze_test_types:main.Pagination:
+      description: |
+        Meta is the pagination metadata
       properties:
         cursor:
+          description: |
+            Cursor is the cursor for the next page
           type: string
         hasMore:
+          description: |
+            HasMore indicates if there are more pages
           type: boolean
+      required:
+        - cursor
+        - hasMore
       type: object
     github_com_odarbelaeze_test_types:main.Todo:
       properties:
         completed:
+          description: |
+            Completed is the completion status of the todo
           type: string
         id:
+          description: |
+            ID is the unique identifier for the todo
           type: string
         title:
+          description: |
+            Title is the title of the todo
           type: string
+      required:
+        - id
+        - title
+        - completed
       type: object
     github_com_odarbelaeze_test_types:main.TodoCreatePayload:
       properties:
         title:
+          description: |
+            Title is the title of the todo
           type: string
+      required:
+        - title
       type: object
     github_com_odarbelaeze_test_types:main.TodoPatchPayload:
       properties:
         completed:
+          description: |
+            Optional field for patching a todo's completion status
           type: boolean
         title:
+          description: |
+            Optional field for patching a todo's title
           type: string
       type: object
     github_com_odarbelaeze_test_types:main.TodoUpdatePayload:
       properties:
         completed:
+          description: |
+            Completed is the completion status of the todo
           type: boolean
         title:
+          description: |
+            Title is the title of the todo
           type: string
+      required:
+        - title
+        - completed
       type: object
 info:
   description: This is a sample API that exposes types.
@@ -53,6 +92,15 @@ jsonSchemaDialect: https://spec.openapis.org/oas/3.1/dialect/base
 openapi: 3.1.1
 paths:
   /todos:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.PaginatedTodos'
+          description: Paginated list of todos
+      summary: List todos
     post:
       requestBody:
         content:
@@ -68,9 +116,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.Todo'
           description: The recently created todo
-      summary: List todos
+      summary: Create a todo
   /todos/{id}:
+    get:
+      parameters:
+        - description: Todo ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.Todo'
+          description: The requested todo
+      summary: Get a todo
     patch:
+      parameters:
+        - description: Todo ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -86,4 +157,27 @@ paths:
                 $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.Todo'
           description: The updated todo
       summary: Patch a todo
+    put:
+      parameters:
+        - description: Todo ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.TodoUpdatePayload'
+        description: The payload to update the todo
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.Todo'
+          description: The updated todo
+      summary: Update a todo
 

@@ -36,33 +36,35 @@ func (o *Operation) Attach(spec *openapi.Extendable[openapi.OpenAPI]) error {
 	}
 	summary := o.Routes.Summarize()
 	for path, methods := range summary {
-		pathItemBuilder := openapi.NewPathItemBuilder()
+		if spec.Spec.Paths == nil {
+			spec.Spec.Paths = openapi.NewPaths()
+		}
+		if _, ok := spec.Spec.Paths.Spec.Paths[path]; !ok {
+			spec.Spec.Paths.Spec.Add(path, openapi.NewPathItemBuilder().Build())
+		}
+		pathItem := spec.Spec.Paths.Spec.Paths[path]
 		for _, method := range methods {
 			switch strings.ToUpper(method) {
 			case http.MethodGet:
-				pathItemBuilder.Get(operation)
+				pathItem.Spec.Spec.Get = operation
 			case http.MethodHead:
-				pathItemBuilder.Head(operation)
+				pathItem.Spec.Spec.Head = operation
 			case http.MethodPost:
-				pathItemBuilder.Post(operation)
+				pathItem.Spec.Spec.Post = operation
 			case http.MethodPut:
-				pathItemBuilder.Put(operation)
+				pathItem.Spec.Spec.Put = operation
 			case http.MethodPatch:
-				pathItemBuilder.Patch(operation)
+				pathItem.Spec.Spec.Patch = operation
 			case http.MethodDelete:
-				pathItemBuilder.Delete(operation)
+				pathItem.Spec.Spec.Delete = operation
 			case http.MethodOptions:
-				pathItemBuilder.Options(operation)
+				pathItem.Spec.Spec.Options = operation
 			case http.MethodTrace:
-				pathItemBuilder.Trace(operation)
+				pathItem.Spec.Spec.Trace = operation
 			default:
 				return fmt.Errorf("unsupported method: %s", method)
 			}
 		}
-		if spec.Spec.Paths == nil {
-			spec.Spec.Paths = openapi.NewPaths()
-		}
-		spec.Spec.Paths.Spec.Add(path, pathItemBuilder.Build())
 	}
 	return nil
 }
