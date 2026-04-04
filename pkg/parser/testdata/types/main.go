@@ -3,6 +3,9 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 // @info.title API that exposes types
@@ -16,13 +19,19 @@ func main() {
 // Todo is a model for to do items
 type Todo struct {
 	// ID is the unique identifier for the todo
-	ID string `json:"id"`
+	ID uuid.UUID `json:"id"`
 
 	// Title is the title of the todo
 	Title string `json:"title"`
 
 	// Completed is the completion status of the todo
 	Completed string `json:"completed"`
+
+	// Created is the time the todo was created
+	Created time.Time `json:"created"`
+
+	// Updated is the time the todo was last updated
+	Updated time.Time `json:"updated"`
 }
 
 // Pagination is a model for cursors and pages
@@ -79,11 +88,11 @@ func TodoCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 // @summary Get a todo
-// @param id string path Todo ID
+// @param id uuid.UUID path Todo ID
 // @response 200 application/json Todo The requested todo
 // @router /todos/{id} [get]
 func TodoGet(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
+	id := uuid.MustParse(r.PathValue("id"))
 	todo := Todo{ID: id}
 	bytes, err := json.Marshal(todo)
 	if err != nil {
@@ -104,12 +113,12 @@ type TodoUpdatePayload struct {
 }
 
 // @summary Update a todo
-// @param id string path Todo ID
+// @param id uuid.UUID path Todo ID
 // @requestBody application/json TodoUpdatePayload The payload to update the todo
 // @response 200 application/json Todo The updated todo
 // @router /todos/{id} [put]
 func TodoUpdate(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
+	id := uuid.MustParse(r.PathValue("id"))
 	todo := Todo{ID: id}
 	bytes, err := json.Marshal(todo)
 	if err != nil {
@@ -130,12 +139,12 @@ type TodoPatchPayload struct {
 }
 
 // @summary Patch a todo
-// @param id string path Todo ID
+// @param id uuid.UUID path Todo ID
 // @requestBody application/json TodoPatchPayload The payload to update the todo
 // @response 200 application/json Todo The updated todo
 // @router /todos/{id} [patch]
 func TodoPatch(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
+	id := uuid.MustParse(r.PathValue("id"))
 	todo := Todo{ID: id}
 	bytes, err := json.Marshal(todo)
 	if err != nil {

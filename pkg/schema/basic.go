@@ -20,6 +20,10 @@ func parseBasicType(t string, options ...SchemaOption) *openapi.RefOrSpec[openap
 		b.AddType("string")
 	case "file":
 		b.AddType("string").Format("binary")
+	case "time.Time":
+		b.AddType("string").Format("date-time")
+	case "uuid.UUID":
+		b.AddType("string").Format("uuid")
 	case "any":
 		// empty schema for any
 	default:

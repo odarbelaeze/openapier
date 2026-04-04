@@ -9,6 +9,10 @@ import (
 	"github.com/sv-tools/openapi"
 )
 
+const (
+	jsonStructTag = "json"
+)
+
 type schemaBuilder struct {
 	resolver Resolver
 	file     *ast.File
@@ -24,6 +28,16 @@ func (b *schemaBuilder) build(expr ast.Expr, options ...SchemaOption) (*openapi.
 		return b.buildStruct(ty, options...)
 	case *ast.StarExpr:
 		return b.build(ty.X, options...)
+	case *ast.SelectorExpr:
+		{
+			pkgIdent, ok := ty.X.(*ast.Ident)
+			if !ok {
+				return nil, fmt.Errorf("unsupported package identifier in selector expression: %T", ty.X)
+			}
+			pkgName := pkgIdent.Name
+			typeName := ty.Sel.Name
+			return b.resolver.Resolve(fmt.Sprintf("%s.%s", pkgName, typeName), b.file, options...)
+		}
 	default:
 		return nil, fmt.Errorf("unsupported type: %T", expr)
 	}
@@ -40,7 +54,7 @@ func (b *schemaBuilder) buildStruct(ty *ast.StructType, options ...SchemaOption)
 			}
 			if field.Tag != nil {
 				tag := reflect.StructTag(strings.Trim(field.Tag.Value, "`"))
-				jsonTag := tag.Get("json")
+				jsonTag := tag.Get(jsonStructTag)
 				if jsonTag == "-" {
 					continue
 				}

@@ -36,18 +36,31 @@ components:
           description: |
             Completed is the completion status of the todo
           type: string
+        created:
+          description: |
+            Created is the time the todo was created
+          format: date-time
+          type: string
         id:
           description: |
             ID is the unique identifier for the todo
+          format: uuid
           type: string
         title:
           description: |
             Title is the title of the todo
           type: string
+        updated:
+          description: |
+            Updated is the time the todo was last updated
+          format: date-time
+          type: string
       required:
         - id
         - title
         - completed
+        - created
+        - updated
       type: object
     github_com_odarbelaeze_test_types:main.TodoCreatePayload:
       properties:
@@ -125,6 +138,7 @@ paths:
           name: id
           required: true
           schema:
+            format: uuid
             type: string
       responses:
         "200":
@@ -141,6 +155,7 @@ paths:
           name: id
           required: true
           schema:
+            format: uuid
             type: string
       requestBody:
         content:
@@ -164,6 +179,7 @@ paths:
           name: id
           required: true
           schema:
+            format: uuid
             type: string
       requestBody:
         content:
