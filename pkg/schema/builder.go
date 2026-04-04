@@ -3,7 +3,8 @@ package schema
 import (
 	"fmt"
 	"go/ast"
-	"log/slog"
+	"reflect"
+	"strings"
 
 	"github.com/sv-tools/openapi"
 )
@@ -31,8 +32,18 @@ func (b *schemaBuilder) buildStruct(ty *ast.StructType) (*openapi.RefOrSpec[open
 	for _, field := range ty.Fields.List {
 		for _, fieldName := range field.Names {
 			name := fieldName.Name
+			if !ast.IsExported(name) {
+				continue
+			}
 			if field.Tag != nil {
-				slog.Info("found tag", "tag", field.Tag)
+				tag := reflect.StructTag(strings.Trim(field.Tag.Value, "`"))
+				jsonTag := tag.Get("json")
+				if jsonTag == "-" {
+					continue
+				}
+				if jsonTag != "" {
+					name = jsonTag
+				}
 			}
 			schema, err := b.build(field.Type)
 			if err != nil {

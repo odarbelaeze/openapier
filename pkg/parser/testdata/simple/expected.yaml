@@ -2,7 +2,7 @@ components:
   schemas:
     github_com_odarbelaeze_test_simple_api:api.Pet3:
       properties:
-        ID:
+        id:
           format: int32
           type: integer
       type: object

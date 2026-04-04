@@ -2,32 +2,32 @@ components:
   schemas:
     github_com_odarbelaeze_test_types:main.CreateTodoPayload:
       properties:
-        Title:
+        title:
           type: string
       type: object
     github_com_odarbelaeze_test_types:main.PaginatedTodos:
       properties:
-        Meta:
+        meta:
           $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.Pagination'
-        Todos:
+        todos:
           items:
             $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.Todo'
           type: array
       type: object
     github_com_odarbelaeze_test_types:main.Pagination:
       properties:
-        Cursor:
+        cursor:
           type: string
-        HasMore:
+        hasMore:
           type: boolean
       type: object
     github_com_odarbelaeze_test_types:main.Todo:
       properties:
-        Completed:
+        completed:
           type: string
-        ID:
+        id:
           type: string
-        Title:
+        title:
           type: string
       type: object
 info:

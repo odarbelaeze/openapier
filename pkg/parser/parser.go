@@ -138,6 +138,9 @@ func (p *parser) parseOperations(root string, resolver schema.Resolver, spec *op
 		var opErr error
 		ast.Inspect(node, func(n ast.Node) bool {
 			if function, ok := n.(*ast.FuncDecl); ok {
+				if function.Name.Name == "main" {
+					return false
+				}
 				operation := operation.NewOperation(resolver)
 				if function.Doc == nil {
 					return false
