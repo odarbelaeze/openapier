@@ -46,17 +46,74 @@ func TodoList(w http.ResponseWriter, r *http.Request) {
 	w.Write(bytes)
 }
 
-type CreateTodoPayload struct {
+type TodoCreatePayload struct {
 	Title string `json:"title"`
 }
 
 // @summary List todos
-// @requestBody application/json CreateTodoPayload The payload to create the todo
+// @requestBody application/json TodoCreatePayload The payload to create the todo
 // @response 201 application/json Todo The recently created todo
 // @router /todos [post]
 func TodoCreate(w http.ResponseWriter, r *http.Request) {
 	var createdTodo Todo
 	bytes, err := json.Marshal(createdTodo)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(bytes)
+}
+
+// @summary Get a todo
+// @response 200 application/json Todo The requested todo
+// @router /todos/{id} [get]
+func TodoGet(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	todo := Todo{ID: id}
+	bytes, err := json.Marshal(todo)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(bytes)
+}
+
+type TodoUpdatePayload struct {
+	Title     string `json:"title"`
+	Completed bool   `json:"completed"`
+}
+
+// @summary Update a todo
+// @requestBody application/json TodoUpdatePayload The payload to update the todo
+// @response 200 application/json Todo The updated todo
+// @router /todos/{id} [put]
+func TodoUpdate(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	todo := Todo{ID: id}
+	bytes, err := json.Marshal(todo)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(bytes)
+}
+
+type TodoPatchPayload struct {
+	Title     *string `json:"title"`
+	Completed *bool   `json:"completed"`
+}
+
+// @summary Patch a todo
+// @requestBody application/json TodoPatchPayload The payload to update the todo
+// @response 200 application/json Todo The updated todo
+// @router /todos/{id} [patch]
+func TodoPatch(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	todo := Todo{ID: id}
+	bytes, err := json.Marshal(todo)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return

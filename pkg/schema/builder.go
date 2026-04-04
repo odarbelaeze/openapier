@@ -22,6 +22,8 @@ func (b *schemaBuilder) build(expr ast.Expr) (*openapi.RefOrSpec[openapi.Schema]
 		return b.buildArray(ty)
 	case *ast.StructType:
 		return b.buildStruct(ty)
+	case *ast.StarExpr:
+		return b.build(ty.X)
 	default:
 		return nil, fmt.Errorf("unsupported type: %T", expr)
 	}

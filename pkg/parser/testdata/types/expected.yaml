@@ -1,10 +1,5 @@
 components:
   schemas:
-    github_com_odarbelaeze_test_types:main.CreateTodoPayload:
-      properties:
-        title:
-          type: string
-      type: object
     github_com_odarbelaeze_test_types:main.PaginatedTodos:
       properties:
         meta:
@@ -30,6 +25,25 @@ components:
         title:
           type: string
       type: object
+    github_com_odarbelaeze_test_types:main.TodoCreatePayload:
+      properties:
+        title:
+          type: string
+      type: object
+    github_com_odarbelaeze_test_types:main.TodoPatchPayload:
+      properties:
+        completed:
+          type: boolean
+        title:
+          type: string
+      type: object
+    github_com_odarbelaeze_test_types:main.TodoUpdatePayload:
+      properties:
+        completed:
+          type: boolean
+        title:
+          type: string
+      type: object
 info:
   description: This is a sample API that exposes types.
   termsOfService: http://swagger.io/terms/
@@ -44,7 +58,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.CreateTodoPayload'
+              $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.TodoCreatePayload'
         description: The payload to create the todo
         required: true
       responses:
@@ -55,4 +69,21 @@ paths:
                 $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.Todo'
           description: The recently created todo
       summary: List todos
+  /todos/{id}:
+    patch:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.TodoPatchPayload'
+        description: The payload to update the todo
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.Todo'
+          description: The updated todo
+      summary: Patch a todo
 
