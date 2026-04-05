@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"go/ast"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/sv-tools/openapi"
 )
 
 const (
-	jsonStructTag = "json"
+	jsonStructTag    = "json"
+	exampleStructTag = "example"
 )
 
 type schemaBuilder struct {
@@ -52,6 +54,7 @@ func (b *schemaBuilder) buildStruct(ty *ast.StructType, options ...SchemaOption)
 			if !ast.IsExported(name) {
 				continue
 			}
+			fieldOptions := []SchemaOption{}
 			if field.Tag != nil {
 				tag := reflect.StructTag(strings.Trim(field.Tag.Value, "`"))
 				jsonTag := tag.Get(jsonStructTag)
@@ -59,10 +62,16 @@ func (b *schemaBuilder) buildStruct(ty *ast.StructType, options ...SchemaOption)
 					continue
 				}
 				if jsonTag != "" {
-					name = jsonTag
+					parts := strings.Split(jsonTag, ",")
+					if parts[0] != "" {
+						name = parts[0]
+					}
+				}
+				example := tag.Get(exampleStructTag)
+				if example != "" {
+					fieldOptions = append(fieldOptions, WithExample(parseExampleValue(example, field.Type)))
 				}
 			}
-			fieldOptions := []SchemaOption{}
 			if field.Doc != nil {
 				fieldOptions = append(fieldOptions, WithDescription(field.Doc.Text()))
 			}
@@ -96,4 +105,27 @@ func (b *schemaBuilder) buildArray(ty *ast.ArrayType, options ...SchemaOption) (
 		option(builder)
 	}
 	return builder.Build(), nil
+}
+
+func parseExampleValue(example string, ty ast.Expr) any {
+	switch expr := ty.(type) {
+	case *ast.Ident:
+		switch expr.Name {
+		case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
+			if val, err := strconv.ParseInt(example, 10, 64); err == nil {
+				return int(val)
+			}
+		case "float32", "float64":
+			if val, err := strconv.ParseFloat(example, 64); err == nil {
+				return val
+			}
+		case "bool":
+			if val, err := strconv.ParseBool(example); err == nil {
+				return val
+			}
+		}
+	case *ast.StarExpr:
+		return parseExampleValue(example, expr.X)
+	}
+	return example
 }

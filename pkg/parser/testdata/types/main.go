@@ -18,7 +18,7 @@ func main() {
 
 type RestError struct {
 	// Code is the HTTP status code
-	Code int `json:"code"`
+	Code int `json:"code,string" example:"500"`
 
 	// Message is the error message
 	Message string `json:"message"`
@@ -38,7 +38,7 @@ type Todo struct {
 	ID uuid.UUID `json:"id"`
 
 	// Title is the title of the todo
-	Title string `json:"title"`
+	Title string `json:"title" example:"Buy milk"`
 
 	// Completed is the completion status of the todo
 	Completed string `json:"completed"`
