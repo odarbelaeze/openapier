@@ -18,12 +18,20 @@ const (
 type schemaBuilder struct {
 	resolver Resolver
 	file     *ast.File
+	aliases  map[string]string
+}
+
+func (b *schemaBuilder) aliased(typeName string) string {
+	if alias, ok := b.aliases[typeName]; ok {
+		return alias
+	}
+	return typeName
 }
 
 func (b *schemaBuilder) build(expr ast.Expr, options ...SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
 	switch ty := expr.(type) {
 	case *ast.Ident:
-		return b.resolver.Resolve(ty.Name, b.file, options...)
+		return b.resolver.Resolve(b.aliased(ty.Name), b.file, options...)
 	case *ast.ArrayType:
 		return b.buildArray(ty, options...)
 	case *ast.StructType:

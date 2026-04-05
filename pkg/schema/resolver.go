@@ -6,10 +6,13 @@ import (
 	"go/token"
 	"log/slog"
 	"path"
+	"regexp"
 	"strings"
 
 	"github.com/sv-tools/openapi"
 )
+
+var genericTypeRegex = regexp.MustCompile(`^(((\w+)\.)?(\w+))\[(.+)\]$`)
 
 type typeDef struct {
 	// TypeSpec is the type specification of the type definition.
@@ -117,7 +120,15 @@ func (r *resolver) Resolve(typeName string, file *ast.File, options ...SchemaOpt
 		return basicSchema, nil
 	}
 
-	candidates, err := r.candidates(typeName, file)
+	matches := genericTypeRegex.FindStringSubmatch(typeName)
+	var typeParams []string
+	if len(matches) == 6 {
+		typeName = matches[1]
+		typeParams = strings.Split(matches[5], ",")
+		slog.Debug("resolving generic type", "typeName", typeName, "typeArgs", typeParams)
+	}
+
+	candidates, err := r.candidates(typeName, typeParams, file)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find any candidates: %w", err)
 	}
@@ -129,7 +140,24 @@ func (r *resolver) Resolve(typeName string, file *ast.File, options ...SchemaOpt
 		}
 		if pkgCache, pkgOk := r.cacheByPkg[loc.Package]; pkgOk {
 			if t, ok := pkgCache[loc.Name]; ok {
-				spec, err := r.spec(t, options...)
+				if len(loc.TypeParams) != t.TypeSpec.TypeParams.NumFields() {
+					return nil, fmt.Errorf(
+						"type parameter count mismatch for %s: expected %d, got %d",
+						loc.TypeName(),
+						t.TypeSpec.TypeParams.NumFields(),
+						len(loc.TypeParams),
+					)
+				}
+				aliases := make(map[string]string)
+				if t.TypeSpec.TypeParams != nil {
+					for i, field := range t.TypeSpec.TypeParams.List {
+						paramName := field.Names[0].Name
+						if i < len(loc.TypeParams) {
+							aliases[paramName] = loc.TypeParams[i]
+						}
+					}
+				}
+				spec, err := r.spec(t, aliases, options...)
 				if err != nil {
 					return nil, fmt.Errorf("failed to build spec: %w", err)
 				}
@@ -142,7 +170,7 @@ func (r *resolver) Resolve(typeName string, file *ast.File, options ...SchemaOpt
 	return nil, fmt.Errorf("failed to resolve type: %s", typeName)
 }
 
-func (r *resolver) candidates(typeName string, file *ast.File) ([]*locator, error) {
+func (r *resolver) candidates(typeName string, typeParams []string, file *ast.File) ([]*locator, error) {
 	var candidates []*locator
 
 	parts := strings.Split(typeName, ".")
@@ -187,6 +215,7 @@ func (r *resolver) candidates(typeName string, file *ast.File) ([]*locator, erro
 
 	loc.Package = pkgName
 	loc.Name = name
+	loc.TypeParams = typeParams
 
 	candidates = append(candidates, loc)
 
@@ -197,11 +226,12 @@ func (r *resolver) loadExternal(importPath string) {
 	slog.Debug("loading external package", "importPath", importPath)
 }
 
-func (r *resolver) spec(t *typeDef, options ...SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
+func (r *resolver) spec(t *typeDef, aliases map[string]string, options ...SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
 	slog.Debug("finding spec for", "typeName", t.TypeSpec.Name.Name)
 	builder := schemaBuilder{
 		resolver: r,
 		file:     t.File,
+		aliases:  aliases,
 	}
 	return builder.build(t.TypeSpec.Type, options...)
 }
