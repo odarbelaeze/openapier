@@ -4,14 +4,11 @@ snapshots: pkg/parser/testdata/generics/expected.yaml pkg/parser/testdata/types/
 	@echo "snapshots are up to date"
 .PHONY: snapshots
 
-pkg/parser/testdata/generics/expected.yaml: $(SOURCES)
-	go run ./cmd/openapier --root pkg/parser/testdata/generics > pkg/parser/testdata/generics/expected.yaml
-
-pkg/parser/testdata/types/expected.yaml: $(SOURCES)
-	go run ./cmd/openapier --root pkg/parser/testdata/types > pkg/parser/testdata/types/expected.yaml
-
-pkg/parser/testdata/simple/expected.yaml: $(SOURCES)
-	go run ./cmd/openapier --root pkg/parser/testdata/simple > pkg/parser/testdata/simple/expected.yaml
+# % matches the name of the test folder
+pkg/parser/testdata/%/expected.yaml: $(SOURCES)
+	# $* is the name of the test folder, $@ is the name of the whole rule
+	go run ./cmd/openapier --root pkg/parser/testdata/$* > $@
 
 test: snapshots
 	go test ./...
+.PHONY: test
