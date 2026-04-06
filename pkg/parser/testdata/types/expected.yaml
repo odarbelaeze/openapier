@@ -48,6 +48,12 @@ components:
       type: object
     github_com_odarbelaeze_test_types:main.Todo:
       properties:
+        attributes:
+          additionalProperties:
+            type: string
+          description: |
+            Attributes is a map of additional attributes for the todo
+          type: object
         completed:
           description: |
             Completed is the completion status of the todo
@@ -76,6 +82,7 @@ components:
         - id
         - title
         - completed
+        - attributes
         - created
         - updated
       type: object
@@ -211,6 +218,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.Todo'
+          description: The updated todo
+        "201":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.Todo'
+                type: object
           description: The updated todo
         "404":
           content:

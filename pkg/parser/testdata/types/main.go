@@ -43,6 +43,9 @@ type Todo struct {
 	// Completed is the completion status of the todo
 	Completed string `json:"completed"`
 
+	// Attributes is a map of additional attributes for the todo
+	Attributes map[string]string `json:"attributes"`
+
 	// Created is the time the todo was created
 	Created time.Time `json:"created"`
 
@@ -172,6 +175,7 @@ type TodoPatchPayload struct {
 // @param id uuid.UUID path Todo ID
 // @requestBody application/json TodoPatchPayload The payload to update the todo
 // @response 200 application/json Todo The updated todo
+// @response 201 application/json map[string]Todo The updated todo
 // @response 404 application/json RestError Todo not found
 // @response 500 application/json RestError Internal server error
 // @router /todos/{id} [patch]

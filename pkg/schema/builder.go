@@ -48,9 +48,26 @@ func (b *schemaBuilder) build(expr ast.Expr, options ...SchemaOption) (*openapi.
 			typeName := ty.Sel.Name
 			return b.resolver.Resolve(fmt.Sprintf("%s.%s", pkgName, typeName), b.file, options...)
 		}
+	case *ast.MapType:
+		return b.buildMap(ty, options...)
 	default:
 		return nil, fmt.Errorf("unsupported type: %T", expr)
 	}
+}
+
+func (b *schemaBuilder) buildMap(ty *ast.MapType, options ...SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
+	builder := openapi.NewSchemaBuilder().AddType("object")
+	valueSchema, err := b.build(ty.Value)
+	if err != nil {
+		return nil, err
+	}
+	valueBoolOrSchema := openapi.NewBoolOrSchema(valueSchema)
+	valueBoolOrSchema.Allowed = true
+	builder.AdditionalProperties(valueBoolOrSchema)
+	for _, opt := range options {
+		opt(builder)
+	}
+	return builder.Build(), nil
 }
 
 func (b *schemaBuilder) buildStruct(ty *ast.StructType, options ...SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {

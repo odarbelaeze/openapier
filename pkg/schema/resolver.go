@@ -12,7 +12,10 @@ import (
 	"github.com/sv-tools/openapi"
 )
 
-var genericTypeRegex = regexp.MustCompile(`^(((\w+)\.)?(\w+))\[(.+)\]$`)
+var (
+	genericTypeRegex = regexp.MustCompile(`^(((\w+)\.)?(\w+))\[(.+)\]$`)
+	mapTypeRegex     = regexp.MustCompile(`^map\[(.+)\](.*)$`)
+)
 
 type typeDef struct {
 	// TypeSpec is the type specification of the type definition.
@@ -109,6 +112,31 @@ func (r *resolver) Resolve(typeName string, file *ast.File, options ...SchemaOpt
 		builder := openapi.NewSchemaBuilder().
 			AddType("array").
 			Items(items)
+		for _, option := range options {
+			option(builder)
+		}
+		return builder.Build(), nil
+	}
+
+	if strings.HasPrefix(typeName, "map[") {
+		matches := mapTypeRegex.FindStringSubmatch(typeName)
+		if len(matches) != 3 {
+			return nil, fmt.Errorf("invalid map type: %s", typeName)
+		}
+		keyTypeName := matches[1]
+		if keyTypeName != "string" {
+			return nil, fmt.Errorf("map key type must be string, got %s", keyTypeName)
+		}
+		valueTypeName := matches[2]
+		valueRef, err := r.Resolve(valueTypeName, file)
+		if err != nil {
+			return nil, fmt.Errorf("failed to resolve value type: %w", err)
+		}
+		valueBoolOrSchema := openapi.NewBoolOrSchema(valueRef)
+		valueBoolOrSchema.Allowed = true
+		builder := openapi.NewSchemaBuilder().
+			AddType("object").
+			AdditionalProperties(valueBoolOrSchema)
 		for _, option := range options {
 			option(builder)
 		}
