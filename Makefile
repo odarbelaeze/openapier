@@ -1,6 +1,8 @@
 SOURCES := $(wildcard ./pkg/**/*.go ./cmd/**/*.go)
+TEST_DIRS := $(wildcard pkg/parser/testdata/*/)
+SNAPSHOTS := $(addsuffix expected.yaml, $(TEST_DIRS))
 
-snapshots: pkg/parser/testdata/generics/expected.yaml pkg/parser/testdata/types/expected.yaml pkg/parser/testdata/simple/expected.yaml
+snapshots: $(SNAPSHOTS)
 	@echo "snapshots are up to date"
 .PHONY: snapshots
 
@@ -8,6 +10,13 @@ snapshots: pkg/parser/testdata/generics/expected.yaml pkg/parser/testdata/types/
 pkg/parser/testdata/%/expected.yaml: $(SOURCES)
 	# $* is the name of the test folder, $@ is the name of the whole rule
 	go run ./cmd/openapier --root pkg/parser/testdata/$* > $@
+
+TAGS.md: $(SOURCES)
+	go run ./cmd/docs > TAGS.md
+
+docs: TAGS.md
+	@echo docs are up to date
+.PHONY: docs
 
 test: snapshots
 	go test ./...

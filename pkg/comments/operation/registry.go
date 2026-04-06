@@ -20,6 +20,7 @@ func Register(c Comment) {
 type Registry interface {
 	Register(c Comment)
 	Parse(line string, f *ast.File, op *Operation) error
+	Comments() []Comment
 }
 
 type standardRegistry struct {
@@ -35,6 +36,14 @@ func NewRegistry() Registry {
 
 func (r *standardRegistry) Register(c Comment) {
 	r.comments[c.Tag()] = c
+}
+
+func (r *standardRegistry) Comments() []Comment {
+	var comments []Comment
+	for _, c := range r.comments {
+		comments = append(comments, c)
+	}
+	return comments
 }
 
 func (r *standardRegistry) Parse(line string, f *ast.File, op *Operation) error {
