@@ -75,7 +75,7 @@ func TestRouterComment_Tag(t *testing.T) {
 
 func TestRouterComment_Usage(t *testing.T) {
 	comment := operation.NewRouterComment()
-	assert.Equal(t, "// @router <path> [method]", comment.Usage())
+	assert.Equal(t, "@router <path> [<method>]", comment.Usage())
 }
 
 func TestRouterComment_Integration(t *testing.T) {

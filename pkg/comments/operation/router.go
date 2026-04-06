@@ -40,5 +40,5 @@ func (r routerComment) Tag() string {
 
 // Usage implements [Comment].
 func (r routerComment) Usage() string {
-	return "// @router <path> [method]"
+	return "@router <path> [<method>]"
 }

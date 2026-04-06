@@ -50,7 +50,7 @@ These tags are used to define individual API operations (Paths, Parameters, Resp
 | `@param.required` | `@param.required <param> [param]...` |
 | `@requestBody` | `@requestBody <content_type> <type> [description]` |
 | `@response` | `@response <status_code> <content_type> <type> [description]` |
-| `@router` | `// @router <path> [method]` |
+| `@router` | `@router <path> [<method>]` |
 | `@security` | `@security <name> [scope1] [scope2] ...` |
 | `@server.description` | `@server.description <description>` |
 | `@server.url` | `@server.url <url>` |
