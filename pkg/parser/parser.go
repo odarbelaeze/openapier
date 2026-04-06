@@ -6,6 +6,7 @@ import (
 	goparser "go/parser"
 	"go/token"
 	"io/fs"
+	"log/slog"
 	"os"
 	"path"
 	"path/filepath"
@@ -14,6 +15,7 @@ import (
 	"github.com/odarbelaeze/openapier/pkg/comments/operation"
 	"github.com/odarbelaeze/openapier/pkg/comments/spec"
 	"github.com/odarbelaeze/openapier/pkg/schema"
+	ignore "github.com/sabhiram/go-gitignore"
 	"github.com/sv-tools/openapi"
 	"golang.org/x/mod/modfile"
 )
@@ -177,11 +179,22 @@ func (p *parser) parseOperations(root string, resolver schema.Resolver, spec *op
 }
 
 func (p *parser) walkGoFiles(root string, fn func(path string) error) error {
+	var ign *ignore.GitIgnore
+	ign, err := ignore.CompileIgnoreFile(filepath.Join(root, ".gitignore"))
+	if err != nil {
+		slog.Debug("failed to compile gitignore", "err", err)
+	}
 	return filepath.Walk(root, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
+		if ign != nil && ign.MatchesPath(path) {
+			return nil
+		}
 		if info.IsDir() {
+			if info.Name() == ".git" || info.Name() == "vendor" {
+				return filepath.SkipDir
+			}
 			return nil
 		}
 		if !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {

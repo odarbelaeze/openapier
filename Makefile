@@ -1,4 +1,4 @@
-SOURCES := $(shell find pkg cmd -name '*.go')
+SOURCES := $(filter %.go, $(shell git ls-files --cached --others --exclude-standard pkg cmd))
 TEST_DIRS := $(wildcard pkg/parser/testdata/*/)
 SNAPSHOTS := $(addsuffix expected.yaml, $(TEST_DIRS))
 
