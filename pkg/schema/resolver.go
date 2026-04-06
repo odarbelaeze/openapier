@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"path"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/sv-tools/openapi"
@@ -14,6 +15,7 @@ import (
 
 var (
 	genericTypeRegex = regexp.MustCompile(`^(((\w+)\.)?(\w+))\[(.+)\]$`)
+	arrayTypeRegex   = regexp.MustCompile(`^\[(\d*)\](.*)$`)
 	mapTypeRegex     = regexp.MustCompile(`^map\[(.+)\](.*)$`)
 )
 
@@ -101,46 +103,12 @@ func (r *resolver) Definitions() map[string]*openapi.RefOrSpec[openapi.Schema] {
 
 // Resolve implements [Resolver].
 func (r *resolver) Resolve(typeName string, file *ast.File, options ...SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
-	if strings.HasPrefix(typeName, "[]") {
-		itemTypeName := typeName[2:]
-		itemRef, err := r.Resolve(itemTypeName, file)
-		if err != nil {
-			return nil, fmt.Errorf("failed to resolve item type: %w", err)
-		}
-		items := openapi.NewBoolOrSchema(itemRef)
-		items.Allowed = true
-		builder := openapi.NewSchemaBuilder().
-			AddType("array").
-			Items(items)
-		for _, option := range options {
-			option(builder)
-		}
-		return builder.Build(), nil
+	if strings.HasPrefix(typeName, "[") {
+		return r.resolveArray(typeName, file, options...)
 	}
 
 	if strings.HasPrefix(typeName, "map[") {
-		matches := mapTypeRegex.FindStringSubmatch(typeName)
-		if len(matches) != 3 {
-			return nil, fmt.Errorf("invalid map type: %s", typeName)
-		}
-		keyTypeName := matches[1]
-		if keyTypeName != "string" {
-			return nil, fmt.Errorf("map key type must be string, got %s", keyTypeName)
-		}
-		valueTypeName := matches[2]
-		valueRef, err := r.Resolve(valueTypeName, file)
-		if err != nil {
-			return nil, fmt.Errorf("failed to resolve value type: %w", err)
-		}
-		valueBoolOrSchema := openapi.NewBoolOrSchema(valueRef)
-		valueBoolOrSchema.Allowed = true
-		builder := openapi.NewSchemaBuilder().
-			AddType("object").
-			AdditionalProperties(valueBoolOrSchema)
-		for _, option := range options {
-			option(builder)
-		}
-		return builder.Build(), nil
+		return r.resolveMap(typeName, file, options...)
 	}
 
 	basicSchema := parseBasicType(typeName, options...)
@@ -196,6 +164,60 @@ func (r *resolver) Resolve(typeName string, file *ast.File, options ...SchemaOpt
 		}
 	}
 	return nil, fmt.Errorf("failed to resolve type: %s", typeName)
+}
+
+func (r *resolver) resolveMap(typeName string, file *ast.File, options ...SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
+	matches := mapTypeRegex.FindStringSubmatch(typeName)
+	if len(matches) != 3 {
+		return nil, fmt.Errorf("invalid map type: %s", typeName)
+	}
+	keyTypeName := matches[1]
+	if keyTypeName != "string" {
+		return nil, fmt.Errorf("map key type must be string, got %s", keyTypeName)
+	}
+	valueTypeName := matches[2]
+	valueRef, err := r.Resolve(valueTypeName, file)
+	if err != nil {
+		return nil, fmt.Errorf("failed to resolve value type: %w", err)
+	}
+	valueBoolOrSchema := openapi.NewBoolOrSchema(valueRef)
+	valueBoolOrSchema.Allowed = true
+	builder := openapi.NewSchemaBuilder().
+		AddType("object").
+		AdditionalProperties(valueBoolOrSchema)
+	for _, option := range options {
+		option(builder)
+	}
+	return builder.Build(), nil
+}
+
+func (r *resolver) resolveArray(typeName string, file *ast.File, options ...SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
+	matches := arrayTypeRegex.FindStringSubmatch(typeName)
+	if len(matches) != 3 {
+		return nil, fmt.Errorf("invalid array type: %s", typeName)
+	}
+	itemTypeName := matches[2]
+	itemRef, err := r.Resolve(itemTypeName, file)
+	if err != nil {
+		return nil, fmt.Errorf("failed to resolve item type: %w", err)
+	}
+	items := openapi.NewBoolOrSchema(itemRef)
+	items.Allowed = true
+	builder := openapi.NewSchemaBuilder().
+		AddType("array").
+		Items(items)
+	if matches[1] != "" {
+		length, err := strconv.Atoi(matches[1])
+		if err != nil {
+			return nil, fmt.Errorf("invalid array length: %s", matches[1])
+		}
+		builder.MinItems(length)
+		builder.MaxItems(length)
+	}
+	for _, option := range options {
+		option(builder)
+	}
+	return builder.Build(), nil
 }
 
 func (r *resolver) candidates(typeName string, typeParams []string, file *ast.File) ([]*locator, error) {

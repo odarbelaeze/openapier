@@ -126,6 +126,14 @@ func (b *schemaBuilder) buildArray(ty *ast.ArrayType, options ...SchemaOption) (
 	itemSchema := openapi.NewBoolOrSchema(elementSchema)
 	itemSchema.Allowed = true
 	builder.Items(itemSchema)
+	if ty.Len != nil {
+		if basicLit, ok := ty.Len.(*ast.BasicLit); ok {
+			if val, err := strconv.Atoi(basicLit.Value); err == nil {
+				builder.MinItems(val)
+				builder.MaxItems(val)
+			}
+		}
+	}
 	for _, option := range options {
 		option(builder)
 	}

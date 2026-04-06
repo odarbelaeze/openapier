@@ -46,6 +46,9 @@ type Todo struct {
 	// Attributes is a map of additional attributes for the todo
 	Attributes map[string]string `json:"attributes"`
 
+	// Coordinates is the geographical coordinates of the todo
+	Coordinates [3]float64 `json:"coordinates"`
+
 	// Created is the time the todo was created
 	Created time.Time `json:"created"`
 
@@ -175,7 +178,8 @@ type TodoPatchPayload struct {
 // @param id uuid.UUID path Todo ID
 // @requestBody application/json TodoPatchPayload The payload to update the todo
 // @response 200 application/json Todo The updated todo
-// @response 201 application/json map[string]Todo The updated todo
+// @response 201 application/json map[string]Todo A map of the updated todo
+// @response 202 application/json [2]Todo An array of exactly two todos
 // @response 404 application/json RestError Todo not found
 // @response 500 application/json RestError Internal server error
 // @router /todos/{id} [patch]

@@ -58,6 +58,15 @@ components:
           description: |
             Completed is the completion status of the todo
           type: string
+        coordinates:
+          description: |
+            Coordinates is the geographical coordinates of the todo
+          items:
+            format: double
+            type: number
+          maxItems: 3
+          minItems: 3
+          type: array
         created:
           description: |
             Created is the time the todo was created
@@ -83,6 +92,7 @@ components:
         - title
         - completed
         - attributes
+        - coordinates
         - created
         - updated
       type: object
@@ -226,7 +236,17 @@ paths:
                 additionalProperties:
                   $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.Todo'
                 type: object
-          description: The updated todo
+          description: A map of the updated todo
+        "202":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/github_com_odarbelaeze_test_types:main.Todo'
+                maxItems: 2
+                minItems: 2
+                type: array
+          description: An array of exactly two todos
         "404":
           content:
             application/json:
