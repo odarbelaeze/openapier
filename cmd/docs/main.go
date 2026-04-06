@@ -38,7 +38,8 @@ func printComments[T comment](comments []T) {
 	})
 
 	for _, c := range comments {
-		usage := strings.ReplaceAll(c.Usage(), "|", "\\|")
-		fmt.Printf("| `@%s` | `%s` |\n", c.Tag(), usage)
+		tag := strings.ReplaceAll(c.Tag(), "`", "\\`")
+		usage := strings.ReplaceAll(c.Usage(), "`", "\\`")
+		fmt.Printf("| `@%s` | `%s` |\n", tag, usage)
 	}
 }

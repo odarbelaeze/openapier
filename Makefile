@@ -1,4 +1,4 @@
-SOURCES := $(wildcard ./pkg/**/*.go ./cmd/**/*.go)
+SOURCES := $(shell find pkg cmd -name '*.go')
 TEST_DIRS := $(wildcard pkg/parser/testdata/*/)
 SNAPSHOTS := $(addsuffix expected.yaml, $(TEST_DIRS))
 
