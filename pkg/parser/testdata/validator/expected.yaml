@@ -1,0 +1,309 @@
+components:
+  schemas:
+    github_com_odarbelaeze_test_validator:main.PaginatedTodos:
+      properties:
+        meta:
+          $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.Pagination'
+        todos:
+          description: |
+            Todos is the list of todos
+          items:
+            $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.Todo'
+          type: array
+      required:
+        - todos
+        - meta
+      type: object
+    github_com_odarbelaeze_test_validator:main.Pagination:
+      description: |
+        Meta is the pagination metadata
+      properties:
+        cursor:
+          description: |
+            Cursor is the cursor for the next page
+          type: string
+        hasMore:
+          description: |
+            HasMore indicates if there are more pages
+          type: boolean
+      required:
+        - cursor
+        - hasMore
+      type: object
+    github_com_odarbelaeze_test_validator:main.RestError:
+      properties:
+        code:
+          description: |
+            Code is the HTTP status code
+          example: 500
+          format: int32
+          type: integer
+        message:
+          description: |
+            Message is the error message
+          type: string
+      required:
+        - code
+        - message
+      type: object
+    github_com_odarbelaeze_test_validator:main.Todo:
+      properties:
+        attributes:
+          additionalProperties:
+            type: string
+          description: |
+            Attributes is a map of additional attributes for the todo
+          maxProperties: 12
+          minProperties: 12
+          type: object
+        completed:
+          description: |
+            Completed is the completion status of the todo
+          type: string
+        coordinates:
+          description: |
+            Coordinates is the geographical coordinates of the todo
+          items:
+            format: double
+            type: number
+          maxItems: 3
+          minItems: 3
+          type: array
+        created:
+          description: |
+            Created is the time the todo was created
+          format: date-time
+          type: string
+        description:
+          description: |
+            Description is a string with an exact lengt
+          example: Buy 2 liters of milk from the store.
+          maxLength: 50
+          minLength: 50
+          type: string
+        id:
+          description: |
+            ID is the unique identifier for the todo
+          format: uuid
+          type: string
+        title:
+          description: |
+            Title is the title of the todo
+          example: Buy milk
+          type: string
+        updated:
+          description: |
+            Updated is the time the todo was last updated
+          format: date-time
+          type: string
+      required:
+        - id
+        - title
+        - description
+        - completed
+        - attributes
+        - coordinates
+        - created
+        - updated
+      type: object
+    github_com_odarbelaeze_test_validator:main.TodoCreatePayload:
+      properties:
+        title:
+          description: |
+            Title is the title of the todo
+          type: string
+      required:
+        - title
+      type: object
+    github_com_odarbelaeze_test_validator:main.TodoPatchPayload:
+      properties:
+        completed:
+          description: |
+            Optional field for patching a todo's completion status
+          type: boolean
+        title:
+          description: |
+            Optional field for patching a todo's title
+          type: string
+      type: object
+    github_com_odarbelaeze_test_validator:main.TodoUpdatePayload:
+      properties:
+        completed:
+          description: |
+            Completed is the completion status of the todo
+          type: boolean
+        title:
+          description: |
+            Title is the title of the todo
+          type: string
+      required:
+        - title
+        - completed
+      type: object
+info:
+  description: This is a sample API that exposes types.
+  termsOfService: http://swagger.io/terms/
+  title: API that exposes types
+  version: "1.0"
+jsonSchemaDialect: https://spec.openapis.org/oas/3.1/dialect/base
+openapi: 3.1.1
+paths:
+  /todos:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.PaginatedTodos'
+          description: Paginated list of todos
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.RestError'
+          description: Internal server error
+      summary: List todos
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.TodoCreatePayload'
+        description: The payload to create the todo
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.Todo'
+          description: The recently created todo
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.RestError'
+          description: Internal server error
+      summary: Create a todo
+  /todos/{id}:
+    get:
+      parameters:
+        - description: Todo ID
+          in: path
+          name: id
+          required: true
+          schema:
+            format: uuid
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.Todo'
+          description: The requested todo
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.RestError'
+          description: Todo not found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.RestError'
+          description: Internal server error
+      summary: Get a todo
+    patch:
+      parameters:
+        - description: Todo ID
+          in: path
+          name: id
+          required: true
+          schema:
+            format: uuid
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.TodoPatchPayload'
+        description: The payload to update the todo
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.Todo'
+          description: The updated todo
+        "201":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.Todo'
+                type: object
+          description: A map of the updated todo
+        "202":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.Todo'
+                maxItems: 2
+                minItems: 2
+                type: array
+          description: An array of exactly two todos
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.RestError'
+          description: Todo not found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.RestError'
+          description: Internal server error
+      summary: Patch a todo
+    put:
+      parameters:
+        - description: Todo ID
+          in: path
+          name: id
+          required: true
+          schema:
+            format: uuid
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.TodoUpdatePayload'
+        description: The payload to update the todo
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.Todo'
+          description: The updated todo
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.RestError'
+          description: Todo not found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.RestError'
+          description: Internal server error
+      summary: Update a todo
+

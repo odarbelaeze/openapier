@@ -19,10 +19,10 @@ func TestRequiredTag(t *testing.T) {
 	})
 
 	t.Run("Parse", func(t *testing.T) {
-		opts, err := tag.Parse("")
+		opts, err := tag.Parse("", "")
 		require.NoError(t, err)
 		assert.Len(t, opts, 1)
-		// We can't easily inspect the option function itself, but we've verified 
+		// We can't easily inspect the option function itself, but we've verified
 		// it returns one option as expected.
 	})
 }

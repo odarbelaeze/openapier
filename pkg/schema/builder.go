@@ -103,7 +103,11 @@ func (b *schemaBuilder) buildStruct(ty *ast.StructType, opts ...options.SchemaOp
 
 				validate := tag.Get(validateStructTag)
 				if validate != "" {
-					validateOpts, err := b.validatorRegistry.Parse(validate)
+					schemaType, err := parseSchemaType(field.Type)
+					if err != nil {
+						return nil, fmt.Errorf("failed to parse schema type for field %s: %w", name, err)
+					}
+					validateOpts, err := b.validatorRegistry.Parse(validate, *schemaType)
 					if err != nil {
 						return nil, fmt.Errorf("failed to parse validate tag for field %s: %w", name, err)
 					}
@@ -151,6 +155,31 @@ func (b *schemaBuilder) buildArray(ty *ast.ArrayType, opts ...options.SchemaOpti
 		option(builder)
 	}
 	return builder.Build(), nil
+}
+
+func parseSchemaType(ty ast.Expr) (*string, error) {
+	switch expr := ty.(type) {
+	case *ast.Ident:
+		switch expr.Name {
+		case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
+			return new("integer"), nil
+		case "float32", "float64":
+			return new("number"), nil
+		case "bool":
+			return new("boolean"), nil
+		case "string":
+			return new("string"), nil
+		default:
+			return nil, fmt.Errorf("unsupported type %s", expr.Name)
+		}
+	case *ast.StarExpr:
+		return parseSchemaType(expr.X)
+	case *ast.ArrayType:
+		return new("array"), nil
+	case *ast.MapType:
+		return new("object"), nil
+	}
+	return nil, fmt.Errorf("unsupported type %T", ty)
 }
 
 func parseExampleValue(example string, ty ast.Expr) any {

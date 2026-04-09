@@ -21,3 +21,39 @@ func WithExample(example any) SchemaOption {
 		sb.Example(example)
 	}
 }
+
+func WithMinLength(minLength int) SchemaOption {
+	return func(sb *openapi.SchemaBuilder) {
+		sb.MinLength(minLength)
+	}
+}
+
+func WithMaxLength(maxLength int) SchemaOption {
+	return func(sb *openapi.SchemaBuilder) {
+		sb.MaxLength(maxLength)
+	}
+}
+
+func WithMinItems(minItems int) SchemaOption {
+	return func(sb *openapi.SchemaBuilder) {
+		sb.MinItems(minItems)
+	}
+}
+
+func WithMaxItems(maxItems int) SchemaOption {
+	return func(sb *openapi.SchemaBuilder) {
+		sb.MaxItems(maxItems)
+	}
+}
+
+func WithMinProperties(minProperties int) SchemaOption {
+	return func(sb *openapi.SchemaBuilder) {
+		sb.MinProperties(minProperties)
+	}
+}
+
+func WithMaxProperties(maxProperties int) SchemaOption {
+	return func(sb *openapi.SchemaBuilder) {
+		sb.MaxProperties(maxProperties)
+	}
+}
