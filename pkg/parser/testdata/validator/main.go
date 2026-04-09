@@ -52,6 +52,9 @@ type Todo struct {
 	// Coordinates is the geographical coordinates of the todo
 	Coordinates [3]float64 `json:"coordinates"`
 
+	// Mailto is the email address of the todo owner
+	Mailto *string `json:"mailto" validate:"email"`
+
 	// Created is the time the todo was created
 	Created time.Time `json:"created"`
 

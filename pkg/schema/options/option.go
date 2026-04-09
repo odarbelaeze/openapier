@@ -69,3 +69,9 @@ func WithMaximum(maximum int) SchemaOption {
 		sb.Maximum(maximum)
 	}
 }
+
+func WithFormat(format string) SchemaOption {
+	return func(sb *openapi.SchemaBuilder) {
+		sb.Format(format)
+	}
+}

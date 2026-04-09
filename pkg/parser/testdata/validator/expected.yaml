@@ -87,6 +87,11 @@ components:
             ID is the unique identifier for the todo
           format: uuid
           type: string
+        mailto:
+          description: |
+            Mailto is the email address of the todo owner
+          format: email
+          type: string
         title:
           description: |
             Title is the title of the todo
