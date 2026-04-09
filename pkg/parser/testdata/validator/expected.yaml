@@ -48,7 +48,14 @@ components:
           description: |
             Message is the error message
           type: string
+        success:
+          description: |
+            Success is a boolean indicating if the request was successful
+          enum:
+            - false
+          type: boolean
       required:
+        - success
         - code
         - message
       type: object

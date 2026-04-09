@@ -17,6 +17,9 @@ func main() {
 }
 
 type RestError struct {
+	// Success is a boolean indicating if the request was successful
+	Success bool `json:"success" validate:"eq=false"`
+
 	// Code is the HTTP status code
 	Code int `json:"code,string" example:"500"`
 

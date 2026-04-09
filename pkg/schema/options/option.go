@@ -75,3 +75,9 @@ func WithFormat(format string) SchemaOption {
 		sb.Format(format)
 	}
 }
+
+func WithEnum(values ...any) SchemaOption {
+	return func(sb *openapi.SchemaBuilder) {
+		sb.Enum(values...)
+	}
+}
