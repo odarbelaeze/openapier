@@ -15,6 +15,7 @@ import (
 	"github.com/odarbelaeze/openapier/pkg/comments/operation"
 	"github.com/odarbelaeze/openapier/pkg/comments/spec"
 	"github.com/odarbelaeze/openapier/pkg/schema"
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	ignore "github.com/sabhiram/go-gitignore"
 	"github.com/sv-tools/openapi"
 	"golang.org/x/mod/modfile"
@@ -109,7 +110,7 @@ func (p *parser) parseTypes(root string) (schema.Resolver, error) {
 	if f.Module == nil {
 		return nil, fmt.Errorf("module declaration not found in go.mod file")
 	}
-	cache := schema.NewResolver()
+	cache := schema.NewResolver(validator.Default())
 	fileSet := token.NewFileSet()
 	err = p.walkGoFiles(root, func(p string) error {
 		node, err := goparser.ParseFile(fileSet, p, nil, goparser.ParseComments)

@@ -55,7 +55,7 @@ func TestParamComment(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			op := operation.NewOperation(schema.NewResolver())
+			op := operation.NewOperation(schema.NewResolver(nil))
 
 			err := comment.ParseInto(tt.content, nil, op)
 			if tt.expectError {

@@ -12,7 +12,7 @@ import (
 )
 
 func TestNewOperation(t *testing.T) {
-	op := operation.NewOperation(schema.NewResolver())
+	op := operation.NewOperation(schema.NewResolver(nil))
 	assert.NotNil(t, op)
 	assert.NotNil(t, op.Builder)
 	assert.NotNil(t, op.Routes)
@@ -90,7 +90,7 @@ func TestOperation_Attach(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			op := operation.NewOperation(schema.NewResolver())
+			op := operation.NewOperation(schema.NewResolver(nil))
 			op.Routes = tt.routes
 			if tt.setupBuilder != nil {
 				tt.setupBuilder(op.Builder)

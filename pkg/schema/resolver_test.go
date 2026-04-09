@@ -10,7 +10,7 @@ import (
 )
 
 func TestResolver_Resolve_BasicType_Success(t *testing.T) {
-	r := schema.NewResolver()
+	r := schema.NewResolver(nil)
 
 	tests := []struct {
 		name     string

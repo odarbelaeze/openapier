@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/odarbelaeze/openapier/pkg/schema/options"
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/sv-tools/openapi"
 )
 
@@ -36,13 +38,16 @@ type Resolver interface {
 	Collect(path string, file *ast.File)
 
 	// Resolve resolves the given type into a schema.
-	Resolve(typeName string, file *ast.File, options ...SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error)
+	Resolve(typeName string, file *ast.File, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error)
 
 	// Definitions returns the definitions that have been resolved.
 	Definitions() map[string]*openapi.RefOrSpec[openapi.Schema]
 }
 
 type resolver struct {
+	// validatorRegistry is the registry of validators used to validate schemas.
+	validatorRegistry validator.Registry
+
 	// definitions is a map of the definitions that have been resolved.
 	definitions map[string]*openapi.RefOrSpec[openapi.Schema]
 
@@ -54,11 +59,12 @@ type resolver struct {
 }
 
 // NewResolver creates a new resolver.
-func NewResolver() Resolver {
+func NewResolver(validatorRegistry validator.Registry) Resolver {
 	return &resolver{
-		definitions: make(map[string]*openapi.RefOrSpec[openapi.Schema]),
-		cacheByPkg:  make(map[string]map[string]*typeDef),
-		loaded:      make(map[string]struct{}),
+		validatorRegistry: validatorRegistry,
+		definitions:       make(map[string]*openapi.RefOrSpec[openapi.Schema]),
+		cacheByPkg:        make(map[string]map[string]*typeDef),
+		loaded:            make(map[string]struct{}),
 	}
 }
 
@@ -102,16 +108,16 @@ func (r *resolver) Definitions() map[string]*openapi.RefOrSpec[openapi.Schema] {
 }
 
 // Resolve implements [Resolver].
-func (r *resolver) Resolve(typeName string, file *ast.File, options ...SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
+func (r *resolver) Resolve(typeName string, file *ast.File, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
 	if strings.HasPrefix(typeName, "[") {
-		return r.resolveArray(typeName, file, options...)
+		return r.resolveArray(typeName, file, opts...)
 	}
 
 	if strings.HasPrefix(typeName, "map[") {
-		return r.resolveMap(typeName, file, options...)
+		return r.resolveMap(typeName, file, opts...)
 	}
 
-	basicSchema := parseBasicType(typeName, options...)
+	basicSchema := parseBasicType(typeName, opts...)
 	if basicSchema != nil {
 		return basicSchema, nil
 	}
@@ -153,7 +159,7 @@ func (r *resolver) Resolve(typeName string, file *ast.File, options ...SchemaOpt
 						}
 					}
 				}
-				spec, err := r.spec(t, aliases, options...)
+				spec, err := r.spec(t, aliases, opts...)
 				if err != nil {
 					return nil, fmt.Errorf("failed to build spec: %w", err)
 				}
@@ -166,7 +172,7 @@ func (r *resolver) Resolve(typeName string, file *ast.File, options ...SchemaOpt
 	return nil, fmt.Errorf("failed to resolve type: %s", typeName)
 }
 
-func (r *resolver) resolveMap(typeName string, file *ast.File, options ...SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
+func (r *resolver) resolveMap(typeName string, file *ast.File, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
 	matches := mapTypeRegex.FindStringSubmatch(typeName)
 	if len(matches) != 3 {
 		return nil, fmt.Errorf("invalid map type: %s", typeName)
@@ -185,13 +191,13 @@ func (r *resolver) resolveMap(typeName string, file *ast.File, options ...Schema
 	builder := openapi.NewSchemaBuilder().
 		AddType("object").
 		AdditionalProperties(valueBoolOrSchema)
-	for _, option := range options {
+	for _, option := range opts {
 		option(builder)
 	}
 	return builder.Build(), nil
 }
 
-func (r *resolver) resolveArray(typeName string, file *ast.File, options ...SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
+func (r *resolver) resolveArray(typeName string, file *ast.File, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
 	matches := arrayTypeRegex.FindStringSubmatch(typeName)
 	if len(matches) != 3 {
 		return nil, fmt.Errorf("invalid array type: %s", typeName)
@@ -214,7 +220,7 @@ func (r *resolver) resolveArray(typeName string, file *ast.File, options ...Sche
 		builder.MinItems(length)
 		builder.MaxItems(length)
 	}
-	for _, option := range options {
+	for _, option := range opts {
 		option(builder)
 	}
 	return builder.Build(), nil
@@ -276,12 +282,17 @@ func (r *resolver) loadExternal(importPath string) {
 	slog.Debug("loading external package", "importPath", importPath)
 }
 
-func (r *resolver) spec(t *typeDef, aliases map[string]string, options ...SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
+func (r *resolver) spec(
+	t *typeDef,
+	aliases map[string]string,
+	opts ...options.SchemaOption,
+) (*openapi.RefOrSpec[openapi.Schema], error) {
 	slog.Debug("finding spec for", "typeName", t.TypeSpec.Name.Name)
 	builder := schemaBuilder{
-		resolver: r,
-		file:     t.File,
-		aliases:  aliases,
+		validatorRegistry: r.validatorRegistry,
+		resolver:          r,
+		file:              t.File,
+		aliases:           aliases,
 	}
-	return builder.build(t.TypeSpec.Type, options...)
+	return builder.build(t.TypeSpec.Type, opts...)
 }

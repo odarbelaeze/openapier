@@ -27,7 +27,7 @@ func TestParamDescriptionComment(t *testing.T) {
 			name:    "valid param description",
 			content: "id the unique identifier of the item",
 			setupOp: func() *operation.Operation {
-				op := operation.NewOperation(schema.NewResolver())
+				op := operation.NewOperation(schema.NewResolver(nil))
 				op.Builder.AddParameters(openapi.NewParameterBuilder().Name("id").Build())
 				return op
 			},
@@ -42,7 +42,7 @@ func TestParamDescriptionComment(t *testing.T) {
 			name:    "parameter not found",
 			content: "limit the maximum number of items",
 			setupOp: func() *operation.Operation {
-				op := operation.NewOperation(schema.NewResolver())
+				op := operation.NewOperation(schema.NewResolver(nil))
 				op.Builder.AddParameters(openapi.NewParameterBuilder().Name("id").Build())
 				return op
 			},
@@ -52,7 +52,7 @@ func TestParamDescriptionComment(t *testing.T) {
 			name:    "invalid format",
 			content: "id",
 			setupOp: func() *operation.Operation {
-				return operation.NewOperation(schema.NewResolver())
+				return operation.NewOperation(schema.NewResolver(nil))
 			},
 			expectError: true,
 		},
