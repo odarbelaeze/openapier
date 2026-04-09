@@ -103,7 +103,11 @@ func (b *schemaBuilder) buildStruct(ty *ast.StructType, opts ...options.SchemaOp
 
 				validate := tag.Get(validateStructTag)
 				if validate != "" {
-					fieldOptions = append(fieldOptions, b.validatorRegistry.Parse(validate)...)
+					validateOpts, err := b.validatorRegistry.Parse(validate)
+					if err != nil {
+						return nil, fmt.Errorf("failed to parse validate tag for field %s: %w", name, err)
+					}
+					fieldOptions = append(fieldOptions, validateOpts...)
 				}
 			}
 			if field.Doc != nil {

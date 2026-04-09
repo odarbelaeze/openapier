@@ -12,10 +12,10 @@ func (t RequiredTag) Tag() string {
 	return "required"
 }
 
-func (t RequiredTag) Parse(string) []options.SchemaOption {
+func (t RequiredTag) Parse(string) ([]options.SchemaOption, error) {
 	return []options.SchemaOption{
 		options.WithRequired(),
-	}
+	}, nil
 }
 
 func (t RequiredTag) Usage() string {

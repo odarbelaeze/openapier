@@ -4,6 +4,6 @@ import "github.com/odarbelaeze/openapier/pkg/schema/options"
 
 type ValidatorTag interface {
 	Tag() string
-	Parse(string) []options.SchemaOption
+	Parse(string) ([]options.SchemaOption, error)
 	Usage() string
 }
