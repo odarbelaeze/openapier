@@ -69,6 +69,9 @@ type Pagination struct {
 
 	// HasMore indicates if there are more pages
 	HasMore bool `json:"hasMore"`
+
+	// Next is the URL for the next page
+	Next *string `json:"next" validate:"omitempty,url"`
 }
 
 // PaginatedTodos is a model for paginated todos

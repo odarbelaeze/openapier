@@ -27,6 +27,11 @@ components:
           description: |
             HasMore indicates if there are more pages
           type: boolean
+        next:
+          description: |
+            Next is the URL for the next page
+          format: url
+          type: string
       required:
         - cursor
         - hasMore
