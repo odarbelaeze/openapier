@@ -9,6 +9,7 @@ components:
             Todos is the list of todos
           items:
             $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.Todo'
+          maxItems: 100
           type: array
       required:
         - todos
@@ -90,6 +91,8 @@ components:
           description: |
             Title is the title of the todo
           example: Buy milk
+          maxLength: 100
+          minLength: 3
           type: string
         updated:
           description: |

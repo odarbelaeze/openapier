@@ -57,3 +57,15 @@ func WithMaxProperties(maxProperties int) SchemaOption {
 		sb.MaxProperties(maxProperties)
 	}
 }
+
+func WithMinimum(minimum int) SchemaOption {
+	return func(sb *openapi.SchemaBuilder) {
+		sb.Minimum(minimum)
+	}
+}
+
+func WithMaximum(maximum int) SchemaOption {
+	return func(sb *openapi.SchemaBuilder) {
+		sb.Maximum(maximum)
+	}
+}

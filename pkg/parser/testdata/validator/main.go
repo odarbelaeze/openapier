@@ -38,7 +38,7 @@ type Todo struct {
 	ID uuid.UUID `json:"id"`
 
 	// Title is the title of the todo
-	Title string `json:"title" example:"Buy milk"`
+	Title string `json:"title" example:"Buy milk" validate:"required,min=3,max=100"`
 
 	// Description is a string with an exact lengt
 	Description string `json:"description" example:"Buy 2 liters of milk from the store." validate:"requited,len=50"`
@@ -71,7 +71,7 @@ type Pagination struct {
 // PaginatedTodos is a model for paginated todos
 type PaginatedTodos struct {
 	// Todos is the list of todos
-	Todos []Todo `json:"todos"`
+	Todos []Todo `json:"todos" validate:"max=100"`
 
 	// Meta is the pagination metadata
 	Meta Pagination `json:"meta"`
