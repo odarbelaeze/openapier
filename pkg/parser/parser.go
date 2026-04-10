@@ -14,7 +14,7 @@ import (
 
 	"github.com/odarbelaeze/openapier/pkg/comments/operation"
 	"github.com/odarbelaeze/openapier/pkg/comments/spec"
-	"github.com/odarbelaeze/openapier/pkg/schema"
+	"github.com/odarbelaeze/openapier/pkg/schema/resolver"
 	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	ignore "github.com/sabhiram/go-gitignore"
 	"github.com/sv-tools/openapi"
@@ -94,7 +94,7 @@ func (p *parser) parseSpec(main string, spec *openapi.Extendable[openapi.OpenAPI
 	return nil
 }
 
-func (p *parser) parseTypes(root string) (schema.Resolver, error) {
+func (p *parser) parseTypes(root string) (resolver.Resolver, error) {
 	gomodPath := path.Join(root, "go.mod")
 	gomodData, err := os.ReadFile(gomodPath)
 	if err != nil {
@@ -110,7 +110,7 @@ func (p *parser) parseTypes(root string) (schema.Resolver, error) {
 	if f.Module == nil {
 		return nil, fmt.Errorf("module declaration not found in go.mod file")
 	}
-	cache := schema.NewResolver(validator.Default())
+	cache := resolver.NewResolver(validator.Default())
 	fileSet := token.NewFileSet()
 	err = p.walkGoFiles(root, func(p string) error {
 		node, err := goparser.ParseFile(fileSet, p, nil, goparser.ParseComments)
@@ -131,7 +131,11 @@ func (p *parser) parseTypes(root string) (schema.Resolver, error) {
 	return cache, nil
 }
 
-func (p *parser) parseOperations(root string, resolver schema.Resolver, spec *openapi.Extendable[openapi.OpenAPI]) error {
+func (p *parser) parseOperations(
+	root string,
+	resolver resolver.Resolver,
+	spec *openapi.Extendable[openapi.OpenAPI],
+) error {
 	fileSet := token.NewFileSet()
 	err := p.walkGoFiles(root, func(path string) error {
 		node, err := goparser.ParseFile(fileSet, path, nil, goparser.ParseComments)

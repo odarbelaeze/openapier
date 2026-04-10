@@ -1,16 +1,16 @@
-package schema_test
+package resolver_test
 
 import (
 	"testing"
 
-	"github.com/odarbelaeze/openapier/pkg/schema"
+	"github.com/odarbelaeze/openapier/pkg/schema/resolver"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/sv-tools/openapi"
 )
 
 func TestResolver_Resolve_BasicType_Success(t *testing.T) {
-	r := schema.NewResolver(nil)
+	r := resolver.NewResolver(nil)
 
 	tests := []struct {
 		name     string

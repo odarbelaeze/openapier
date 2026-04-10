@@ -1,4 +1,4 @@
-package schema
+package resolver
 
 import (
 	"fmt"
@@ -118,7 +118,7 @@ func (r *resolver) Resolve(typeName string, file *ast.File, opts ...options.Sche
 		return r.resolveMap(typeName, file, opts...)
 	}
 
-	basicSchema := parseBasicType(typeName, opts...)
+	basicSchema := r.resolveBasicType(typeName, opts...)
 	if basicSchema != nil {
 		return basicSchema, nil
 	}
@@ -171,6 +171,39 @@ func (r *resolver) Resolve(typeName string, file *ast.File, opts ...options.Sche
 		}
 	}
 	return nil, fmt.Errorf("failed to resolve type: %s", typeName)
+}
+
+func (r *resolver) resolveBasicType(typeName string, opts ...options.SchemaOption) *openapi.RefOrSpec[openapi.Schema] {
+	b := openapi.NewSchemaBuilder()
+	switch typeName {
+	case "int", "int32", "uint", "uint32":
+		b.AddType("integer").Format("int32")
+	case "int64", "uint64":
+		b.AddType("integer").Format("int64")
+	case "float32":
+		b.AddType("number").Format("float")
+	case "float64":
+		b.AddType("number").Format("double")
+	case "bool":
+		b.AddType("boolean")
+	case "string":
+		b.AddType("string")
+	case "file":
+		b.AddType("string").Format("binary")
+	case "time.Time":
+		b.AddType("string").Format("date-time")
+	case "uuid.UUID":
+		b.AddType("string").Format("uuid")
+	case "any":
+		// empty schema for any
+	default:
+		// this is not a basic type, let the caller figure it out
+		return nil
+	}
+	for _, option := range opts {
+		option(b)
+	}
+	return b.Build()
 }
 
 func (r *resolver) resolveMap(typeName string, file *ast.File, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
@@ -289,11 +322,11 @@ func (r *resolver) spec(
 	opts ...options.SchemaOption,
 ) (*openapi.RefOrSpec[openapi.Schema], error) {
 	slog.Debug("finding spec for", "typeName", t.TypeSpec.Name.Name)
-	builder := schemaBuilder{
-		validatorRegistry: r.validatorRegistry,
-		resolver:          r,
-		file:              t.File,
-		aliases:           aliases,
-	}
-	return builder.build(t.TypeSpec.Type, opts...)
+	b := NewSchemaBuilder(
+		r.validatorRegistry,
+		r,
+		t.File,
+		aliases,
+	)
+	return b.Build(t.TypeSpec.Type, opts...)
 }

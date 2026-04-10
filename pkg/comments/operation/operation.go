@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/odarbelaeze/openapier/pkg/schema"
+	"github.com/odarbelaeze/openapier/pkg/schema/resolver"
 	"github.com/sv-tools/openapi"
 )
 
@@ -14,11 +14,11 @@ type Operation struct {
 	Builder          *openapi.OperationBuilder
 	ResponsesBuilder *openapi.ResponsesBuilder
 	Routes           Routes
-	Resolver         schema.Resolver
+	Resolver         resolver.Resolver
 }
 
 // NewOperation builds a new operation
-func NewOperation(resolver schema.Resolver) *Operation {
+func NewOperation(resolver resolver.Resolver) *Operation {
 	return &Operation{
 		Builder:          openapi.NewOperationBuilder(),
 		ResponsesBuilder: openapi.NewResponsesBuilder(),

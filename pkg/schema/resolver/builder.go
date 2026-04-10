@@ -1,4 +1,4 @@
-package schema
+package resolver
 
 import (
 	"fmt"
@@ -18,11 +18,29 @@ const (
 	validateStructTag = "validate"
 )
 
+type SchemaBuilder interface {
+	Build(expr ast.Expr, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error)
+}
+
 type schemaBuilder struct {
 	resolver          Resolver
 	validatorRegistry validator.Registry
 	file              *ast.File
 	aliases           map[string]string
+}
+
+func NewSchemaBuilder(
+	validatorRegistry validator.Registry,
+	resolver Resolver,
+	file *ast.File,
+	aliases map[string]string,
+) SchemaBuilder {
+	return &schemaBuilder{
+		validatorRegistry: validatorRegistry,
+		resolver:          resolver,
+		file:              file,
+		aliases:           aliases,
+	}
 }
 
 func (b *schemaBuilder) aliased(typeName string) string {
@@ -32,7 +50,7 @@ func (b *schemaBuilder) aliased(typeName string) string {
 	return typeName
 }
 
-func (b *schemaBuilder) build(expr ast.Expr, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
+func (b *schemaBuilder) Build(expr ast.Expr, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
 	switch ty := expr.(type) {
 	case *ast.Ident:
 		return b.resolver.Resolve(b.aliased(ty.Name), b.file, opts...)
@@ -41,7 +59,7 @@ func (b *schemaBuilder) build(expr ast.Expr, opts ...options.SchemaOption) (*ope
 	case *ast.StructType:
 		return b.buildStruct(ty, opts...)
 	case *ast.StarExpr:
-		return b.build(ty.X, opts...)
+		return b.Build(ty.X, opts...)
 	case *ast.SelectorExpr:
 		{
 			pkgIdent, ok := ty.X.(*ast.Ident)
@@ -61,7 +79,7 @@ func (b *schemaBuilder) build(expr ast.Expr, opts ...options.SchemaOption) (*ope
 
 func (b *schemaBuilder) buildMap(ty *ast.MapType, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
 	builder := openapi.NewSchemaBuilder().AddType("object")
-	valueSchema, err := b.build(ty.Value)
+	valueSchema, err := b.Build(ty.Value)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +138,7 @@ func (b *schemaBuilder) buildStruct(ty *ast.StructType, opts ...options.SchemaOp
 			if _, ok := field.Type.(*ast.StarExpr); !ok {
 				required = append(required, name)
 			}
-			schema, err := b.build(field.Type, fieldOptions...)
+			schema, err := b.Build(field.Type, fieldOptions...)
 			if err != nil {
 				return nil, fmt.Errorf("unsupported property type %T: %w", field.Type, err)
 			}
@@ -136,7 +154,7 @@ func (b *schemaBuilder) buildStruct(ty *ast.StructType, opts ...options.SchemaOp
 
 func (b *schemaBuilder) buildArray(ty *ast.ArrayType, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
 	builder := openapi.NewSchemaBuilder().Type("array")
-	elementSchema, err := b.build(ty.Elt)
+	elementSchema, err := b.Build(ty.Elt)
 	if err != nil {
 		return nil, fmt.Errorf("unsupported element type %T: %w", ty.Elt, err)
 	}
