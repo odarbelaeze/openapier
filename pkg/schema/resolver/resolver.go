@@ -49,6 +49,9 @@ type resolver struct {
 	// validatorRegistry is the registry of validators used to validate schemas.
 	validatorRegistry validator.Registry
 
+	// builderFactory is the factory used to create schema builders.
+	builderFactory SchemaBuilderFactory
+
 	// definitions is a map of the definitions that have been resolved.
 	definitions map[string]*openapi.RefOrSpec[openapi.Schema]
 
@@ -60,9 +63,10 @@ type resolver struct {
 }
 
 // NewResolver creates a new resolver.
-func NewResolver(validatorRegistry validator.Registry) Resolver {
+func NewResolver(validatorRegistry validator.Registry, builderFactory SchemaBuilderFactory) Resolver {
 	return &resolver{
 		validatorRegistry: validatorRegistry,
+		builderFactory:    builderFactory,
 		definitions:       make(map[string]*openapi.RefOrSpec[openapi.Schema]),
 		cacheByPkg:        make(map[string]map[string]*typeDef),
 		loaded:            make(map[string]struct{}),
@@ -322,7 +326,7 @@ func (r *resolver) spec(
 	opts ...options.SchemaOption,
 ) (*openapi.RefOrSpec[openapi.Schema], error) {
 	slog.Debug("finding spec for", "typeName", t.TypeSpec.Name.Name)
-	b := NewSchemaBuilder(
+	b := r.builderFactory(
 		r.validatorRegistry,
 		r,
 		t.File,

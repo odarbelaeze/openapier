@@ -22,6 +22,13 @@ type SchemaBuilder interface {
 	Build(expr ast.Expr, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error)
 }
 
+type SchemaBuilderFactory func(
+	validatorRegistry validator.Registry,
+	resolver Resolver,
+	file *ast.File,
+	aliases map[string]string,
+) SchemaBuilder
+
 type schemaBuilder struct {
 	resolver          Resolver
 	validatorRegistry validator.Registry

@@ -57,7 +57,7 @@ func TestResponseComment(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			op := operation.NewOperation(resolver.NewResolver(nil))
+			op := operation.NewOperation(resolver.NewResolver(nil, resolver.NewSchemaBuilder))
 			err := comment.ParseInto(tt.content, nil, op)
 			if tt.expectError {
 				require.Error(t, err)

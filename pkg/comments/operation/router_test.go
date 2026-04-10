@@ -51,7 +51,7 @@ func TestRouterComment_ParseInto(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			op := operation.NewOperation(resolver.NewResolver(nil))
+			op := operation.NewOperation(resolver.NewResolver(nil, resolver.NewSchemaBuilder))
 			comment := operation.NewRouterComment()
 
 			err := comment.ParseInto(tt.comment, nil, op)
@@ -79,7 +79,7 @@ func TestRouterComment_Usage(t *testing.T) {
 }
 
 func TestRouterComment_Integration(t *testing.T) {
-	op := operation.NewOperation(resolver.NewResolver(nil))
+	op := operation.NewOperation(resolver.NewResolver(nil, resolver.NewSchemaBuilder))
 	err := operation.DefaultRegistry.Parse("// @router /user [get]", nil, op)
 	require.NoError(t, err)
 

@@ -110,7 +110,7 @@ func (p *parser) parseTypes(root string) (resolver.Resolver, error) {
 	if f.Module == nil {
 		return nil, fmt.Errorf("module declaration not found in go.mod file")
 	}
-	cache := resolver.NewResolver(validator.Default())
+	cache := resolver.NewResolver(validator.Default(), resolver.NewSchemaBuilder)
 	fileSet := token.NewFileSet()
 	err = p.walkGoFiles(root, func(p string) error {
 		node, err := goparser.ParseFile(fileSet, p, nil, goparser.ParseComments)

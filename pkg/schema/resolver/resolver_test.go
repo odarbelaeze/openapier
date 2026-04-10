@@ -1,6 +1,8 @@
 package resolver_test
 
 import (
+	"go/parser"
+	"go/token"
 	"testing"
 
 	"github.com/odarbelaeze/openapier/pkg/schema/resolver"
@@ -10,7 +12,7 @@ import (
 )
 
 func TestResolver_Resolve_BasicType_Success(t *testing.T) {
-	r := resolver.NewResolver(nil)
+	r := resolver.NewResolver(nil, resolver.NewSchemaBuilder)
 
 	tests := []struct {
 		name     string
@@ -87,3 +89,67 @@ func TestResolver_Resolve_BasicType_Success(t *testing.T) {
 		})
 	}
 }
+
+func TestResolver_CollectAndResolve(t *testing.T) {
+	r := resolver.NewResolver(nil, resolver.NewSchemaBuilder)
+	fset := token.NewFileSet()
+	src := `package test
+type User struct {
+	Name string
+}`
+	f, err := parser.ParseFile(fset, "test.go", src, 0)
+	require.NoError(t, err)
+
+	r.Collect("github.com/test", f)
+
+	// Resolve the type
+	got, err := r.Resolve("User", f)
+	require.NoError(t, err)
+
+	assert.NotNil(t, got.Ref)
+	assert.Equal(t, "#/components/schemas/github_com_test:test.User", got.Ref.Ref)
+
+	// Verify it's in definitions
+	defs := r.Definitions()
+	assert.Contains(t, defs, "github_com_test:test.User")
+}
+
+func TestResolver_ResolveComplexTypes(t *testing.T) {
+	r := resolver.NewResolver(nil, resolver.NewSchemaBuilder)
+	fset := token.NewFileSet()
+	src := `package test
+type User struct {
+	Name string
+}`
+	f, err := parser.ParseFile(fset, "test.go", src, 0)
+	require.NoError(t, err)
+
+	r.Collect("github.com/test", f)
+
+	t.Run("resolve map", func(t *testing.T) {
+		got, err := r.Resolve("map[string]User", f)
+		require.NoError(t, err)
+		assert.NotNil(t, got.Spec)
+		assert.Equal(t, "object", (*got.Spec.Type)[0])
+		assert.NotNil(t, got.Spec.AdditionalProperties)
+	})
+
+	t.Run("resolve array", func(t *testing.T) {
+		got, err := r.Resolve("[]User", f)
+		require.NoError(t, err)
+		assert.NotNil(t, got.Spec)
+		assert.Equal(t, "array", (*got.Spec.Type)[0])
+		assert.NotNil(t, got.Spec.Items)
+	})
+
+	t.Run("resolve fixed array", func(t *testing.T) {
+		got, err := r.Resolve("[5]User", f)
+		require.NoError(t, err)
+		assert.NotNil(t, got.Spec)
+		assert.Equal(t, "array", (*got.Spec.Type)[0])
+		assert.Equal(t, 5, *got.Spec.MinItems)
+		assert.Equal(t, 5, *got.Spec.MaxItems)
+	})
+}
+
+
