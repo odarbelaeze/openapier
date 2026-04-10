@@ -3,6 +3,7 @@ package resolver
 import (
 	"fmt"
 	"go/ast"
+	"log/slog"
 	"reflect"
 	"strconv"
 	"strings"
@@ -103,6 +104,28 @@ func (b *schemaBuilder) buildStruct(ty *ast.StructType, opts ...options.SchemaOp
 	builder := openapi.NewSchemaBuilder().AddType("object")
 	required := []string{}
 	for _, field := range ty.Fields.List {
+		if field.Names == nil {
+			embedSchema, err := b.Build(field.Type)
+			if err != nil {
+				return nil, fmt.Errorf("error resolving embed schema: %w", err)
+			}
+			slog.Info("got an embed schema", "embedSchema", embedSchema)
+			var spec *openapi.Schema
+			if embedSchema.Spec == nil {
+				ref := strings.TrimLeft(embedSchema.Ref.Ref, "#/components/schemas/")
+				if cached, ok := b.resolver.Definitions()[ref]; ok {
+					spec = cached.Spec
+				} else {
+					return nil, fmt.Errorf("embed schema not found: %s", ref)
+				}
+			} else {
+				spec = embedSchema.Spec
+			}
+			required = append(required, spec.Required...)
+			for name, property := range spec.Properties {
+				builder.AddProperty(name, property)
+			}
+		}
 		for _, fieldName := range field.Names {
 			name := fieldName.Name
 			if !ast.IsExported(name) {

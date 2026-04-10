@@ -1,0 +1,183 @@
+components:
+  schemas:
+    github_com_odarbelaeze_test_embed:main.BaseTodo:
+      properties:
+        completed:
+          description: |
+            Completed is the completion status of the todo
+          type: string
+        description:
+          description: |
+            Description is a string with an exact length of 50 characters
+          examples:
+            - Buy 2 liters of milk from the store.
+          maxLength: 50
+          minLength: 50
+          type: string
+        title:
+          description: |
+            Title is the title of the todo
+          examples:
+            - Buy milk
+          maxLength: 100
+          minLength: 3
+          type: string
+      required:
+        - title
+        - description
+        - completed
+      type: object
+    github_com_odarbelaeze_test_embed:main.PaginatedTodos:
+      properties:
+        meta:
+          $ref: '#/components/schemas/github_com_odarbelaeze_test_embed:main.Pagination'
+        todos:
+          description: |
+            Todos is the list of todos
+          items:
+            $ref: '#/components/schemas/github_com_odarbelaeze_test_embed:main.Todo'
+          maxItems: 100
+          type: array
+      required:
+        - todos
+        - meta
+      type: object
+    github_com_odarbelaeze_test_embed:main.Pagination:
+      description: |
+        Meta is the pagination metadata
+      properties:
+        cursor:
+          description: |
+            Cursor is the cursor for the next page
+          type: string
+        hasMore:
+          description: |
+            HasMore indicates if there are more pages
+          type: boolean
+        next:
+          description: |
+            Next is the URL for the next page
+          format: url
+          type: string
+      required:
+        - cursor
+        - hasMore
+      type: object
+    github_com_odarbelaeze_test_embed:main.RestError:
+      properties:
+        code:
+          description: |
+            Code is the HTTP status code
+          examples:
+            - 500
+          format: int32
+          type: integer
+        message:
+          description: |
+            Message is the error message
+          type: string
+        success:
+          description: |
+            Success is a boolean indicating if the request was successful
+          enum:
+            - false
+          type: boolean
+      required:
+        - success
+        - code
+        - message
+      type: object
+    github_com_odarbelaeze_test_embed:main.Todo:
+      properties:
+        attributes:
+          additionalProperties:
+            type: string
+          description: |
+            Attributes is a map of additional attributes for the todo
+          maxProperties: 12
+          minProperties: 12
+          type: object
+        completed:
+          description: |
+            Completed is the completion status of the todo
+          type: string
+        coordinates:
+          description: |
+            Coordinates is the geographical coordinates of the todo
+          items:
+            format: double
+            type: number
+          maxItems: 3
+          minItems: 3
+          type: array
+        created:
+          description: |
+            Created is the time the todo was created
+          format: date-time
+          type: string
+        description:
+          description: |
+            Description is a string with an exact length of 50 characters
+          examples:
+            - Buy 2 liters of milk from the store.
+          maxLength: 50
+          minLength: 50
+          type: string
+        id:
+          description: |
+            ID is the unique identifier for the todo
+          format: uuid
+          type: string
+        mailto:
+          description: |
+            Mailto is the email address of the todo owner
+          format: email
+          type: string
+        title:
+          description: |
+            Title is the title of the todo
+          examples:
+            - Buy milk
+          maxLength: 100
+          minLength: 3
+          type: string
+        updated:
+          description: |
+            Updated is the time the todo was last updated
+          format: date-time
+          type: string
+      required:
+        - title
+        - description
+        - completed
+        - id
+        - attributes
+        - coordinates
+        - created
+        - updated
+      type: object
+info:
+  description: This is a sample API that exposes types.
+  termsOfService: http://swagger.io/terms/
+  title: API that exposes types
+  version: "1.0"
+jsonSchemaDialect: https://spec.openapis.org/oas/3.1/dialect/base
+openapi: 3.1.1
+paths:
+  /todos:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_embed:main.PaginatedTodos'
+          description: Paginated list of todos
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_embed:main.RestError'
+          description: Internal server error
+      summary: List todos
+

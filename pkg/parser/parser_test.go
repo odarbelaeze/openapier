@@ -39,6 +39,11 @@ func TestParser_Parse(t *testing.T) {
 			root: "./testdata/validator",
 			main: "main.go",
 		},
+		{
+			name: "should parse embedded fields",
+			root: "./testdata/embed/",
+			main: "main.go",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

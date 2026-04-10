@@ -164,7 +164,9 @@ func (r *resolver) Resolve(typeName string, file *ast.File, opts ...options.Sche
 						}
 					}
 				}
-				spec, err := r.spec(t, aliases, opts...)
+				slog.Debug("finding spec for", "typeName", t.TypeSpec.Name.Name)
+				b := r.builderFactory(r.validatorRegistry, r, t.File, aliases)
+				spec, err := b.Build(t.TypeSpec.Type, opts...)
 				if err != nil {
 					return nil, fmt.Errorf("failed to build spec: %w", err)
 				}
