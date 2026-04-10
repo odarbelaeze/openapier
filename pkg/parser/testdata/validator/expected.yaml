@@ -41,7 +41,8 @@ components:
         code:
           description: |
             Code is the HTTP status code
-          example: 500
+          examples:
+            - 500
           format: int32
           type: integer
         message:
@@ -90,7 +91,8 @@ components:
         description:
           description: |
             Description is a string with an exact lengt
-          example: Buy 2 liters of milk from the store.
+          examples:
+            - Buy 2 liters of milk from the store.
           maxLength: 50
           minLength: 50
           type: string
@@ -107,7 +109,8 @@ components:
         title:
           description: |
             Title is the title of the todo
-          example: Buy milk
+          examples:
+            - Buy milk
           maxLength: 100
           minLength: 3
           type: string

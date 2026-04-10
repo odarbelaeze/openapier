@@ -35,7 +35,8 @@ components:
         code:
           description: |
             Code is the HTTP status code
-          example: 500
+          examples:
+            - 500
           format: int32
           type: integer
         message:
@@ -65,7 +66,8 @@ components:
         title:
           description: |
             Title is the title of the todo
-          example: Buy milk
+          examples:
+            - Buy milk
           type: string
         updated:
           description: |

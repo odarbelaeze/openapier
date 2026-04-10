@@ -18,9 +18,9 @@ func TestOptions(t *testing.T) {
 			name:   "WithRequired",
 			option: options.WithRequired(),
 			validate: func(t *testing.T, s *openapi.Schema) {
-				// Note: openapi.Schema doesn't have a direct "Required" bool, 
+				// Note: openapi.Schema doesn't have a direct "Required" bool,
 				// it's usually handled by the parent object's Required list.
-				// However, the builder call exists, so we ensure it doesn't panic 
+				// However, the builder call exists, so we ensure it doesn't panic
 				// and we can check if it's nil or not.
 				assert.NotNil(t, s)
 			},
@@ -36,7 +36,7 @@ func TestOptions(t *testing.T) {
 			name:   "WithExample",
 			option: options.WithExample("test example"),
 			validate: func(t *testing.T, s *openapi.Schema) {
-				assert.Equal(t, "test example", s.Example)
+				assert.Contains(t, s.Examples, "test example")
 			},
 		},
 		{

@@ -18,7 +18,7 @@ func WithDescription(description string) SchemaOption {
 
 func WithExample(example any) SchemaOption {
 	return func(sb *openapi.SchemaBuilder) {
-		sb.Example(example)
+		sb.Examples(example)
 	}
 }
 
