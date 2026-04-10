@@ -1,11 +1,11 @@
-package schema
+package locator
 
 import (
 	"fmt"
 	"strings"
 )
 
-type locator struct {
+type Locator struct {
 	// Path is the path to the type.
 	Path string
 
@@ -19,13 +19,13 @@ type locator struct {
 	TypeParams []string
 }
 
-func (l locator) Prefix() string {
+func (l Locator) Prefix() string {
 	prefix := strings.ReplaceAll(l.Path, "/", "_")
 	prefix = strings.ReplaceAll(prefix, ".", "_")
 	return prefix
 }
 
-func (l locator) TypeName() string {
+func (l Locator) TypeName() string {
 	typeParams := ""
 	if len(l.TypeParams) > 0 {
 		typeParams = fmt.Sprintf("[%s]", strings.Join(l.TypeParams, ","))
@@ -33,6 +33,6 @@ func (l locator) TypeName() string {
 	return fmt.Sprintf("%s.%s%s", l.Package, l.Name, typeParams)
 }
 
-func (l locator) String() string {
+func (l Locator) String() string {
 	return fmt.Sprintf("%s:%s", l.Prefix(), l.TypeName())
 }

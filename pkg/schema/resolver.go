@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/odarbelaeze/openapier/pkg/schema/locator"
 	"github.com/odarbelaeze/openapier/pkg/schema/options"
 	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/sv-tools/openapi"
@@ -29,7 +30,7 @@ type typeDef struct {
 	File *ast.File
 
 	// Locator is the locator of the type definition.
-	Locator *locator
+	Locator *locator.Locator
 }
 
 // Resolves types into a schema.
@@ -80,22 +81,22 @@ func (r *resolver) Collect(path string, file *ast.File) {
 			if !ok {
 				continue
 			}
-			locator := locator{
+			loc := locator.Locator{
 				Path:    path,
 				Package: file.Name.Name,
 				Name:    typeSpec.Name.Name,
 			}
-			slog.Debug("caching type definition", "locator", locator)
+			slog.Debug("caching type definition", "locator", loc)
 			def := &typeDef{
 				TypeSpec: typeSpec,
 				File:     file,
-				Locator:  &locator,
+				Locator:  &loc,
 			}
 
-			if r.cacheByPkg[locator.Package] == nil {
-				r.cacheByPkg[locator.Package] = make(map[string]*typeDef)
+			if r.cacheByPkg[loc.Package] == nil {
+				r.cacheByPkg[loc.Package] = make(map[string]*typeDef)
 			}
-			r.cacheByPkg[locator.Package][locator.Name] = def
+			r.cacheByPkg[loc.Package][loc.Name] = def
 		}
 	}
 	// Mark the path as loaded.
@@ -226,12 +227,12 @@ func (r *resolver) resolveArray(typeName string, file *ast.File, opts ...options
 	return builder.Build(), nil
 }
 
-func (r *resolver) candidates(typeName string, typeParams []string, file *ast.File) ([]*locator, error) {
-	var candidates []*locator
+func (r *resolver) candidates(typeName string, typeParams []string, file *ast.File) ([]*locator.Locator, error) {
+	var candidates []*locator.Locator
 
 	parts := strings.Split(typeName, ".")
 	var pkgName, name string
-	loc := &locator{}
+	loc := &locator.Locator{}
 
 	if len(parts) == 1 {
 		pkgName = file.Name.Name
