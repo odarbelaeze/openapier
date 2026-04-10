@@ -26,6 +26,9 @@ func (m *mockResolver) Collect(path string, file *ast.File) {
 
 func (m *mockResolver) Resolve(typeName string, file *ast.File, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
 	args := m.Called(typeName, file, opts)
+	if f, ok := args.Get(0).(func(string, *ast.File, ...options.SchemaOption) *openapi.RefOrSpec[openapi.Schema]); ok {
+		return f(typeName, file, opts...), args.Error(1)
+	}
 	return args.Get(0).(*openapi.RefOrSpec[openapi.Schema]), args.Error(1)
 }
 
@@ -39,7 +42,7 @@ type mockValidatorRegistry struct {
 	mock.Mock
 }
 
-func (m *mockValidatorRegistry) Register(v ...validator.ValidatorTag) {
+func (m *mockValidatorRegistry) Register(v validator.ValidatorTag) {
 	m.Called(v)
 }
 
@@ -133,6 +136,37 @@ func TestSchemaBuilder_Build(t *testing.T) {
 		assert.GreaterOrEqual(t, len(mr.Calls[0].Arguments[2].([]options.SchemaOption)), 1)
 		// We expect the example option to be passed through to the field schema
 		// assert.Equal(t, "bob", prop.Spec.Examples[0])
+	})
+
+	t.Run("struct type with validations", func(t *testing.T) {
+		mr := new(mockResolver)
+		mv := new(mockValidatorRegistry)
+		expr := parseExpr(t, "struct { Email string `validate:\"required,email\"` }")
+
+		// Mock resolver for the field type
+		mr.On("Resolve", "string", mock.Anything, mock.Anything).Return(func(typeName string, file *ast.File, opts ...options.SchemaOption) *openapi.RefOrSpec[openapi.Schema] {
+			sb := openapi.NewSchemaBuilder().AddType("string")
+			for _, opt := range opts {
+				opt(sb)
+			}
+			return sb.Build()
+		}, nil)
+
+		// Mock validator registry
+		// We expect it to be called with the tag value and the schema type
+		mv.On("Parse", "required,email", "string").Return([]options.SchemaOption{
+			options.WithFormat("email"),
+		}, nil)
+
+		builder := resolver.NewSchemaBuilder(mv, mr, nil, nil)
+		got, err := builder.Build(expr)
+
+		require.NoError(t, err)
+		assert.Equal(t, "object", (*got.Spec.Type)[0])
+		prop, ok := got.Spec.Properties["Email"]
+		assert.True(t, ok)
+		assert.Equal(t, "email", prop.Spec.Format)
+		mv.AssertExpectations(t)
 	})
 
 	t.Run("star expression", func(t *testing.T) {
