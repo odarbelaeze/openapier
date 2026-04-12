@@ -16,7 +16,7 @@ func main() {
 
 	fmt.Println("\n## Spec-level Tags")
 	fmt.Println("\nThese tags are used to define general information about the API (Info, Servers, etc.).")
-	specComments := spec.DefaultRegistry.Comments()
+	specComments := spec.Default().Comments()
 	printComments(specComments, "@")
 
 	fmt.Println("\n## Operation-level Tags")
