@@ -58,6 +58,9 @@ type Todo struct {
 	// Mailto is the email address of the todo owner
 	Mailto *string `json:"mailto" validate:"email"`
 
+	// Status is the status of the todo
+	Status string `json:"status" validate:"oneof=open closed"`
+
 	// Created is the time the todo was created
 	Created time.Time `json:"created"`
 

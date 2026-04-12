@@ -71,6 +71,7 @@ These tags are used in Go struct fields within the `validate` tag to define sche
 | `len` | `len=x` |
 | `max` | `max=x` |
 | `min` | `min=x` |
+| `oneof` | `oneof=val1 val2 val3` |
 | `required` | `required` |
 | `url` | `url` |
 | `uuid` | `uuid` |

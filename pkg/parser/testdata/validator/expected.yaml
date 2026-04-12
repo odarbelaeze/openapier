@@ -106,6 +106,13 @@ components:
             Mailto is the email address of the todo owner
           format: email
           type: string
+        status:
+          description: |
+            Status is the status of the todo
+          enum:
+            - open
+            - closed
+          type: string
         title:
           description: |
             Title is the title of the todo
@@ -126,6 +133,7 @@ components:
         - completed
         - attributes
         - coordinates
+        - status
         - created
         - updated
       type: object
