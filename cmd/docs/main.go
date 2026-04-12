@@ -21,7 +21,7 @@ func main() {
 
 	fmt.Println("\n## Operation-level Tags")
 	fmt.Println("\nThese tags are used to define individual API operations (Paths, Parameters, Responses, etc.).")
-	opComments := operation.DefaultRegistry.Comments()
+	opComments := operation.Default().Comments()
 	printComments(opComments, "@")
 
 	fmt.Println("\n## Validation Tags")

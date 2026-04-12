@@ -8,12 +8,16 @@ import (
 
 var (
 	commentPattern  = regexp.MustCompile(`^//\s*@([\w\.]+)\s+(.*)$`)
-	DefaultRegistry = NewRegistry()
+	defaultRegistry = NewRegistry()
 )
+
+func Default() Registry {
+	return defaultRegistry
+}
 
 // Register registers a comment to the default registry.
 func Register(c Comment) {
-	DefaultRegistry.Register(c)
+	defaultRegistry.Register(c)
 }
 
 // Registry allows to register and parse comments.

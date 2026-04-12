@@ -80,7 +80,7 @@ func TestRouterComment_Usage(t *testing.T) {
 
 func TestRouterComment_Integration(t *testing.T) {
 	op := operation.NewOperation(resolver.NewResolver(nil, resolver.NewSchemaBuilder))
-	err := operation.DefaultRegistry.Parse("// @router /user [get]", nil, op)
+	err := operation.Default().Parse("// @router /user [get]", nil, op)
 	require.NoError(t, err)
 
 	require.Len(t, op.Routes, 1)

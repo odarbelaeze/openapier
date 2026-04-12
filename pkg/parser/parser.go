@@ -46,7 +46,7 @@ func WithSpecRegistry(specRegistry spec.Registry) ParserOption {
 
 func NewParser(opts ...ParserOption) Parser {
 	p := &parser{
-		operationRegistry: operation.DefaultRegistry,
+		operationRegistry: operation.Default(),
 		specRegistry:      spec.DefaultRegistry,
 	}
 
