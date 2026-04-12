@@ -106,6 +106,19 @@ components:
             Mailto is the email address of the todo owner
           format: email
           type: string
+        starGazers:
+          description: |
+            StarGazers is the number of users who have starred the todo
+          format: int32
+          minimum: 0
+          type: integer
+        stars:
+          description: |
+            Stars is the number of stars the todo has received
+          exclusiveMaximum: 5
+          exclusiveMinimum: 0
+          format: int32
+          type: integer
         status:
           description: |
             Status is the status of the todo
@@ -134,6 +147,8 @@ components:
         - attributes
         - coordinates
         - status
+        - stars
+        - starGazers
         - created
         - updated
       type: object

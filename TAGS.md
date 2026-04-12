@@ -68,7 +68,11 @@ These tags are used in Go struct fields within the `validate` tag to define sche
 | :--- | :--- |
 | `email` | `email` |
 | `eq` | `eq=x` |
+| `gt` | `gt=x` |
+| `gte` | `gte=x` |
 | `len` | `len=x` |
+| `lt` | `lt=x` |
+| `lte` | `lte=x` |
 | `max` | `max=x` |
 | `min` | `min=x` |
 | `oneof` | `oneof=val1 val2 val3` |

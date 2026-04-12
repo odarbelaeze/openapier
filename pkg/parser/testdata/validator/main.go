@@ -61,6 +61,12 @@ type Todo struct {
 	// Status is the status of the todo
 	Status string `json:"status" validate:"oneof=open closed"`
 
+	// Stars is the number of stars the todo has received
+	Stars int `json:"stars" validate:"gt=0,lt=5"`
+
+	// StarGazers is the number of users who have starred the todo
+	StarGazers int `json:"starGazers" validate:"gte=0"`
+
 	// Created is the time the todo was created
 	Created time.Time `json:"created"`
 

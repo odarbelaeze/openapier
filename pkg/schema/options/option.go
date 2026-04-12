@@ -70,6 +70,18 @@ func WithMaximum(maximum int) SchemaOption {
 	}
 }
 
+func WithExclusiveMinimum(minimum int) SchemaOption {
+	return func(sb *openapi.SchemaBuilder) {
+		sb.ExclusiveMinimum(minimum)
+	}
+}
+
+func WithExclusiveMaximum(maximum int) SchemaOption {
+	return func(sb *openapi.SchemaBuilder) {
+		sb.ExclusiveMaximum(maximum)
+	}
+}
+
 func WithFormat(format string) SchemaOption {
 	return func(sb *openapi.SchemaBuilder) {
 		sb.Format(format)
