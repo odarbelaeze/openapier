@@ -321,18 +321,3 @@ func (r *resolver) candidates(typeName string, typeParams []string, file *ast.Fi
 func (r *resolver) loadExternal(importPath string) {
 	slog.Debug("loading external package", "importPath", importPath)
 }
-
-func (r *resolver) spec(
-	t *typeDef,
-	aliases map[string]string,
-	opts ...options.SchemaOption,
-) (*openapi.RefOrSpec[openapi.Schema], error) {
-	slog.Debug("finding spec for", "typeName", t.TypeSpec.Name.Name)
-	b := r.builderFactory(
-		r.validatorRegistry,
-		r,
-		t.File,
-		aliases,
-	)
-	return b.Build(t.TypeSpec.Type, opts...)
-}

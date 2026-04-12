@@ -112,7 +112,7 @@ func (b *schemaBuilder) buildStruct(ty *ast.StructType, opts ...options.SchemaOp
 			slog.Info("got an embed schema", "embedSchema", embedSchema)
 			var spec *openapi.Schema
 			if embedSchema.Spec == nil {
-				ref := strings.TrimLeft(embedSchema.Ref.Ref, "#/components/schemas/")
+				ref, _ := strings.CutPrefix(embedSchema.Ref.Ref, "#/components/schemas/")
 				if cached, ok := b.resolver.Definitions()[ref]; ok {
 					spec = cached.Spec
 				} else {

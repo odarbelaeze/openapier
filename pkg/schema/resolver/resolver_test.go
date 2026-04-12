@@ -151,5 +151,3 @@ type User struct {
 		assert.Equal(t, 5, *got.Spec.MaxItems)
 	})
 }
-
-
