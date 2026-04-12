@@ -64,4 +64,16 @@ func TestRegistry_Parse(t *testing.T) {
 		require.NoError(t, err)
 		assert.Len(t, opts, 2)
 	})
+
+	t.Run("validators", func(t *testing.T) {
+		r := NewRegistry()
+		r.Register(&mockTag{tag: "t1"})
+		r.Register(&mockTag{tag: "t2"})
+
+		validators := r.Validators()
+		assert.Len(t, validators, 2)
+		tags := []string{validators[0].Tag(), validators[1].Tag()}
+		assert.Contains(t, tags, "t1")
+		assert.Contains(t, tags, "t2")
+	})
 }

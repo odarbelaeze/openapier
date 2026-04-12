@@ -12,6 +12,7 @@ var defaultRegistry = NewRegistry()
 type Registry interface {
 	Register(tag ValidatorTag)
 	Parse(string, string) ([]options.SchemaOption, error)
+	Validators() []ValidatorTag
 }
 
 type registry struct {
@@ -30,6 +31,14 @@ func NewRegistry() Registry {
 
 func (r *registry) Register(tag ValidatorTag) {
 	r.tags[tag.Tag()] = tag
+}
+
+func (r *registry) Validators() []ValidatorTag {
+	validators := make([]ValidatorTag, 0, len(r.tags))
+	for _, v := range r.tags {
+		validators = append(validators, v)
+	}
+	return validators
 }
 
 func (r *registry) Parse(tagValue string, as string) ([]options.SchemaOption, error) {

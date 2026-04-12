@@ -1,6 +1,6 @@
 # OpenAPI Tags Documentation
 
-This document lists all the supported `@` tags for the `openapier` tool.
+This document lists all the supported `@` tags and validation tags for the `openapier` tool.
 
 ## Spec-level Tags
 
@@ -59,3 +59,18 @@ These tags are used to define individual API operations (Paths, Parameters, Resp
 | `@server.variable.enum` | `@server.variable.enum <variable> [value1] [value2] ...` |
 | `@summary` | `@summary <summary>` |
 | `@tags` | `@tags <tag1> [tag2]...` |
+
+## Validation Tags
+
+These tags are used in Go struct fields within the `validate` tag to define schema constraints.
+
+| Tag | Usage |
+| :--- | :--- |
+| `email` | `email` |
+| `eq` | `eq=x` |
+| `len` | `len=x` |
+| `max` | `max=x` |
+| `min` | `min=x` |
+| `required` | `required` |
+| `url` | `url` |
+| `uuid` | `uuid` |

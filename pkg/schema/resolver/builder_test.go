@@ -51,6 +51,11 @@ func (m *mockValidatorRegistry) Parse(tag string, schemaType string) ([]options.
 	return args.Get(0).([]options.SchemaOption), args.Error(1)
 }
 
+func (m *mockValidatorRegistry) Validators() []validator.ValidatorTag {
+	args := m.Called()
+	return args.Get(0).([]validator.ValidatorTag)
+}
+
 // Helper to parse a type expression from a string
 func parseExpr(t *testing.T, expr string) ast.Expr {
 	f, err := parser.ParseFile(token.NewFileSet(), "", "package p; type T "+expr, 0)
