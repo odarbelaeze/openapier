@@ -28,6 +28,7 @@ type Parser interface {
 type parser struct {
 	operationRegistry operation.Registry
 	specRegistry      spec.Registry
+	validatorRegistry validator.Registry
 }
 
 type ParserOption func(*parser)
@@ -44,10 +45,17 @@ func WithSpecRegistry(specRegistry spec.Registry) ParserOption {
 	}
 }
 
+func WithValidatorRegistry(validatorRegistry validator.Registry) ParserOption {
+	return func(p *parser) {
+		p.validatorRegistry = validatorRegistry
+	}
+}
+
 func NewParser(opts ...ParserOption) Parser {
 	p := &parser{
 		operationRegistry: operation.Default(),
 		specRegistry:      spec.Default(),
+		validatorRegistry: validator.Default(),
 	}
 
 	for _, opt := range opts {
@@ -110,7 +118,7 @@ func (p *parser) parseTypes(root string) (resolver.Resolver, error) {
 	if f.Module == nil {
 		return nil, fmt.Errorf("module declaration not found in go.mod file")
 	}
-	cache := resolver.NewResolver(validator.Default(), resolver.NewSchemaBuilder)
+	cache := resolver.NewResolver(p.validatorRegistry, resolver.NewSchemaBuilder)
 	fileSet := token.NewFileSet()
 	err = p.walkGoFiles(root, func(p string) error {
 		node, err := goparser.ParseFile(fileSet, p, nil, goparser.ParseComments)
