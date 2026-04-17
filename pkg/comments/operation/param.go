@@ -37,7 +37,7 @@ func (c *ParamComment) ParseInto(content string, f *ast.File, op *Operation) err
 	in := fields[2]
 	description := strings.Join(fields[3:], " ")
 
-	paramSchema, err := op.Resolver.Resolve(typ, f)
+	paramSchema, err := op.Resolver.Resolve(typ)
 	if err != nil {
 		return fmt.Errorf("failed to resolve type %q: %w", typ, err)
 	}

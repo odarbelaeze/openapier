@@ -8,29 +8,23 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/sv-tools/openapi"
+	"go.uber.org/mock/gomock"
 )
 
-func TestRequestBodyComment(t *testing.T) {
+func TestRequestBodyComment_Success(t *testing.T) {
 	comment := operation.NewRequestBodyComment()
 
 	assert.Equal(t, "requestBody", comment.Tag())
 	assert.Equal(t, "@requestBody <content_type> <type> [description]", comment.Usage())
 
 	tests := []struct {
-		name        string
-		content     string
-		expectError bool
-		validate    func(t *testing.T, op *openapi.Operation)
+		name     string
+		content  string
+		validate func(t *testing.T, op *openapi.Operation)
 	}{
 		{
-			name:        "invalid format",
-			content:     "application/json",
-			expectError: true,
-		},
-		{
-			name:        "valid form without description",
-			content:     "application/json string",
-			expectError: false,
+			name:    "valid form without description",
+			content: "application/json string",
 			validate: func(t *testing.T, op *openapi.Operation) {
 				require.NotNil(t, op.RequestBody)
 				req := op.RequestBody.Spec.Spec
@@ -42,9 +36,8 @@ func TestRequestBodyComment(t *testing.T) {
 			},
 		},
 		{
-			name:        "valid form with description",
-			content:     "application/json int The identifier",
-			expectError: false,
+			name:    "valid form with description",
+			content: "application/json string The identifier",
 			validate: func(t *testing.T, op *openapi.Operation) {
 				require.NotNil(t, op.RequestBody)
 				req := op.RequestBody.Spec.Spec
@@ -52,23 +45,43 @@ func TestRequestBodyComment(t *testing.T) {
 				assert.Equal(t, "The identifier", req.Description)
 				require.NotNil(t, req.Content["application/json"])
 				mediaType := req.Content["application/json"].Spec
-				assert.Equal(t, "integer", (*mediaType.Schema.Spec.Type)[0])
+				assert.Equal(t, "string", (*mediaType.Schema.Spec.Type)[0])
 			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			op := operation.NewOperation(resolver.NewResolver(nil, resolver.NewSchemaBuilder))
+			controller := gomock.NewController(t)
+			resolver := resolver.NewMockResolver(controller)
+			resolver.EXPECT().Resolve("string").Return(openapi.NewSchemaBuilder().Type("string").Build(), nil)
+			op := operation.NewOperation(resolver)
 			err := comment.ParseInto(tt.content, nil, op)
-			if tt.expectError {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-				if tt.validate != nil {
-					tt.validate(t, op.Builder.Build().Spec)
-				}
+			require.NoError(t, err)
+			if tt.validate != nil {
+				tt.validate(t, op.Builder.Build().Spec)
 			}
+		})
+	}
+}
+
+func TestRequestBodyComment_Failure(t *testing.T) {
+	comment := operation.NewRequestBodyComment()
+	tests := []struct {
+		name    string
+		content string
+	}{
+		{
+			name:    "invalid format",
+			content: "application/json",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			op := operation.NewOperation(nil)
+			err := comment.ParseInto(tt.content, nil, op)
+			assert.Error(t, err)
 		})
 	}
 }

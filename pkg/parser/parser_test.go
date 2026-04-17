@@ -40,8 +40,8 @@ func TestParser_Parse(t *testing.T) {
 			main: "main.go",
 		},
 		{
-			name: "should parse embedded fields",
-			root: "./testdata/embed/",
+			name: "should parse external dependencies",
+			root: "./testdata/external",
 			main: "main.go",
 		},
 	}

@@ -61,6 +61,6 @@ func (r *standardRegistry) Parse(line string, s *openapi.Extendable[openapi.Open
 	if handler, ok := r.comments[tag]; ok {
 		return handler.ParseInto(content, s)
 	}
-	slog.Warn("unknown spec tag", "tag", tag)
+	slog.Debug("unknown spec tag", "tag", tag)
 	return nil
 }

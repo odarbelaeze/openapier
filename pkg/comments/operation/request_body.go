@@ -43,7 +43,7 @@ func (c *RequestBodyComment) ParseInto(content string, f *ast.File, op *Operatio
 		description = strings.TrimSpace(content[strings.Index(content, typ)+len(typ):])
 	}
 
-	s, err := op.Resolver.Resolve(typ, f)
+	s, err := op.Resolver.Resolve(typ)
 	if err != nil {
 		return fmt.Errorf("failed to resolve type %q: %w", typ, err)
 	}

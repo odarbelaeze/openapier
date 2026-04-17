@@ -61,6 +61,6 @@ func (r *standardRegistry) Parse(line string, f *ast.File, op *Operation) error 
 	if handler, ok := r.comments[tag]; ok {
 		return handler.ParseInto(content, f, op)
 	}
-	slog.Warn("unknown operation tag", "tag", tag)
+	slog.Debug("unknown operation tag", "tag", tag)
 	return nil
 }

@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/odarbelaeze/openapier/pkg/comments/operation"
-	"github.com/odarbelaeze/openapier/pkg/schema/resolver"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -51,7 +50,7 @@ func TestRouterComment_ParseInto(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			op := operation.NewOperation(resolver.NewResolver(nil, resolver.NewSchemaBuilder))
+			op := operation.NewOperation(nil)
 			comment := operation.NewRouterComment()
 
 			err := comment.ParseInto(tt.comment, nil, op)
@@ -79,7 +78,7 @@ func TestRouterComment_Usage(t *testing.T) {
 }
 
 func TestRouterComment_Integration(t *testing.T) {
-	op := operation.NewOperation(resolver.NewResolver(nil, resolver.NewSchemaBuilder))
+	op := operation.NewOperation(nil)
 	err := operation.Default().Parse("// @router /user [get]", nil, op)
 	require.NoError(t, err)
 

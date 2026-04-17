@@ -26,27 +26,23 @@ type SchemaBuilder interface {
 type SchemaBuilderFactory func(
 	validatorRegistry validator.Registry,
 	resolver Resolver,
-	file *ast.File,
 	aliases map[string]string,
 ) SchemaBuilder
 
 type schemaBuilder struct {
 	resolver          Resolver
 	validatorRegistry validator.Registry
-	file              *ast.File
 	aliases           map[string]string
 }
 
 func NewSchemaBuilder(
 	validatorRegistry validator.Registry,
 	resolver Resolver,
-	file *ast.File,
 	aliases map[string]string,
 ) SchemaBuilder {
 	return &schemaBuilder{
 		validatorRegistry: validatorRegistry,
 		resolver:          resolver,
-		file:              file,
 		aliases:           aliases,
 	}
 }
@@ -61,7 +57,7 @@ func (b *schemaBuilder) aliased(typeName string) string {
 func (b *schemaBuilder) Build(expr ast.Expr, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
 	switch ty := expr.(type) {
 	case *ast.Ident:
-		return b.resolver.Resolve(b.aliased(ty.Name), b.file, opts...)
+		return b.resolver.Resolve(b.aliased(ty.Name), opts...)
 	case *ast.ArrayType:
 		return b.buildArray(ty, opts...)
 	case *ast.StructType:
@@ -76,7 +72,7 @@ func (b *schemaBuilder) Build(expr ast.Expr, opts ...options.SchemaOption) (*ope
 			}
 			pkgName := pkgIdent.Name
 			typeName := ty.Sel.Name
-			return b.resolver.Resolve(fmt.Sprintf("%s.%s", pkgName, typeName), b.file, opts...)
+			return b.resolver.Resolve(fmt.Sprintf("%s.%s", pkgName, typeName), opts...)
 		}
 	case *ast.MapType:
 		return b.buildMap(ty, opts...)
@@ -112,12 +108,7 @@ func (b *schemaBuilder) buildStruct(ty *ast.StructType, opts ...options.SchemaOp
 			slog.Info("got an embed schema", "embedSchema", embedSchema)
 			var spec *openapi.Schema
 			if embedSchema.Spec == nil {
-				ref, _ := strings.CutPrefix(embedSchema.Ref.Ref, "#/components/schemas/")
-				if cached, ok := b.resolver.Definitions()[ref]; ok {
-					spec = cached.Spec
-				} else {
-					return nil, fmt.Errorf("embed schema not found: %s", ref)
-				}
+				return nil, fmt.Errorf("embed schema not found: %s", embedSchema.Ref.Ref)
 			} else {
 				spec = embedSchema.Spec
 			}

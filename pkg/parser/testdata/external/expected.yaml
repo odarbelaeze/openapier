@@ -1,0 +1,24 @@
+components:
+  schemas:
+    github_com_odarbelaeze_rest:rest.Error:
+      properties:
+        code:
+          format: int32
+          type: integer
+        details:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+        - details
+      type: object
+info:
+  description: Loads external packages.
+  termsOfService: http://swagger.io/terms/
+  title: API that exposes types
+  version: "1.0"
+jsonSchemaDialect: https://spec.openapis.org/oas/3.1/dialect/base
+openapi: 3.1.1
+

@@ -73,12 +73,10 @@ func (p *parser) Parse(root string, main string) (*openapi.Extendable[openapi.Op
 		return nil, fmt.Errorf("failed to parse spec: %w", err)
 	}
 
-	resolver, err := p.parseTypes(root)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse types: %w", err)
-	}
+	cache := resolver.NewTypeDefCache(root)
+	definitions := resolver.NewDefinitionsCache()
 
-	err = p.parseOperations(root, resolver, spec)
+	err = p.parseOperations(root, cache, definitions, spec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse operations: %w", err)
 	}
@@ -102,60 +100,53 @@ func (p *parser) parseSpec(main string, spec *openapi.Extendable[openapi.OpenAPI
 	return nil
 }
 
-func (p *parser) parseTypes(root string) (resolver.Resolver, error) {
+func (p *parser) parseOperations(
+	root string,
+	cache resolver.TypeDefCache,
+	definitionsCache resolver.DefinitionsCache,
+	spec *openapi.Extendable[openapi.OpenAPI],
+) error {
 	gomodPath := path.Join(root, "go.mod")
 	gomodData, err := os.ReadFile(gomodPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("go.mod file not found in root directory: %s", gomodPath)
+			return fmt.Errorf("go.mod file not found in root directory: %s", gomodPath)
 		}
-		return nil, fmt.Errorf("failed to open go.mod file: %w", err)
+		return fmt.Errorf("failed to open go.mod file: %w", err)
 	}
 	f, err := modfile.ParseLax(gomodPath, gomodData, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse go.mod file: %w", err)
+		return fmt.Errorf("failed to parse go.mod file: %w", err)
 	}
 	if f.Module == nil {
-		return nil, fmt.Errorf("module declaration not found in go.mod file")
+		return fmt.Errorf("module declaration not found in go.mod file")
 	}
-	cache := resolver.NewResolver(p.validatorRegistry, resolver.NewSchemaBuilder)
 	fileSet := token.NewFileSet()
-	err = p.walkGoFiles(root, func(p string) error {
-		node, err := goparser.ParseFile(fileSet, p, nil, goparser.ParseComments)
-		if err != nil {
-			return fmt.Errorf("failed to parse file: %w", err)
-		}
-		realPath, err := filepath.Rel(root, p)
-		if err != nil {
-			return fmt.Errorf("failed to get relative path: %w", err)
-		}
-		realPath = path.Join(f.Module.Mod.Path, filepath.Dir(realPath))
-		cache.Collect(realPath, node)
-		return nil
-	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to walk directory: %w", err)
-	}
-	return cache, nil
-}
-
-func (p *parser) parseOperations(
-	root string,
-	resolver resolver.Resolver,
-	spec *openapi.Extendable[openapi.OpenAPI],
-) error {
-	fileSet := token.NewFileSet()
-	err := p.walkGoFiles(root, func(path string) error {
+	err = p.walkGoFiles(root, func(path string) error {
 		node, err := goparser.ParseFile(fileSet, path, nil, goparser.ParseComments)
 		if err != nil {
 			return fmt.Errorf("failed to parse file: %w", err)
 		}
+		folder := filepath.Dir(path)
+		relativeFolder, err := filepath.Rel(root, folder)
+		if err != nil {
+			return fmt.Errorf("failed to get relative path: %w", err)
+		}
+		from := filepath.Join(f.Module.Mod.Path, relativeFolder)
 		var opErr error
 		ast.Inspect(node, func(n ast.Node) bool {
 			if function, ok := n.(*ast.FuncDecl); ok {
 				if function.Name.Name == "main" {
 					return false
 				}
+				resolver := resolver.NewResolver(
+					p.validatorRegistry,
+					cache,
+					definitionsCache,
+					resolver.NewSchemaBuilder,
+					node,
+					from,
+				)
 				operation := operation.NewOperation(resolver)
 				if function.Doc == nil {
 					return false
@@ -184,9 +175,9 @@ func (p *parser) parseOperations(
 	if err != nil {
 		return fmt.Errorf("failed to walk directory: %w", err)
 	}
-	if len(resolver.Definitions()) > 0 {
+	if len(definitionsCache.Definitions()) > 0 {
 		spec.Spec.Components = openapi.NewComponents()
-		spec.Spec.Components.Spec.Schemas = resolver.Definitions()
+		spec.Spec.Components.Spec.Schemas = definitionsCache.Definitions()
 	}
 	return nil
 }

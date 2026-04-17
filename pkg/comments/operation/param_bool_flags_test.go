@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/odarbelaeze/openapier/pkg/comments/operation"
-	"github.com/odarbelaeze/openapier/pkg/schema/resolver"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/sv-tools/openapi"
@@ -28,7 +27,7 @@ func TestParamBoolFlags(t *testing.T) {
 			usage:   "@param.allowReserved <param> [param]...",
 			content: "id other",
 			setupOp: func() *operation.Operation {
-				op := operation.NewOperation(resolver.NewResolver(nil, resolver.NewSchemaBuilder))
+				op := operation.NewOperation(nil)
 				op.Builder.AddParameters(openapi.NewParameterBuilder().Name("id").Build())
 				op.Builder.AddParameters(openapi.NewParameterBuilder().Name("other").Build())
 				return op
@@ -46,7 +45,7 @@ func TestParamBoolFlags(t *testing.T) {
 			usage:   "@param.allowEmptyValue <param> [param]...",
 			content: "id",
 			setupOp: func() *operation.Operation {
-				op := operation.NewOperation(resolver.NewResolver(nil, resolver.NewSchemaBuilder))
+				op := operation.NewOperation(nil)
 				op.Builder.AddParameters(openapi.NewParameterBuilder().Name("id").Build())
 				return op
 			},
@@ -62,7 +61,7 @@ func TestParamBoolFlags(t *testing.T) {
 			usage:   "@param.deprecated <param> [param]...",
 			content: "id",
 			setupOp: func() *operation.Operation {
-				op := operation.NewOperation(resolver.NewResolver(nil, resolver.NewSchemaBuilder))
+				op := operation.NewOperation(nil)
 				op.Builder.AddParameters(openapi.NewParameterBuilder().Name("id").Build())
 				return op
 			},
@@ -78,7 +77,7 @@ func TestParamBoolFlags(t *testing.T) {
 			usage:   "@param.required <param> [param]...",
 			content: "id",
 			setupOp: func() *operation.Operation {
-				op := operation.NewOperation(resolver.NewResolver(nil, resolver.NewSchemaBuilder))
+				op := operation.NewOperation(nil)
 				op.Builder.AddParameters(openapi.NewParameterBuilder().Name("id").Build())
 				return op
 			},
@@ -94,7 +93,7 @@ func TestParamBoolFlags(t *testing.T) {
 			usage:   "@param.allowReserved <param> [param]...",
 			content: "missing_param",
 			setupOp: func() *operation.Operation {
-				op := operation.NewOperation(resolver.NewResolver(nil, resolver.NewSchemaBuilder))
+				op := operation.NewOperation(nil)
 				op.Builder.AddParameters(openapi.NewParameterBuilder().Name("id").Build())
 				return op
 			},
@@ -107,7 +106,7 @@ func TestParamBoolFlags(t *testing.T) {
 			usage:   "@param.allowReserved <param> [param]...",
 			content: "",
 			setupOp: func() *operation.Operation {
-				return operation.NewOperation(resolver.NewResolver(nil, resolver.NewSchemaBuilder))
+				return operation.NewOperation(nil)
 			},
 			expectError: true,
 		},

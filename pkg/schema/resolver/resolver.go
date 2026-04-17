@@ -1,9 +1,9 @@
 package resolver
 
 import (
+	"context"
 	"fmt"
 	"go/ast"
-	"go/token"
 	"log/slog"
 	"path"
 	"regexp"
@@ -16,33 +16,21 @@ import (
 	"github.com/sv-tools/openapi"
 )
 
+//go:generate mockgen -destination resolver_mock.go -package resolver . Resolver
+
 var (
 	genericTypeRegex = regexp.MustCompile(`^(((\w+)\.)?(\w+))\[(.+)\]$`)
 	arrayTypeRegex   = regexp.MustCompile(`^\[(\d*)\](.*)$`)
 	mapTypeRegex     = regexp.MustCompile(`^map\[(.+)\](.*)$`)
 )
 
-type typeDef struct {
-	// TypeSpec is the type specification of the type definition.
-	TypeSpec *ast.TypeSpec
-
-	// File is the file where the type definition is located.
-	File *ast.File
-
-	// Locator is the locator of the type definition.
-	Locator *locator.Locator
-}
-
 // Resolves types into a schema.
 type Resolver interface {
-	// Collect collects the type definitions for the given path and file, and caches them.
-	Collect(path string, file *ast.File)
-
 	// Resolve resolves the given type into a schema.
-	Resolve(typeName string, file *ast.File, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error)
+	Resolve(typeName string, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error)
 
-	// Definitions returns the definitions that have been resolved.
-	Definitions() map[string]*openapi.RefOrSpec[openapi.Schema]
+	// From returns a new resolver re-positioned to the given file.
+	From(file *ast.File, from string) Resolver
 }
 
 type resolver struct {
@@ -52,74 +40,57 @@ type resolver struct {
 	// builderFactory is the factory used to create schema builders.
 	builderFactory SchemaBuilderFactory
 
-	// definitions is a map of the definitions that have been resolved.
-	definitions map[string]*openapi.RefOrSpec[openapi.Schema]
+	// typeDefCache is the cache of type definitions.
+	typeDefCache TypeDefCache
 
-	// cacheByPkg maps package names to type names to type definitions.
-	cacheByPkg map[string]map[string]*typeDef
+	// definitionsCache is the cache of resolved definitions.
+	definitionsCache DefinitionsCache
 
-	// loaded is a set of package paths that have been loaded.
-	loaded map[string]struct{}
+	// file is the AST file being resolved.
+	file *ast.File
+
+	// from is the package path of the file being resolved.
+	from string
 }
 
 // NewResolver creates a new resolver.
-func NewResolver(validatorRegistry validator.Registry, builderFactory SchemaBuilderFactory) Resolver {
+func NewResolver(
+	validatorRegistry validator.Registry,
+	typeDefCache TypeDefCache,
+	definitionsCache DefinitionsCache,
+	builderFactory SchemaBuilderFactory,
+	file *ast.File,
+	from string,
+) Resolver {
 	return &resolver{
 		validatorRegistry: validatorRegistry,
 		builderFactory:    builderFactory,
-		definitions:       make(map[string]*openapi.RefOrSpec[openapi.Schema]),
-		cacheByPkg:        make(map[string]map[string]*typeDef),
-		loaded:            make(map[string]struct{}),
+		typeDefCache:      typeDefCache,
+		definitionsCache:  definitionsCache,
+		file:              file,
+		from:              from,
 	}
 }
 
-// Collect implements [Resolver].
-func (r *resolver) Collect(path string, file *ast.File) {
-	for _, decl := range file.Decls {
-		genDecl, ok := decl.(*ast.GenDecl)
-		if !ok || genDecl.Tok != token.TYPE {
-			continue
-		}
-		for _, spec := range genDecl.Specs {
-			typeSpec, ok := spec.(*ast.TypeSpec)
-			if !ok {
-				continue
-			}
-			loc := locator.Locator{
-				Path:    path,
-				Package: file.Name.Name,
-				Name:    typeSpec.Name.Name,
-			}
-			slog.Debug("caching type definition", "locator", loc)
-			def := &typeDef{
-				TypeSpec: typeSpec,
-				File:     file,
-				Locator:  &loc,
-			}
-
-			if r.cacheByPkg[loc.Package] == nil {
-				r.cacheByPkg[loc.Package] = make(map[string]*typeDef)
-			}
-			r.cacheByPkg[loc.Package][loc.Name] = def
-		}
+func (r *resolver) From(file *ast.File, from string) Resolver {
+	return &resolver{
+		validatorRegistry: r.validatorRegistry,
+		builderFactory:    r.builderFactory,
+		typeDefCache:      r.typeDefCache,
+		definitionsCache:  r.definitionsCache,
+		file:              file,
+		from:              from,
 	}
-	// Mark the path as loaded.
-	r.loaded[path] = struct{}{}
-}
-
-// Definitions implements [Resolver].
-func (r *resolver) Definitions() map[string]*openapi.RefOrSpec[openapi.Schema] {
-	return r.definitions
 }
 
 // Resolve implements [Resolver].
-func (r *resolver) Resolve(typeName string, file *ast.File, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
+func (r *resolver) Resolve(typeName string, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
 	if strings.HasPrefix(typeName, "[") {
-		return r.resolveArray(typeName, file, opts...)
+		return r.resolveArray(typeName, opts...)
 	}
 
 	if strings.HasPrefix(typeName, "map[") {
-		return r.resolveMap(typeName, file, opts...)
+		return r.resolveMap(typeName, opts...)
 	}
 
 	basicSchema := r.resolveBasicType(typeName, opts...)
@@ -135,45 +106,43 @@ func (r *resolver) Resolve(typeName string, file *ast.File, opts ...options.Sche
 		slog.Debug("resolving generic type", "typeName", typeName, "typeArgs", typeParams)
 	}
 
-	candidates, err := r.candidates(typeName, typeParams, file)
+	candidates, err := r.candidates(typeName, typeParams)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find any candidates: %w", err)
 	}
 	for _, loc := range candidates {
 		schemaPath := fmt.Sprintf("#/components/schemas/%s", loc)
-		if _, ok := r.definitions[loc.String()]; ok {
+		if _, ok := r.definitionsCache.Get(loc.String()); ok {
 			ref := openapi.NewRefOrSpec[openapi.Schema](schemaPath)
 			return ref, nil
 		}
-		if pkgCache, pkgOk := r.cacheByPkg[loc.Package]; pkgOk {
-			if t, ok := pkgCache[loc.Name]; ok {
-				if len(loc.TypeParams) != t.TypeSpec.TypeParams.NumFields() {
-					return nil, fmt.Errorf(
-						"type parameter count mismatch for %s: expected %d, got %d",
-						loc.TypeName(),
-						t.TypeSpec.TypeParams.NumFields(),
-						len(loc.TypeParams),
-					)
-				}
-				aliases := make(map[string]string)
-				if t.TypeSpec.TypeParams != nil {
-					for i, field := range t.TypeSpec.TypeParams.List {
-						paramName := field.Names[0].Name
-						if i < len(loc.TypeParams) {
-							aliases[paramName] = loc.TypeParams[i]
-						}
+		if t, ok := r.typeDefCache.Get(loc.Path, loc.Name); ok {
+			if len(loc.TypeParams) != t.TypeSpec.TypeParams.NumFields() {
+				return nil, fmt.Errorf(
+					"type parameter count mismatch for %s: expected %d, got %d",
+					loc.TypeName(),
+					t.TypeSpec.TypeParams.NumFields(),
+					len(loc.TypeParams),
+				)
+			}
+			aliases := make(map[string]string)
+			if t.TypeSpec.TypeParams != nil {
+				for i, field := range t.TypeSpec.TypeParams.List {
+					paramName := field.Names[0].Name
+					if i < len(loc.TypeParams) {
+						aliases[paramName] = loc.TypeParams[i]
 					}
 				}
-				slog.Debug("finding spec for", "typeName", t.TypeSpec.Name.Name)
-				b := r.builderFactory(r.validatorRegistry, r, t.File, aliases)
-				spec, err := b.Build(t.TypeSpec.Type, opts...)
-				if err != nil {
-					return nil, fmt.Errorf("failed to build spec: %w", err)
-				}
-				r.definitions[loc.String()] = spec
-				ref := openapi.NewRefOrSpec[openapi.Schema](schemaPath)
-				return ref, nil
 			}
+			slog.Debug("finding spec for", "typeName", t.TypeSpec.Name.Name)
+			b := r.builderFactory(r.validatorRegistry, r.From(t.File, t.Locator.Path), aliases)
+			spec, err := b.Build(t.TypeSpec.Type, opts...)
+			if err != nil {
+				return nil, fmt.Errorf("failed to build spec: %w", err)
+			}
+			r.definitionsCache.Put(loc.String(), spec)
+			ref := openapi.NewRefOrSpec[openapi.Schema](schemaPath)
+			return ref, nil
 		}
 	}
 	return nil, fmt.Errorf("failed to resolve type: %s", typeName)
@@ -212,7 +181,7 @@ func (r *resolver) resolveBasicType(typeName string, opts ...options.SchemaOptio
 	return b.Build()
 }
 
-func (r *resolver) resolveMap(typeName string, file *ast.File, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
+func (r *resolver) resolveMap(typeName string, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
 	matches := mapTypeRegex.FindStringSubmatch(typeName)
 	if len(matches) != 3 {
 		return nil, fmt.Errorf("invalid map type: %s", typeName)
@@ -222,7 +191,7 @@ func (r *resolver) resolveMap(typeName string, file *ast.File, opts ...options.S
 		return nil, fmt.Errorf("map key type must be string, got %s", keyTypeName)
 	}
 	valueTypeName := matches[2]
-	valueRef, err := r.Resolve(valueTypeName, file)
+	valueRef, err := r.Resolve(valueTypeName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to resolve value type: %w", err)
 	}
@@ -237,13 +206,13 @@ func (r *resolver) resolveMap(typeName string, file *ast.File, opts ...options.S
 	return builder.Build(), nil
 }
 
-func (r *resolver) resolveArray(typeName string, file *ast.File, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
+func (r *resolver) resolveArray(typeName string, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
 	matches := arrayTypeRegex.FindStringSubmatch(typeName)
 	if len(matches) != 3 {
 		return nil, fmt.Errorf("invalid array type: %s", typeName)
 	}
 	itemTypeName := matches[2]
-	itemRef, err := r.Resolve(itemTypeName, file)
+	itemRef, err := r.Resolve(itemTypeName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to resolve item type: %w", err)
 	}
@@ -266,7 +235,7 @@ func (r *resolver) resolveArray(typeName string, file *ast.File, opts ...options
 	return builder.Build(), nil
 }
 
-func (r *resolver) candidates(typeName string, typeParams []string, file *ast.File) ([]*locator.Locator, error) {
+func (r *resolver) candidates(typeName string, typeParams []string) ([]*locator.Locator, error) {
 	var candidates []*locator.Locator
 
 	parts := strings.Split(typeName, ".")
@@ -274,28 +243,32 @@ func (r *resolver) candidates(typeName string, typeParams []string, file *ast.Fi
 	loc := &locator.Locator{}
 
 	if len(parts) == 1 {
-		pkgName = file.Name.Name
+		pkgName = r.file.Name.Name
 		name = parts[0]
-		if pkgCache, ok := r.cacheByPkg[pkgName]; ok {
-			if def, ok := pkgCache[name]; ok {
-				loc.Path = def.Locator.Path
-			} else {
-				for _, def := range pkgCache {
-					loc.Path = def.Locator.Path
-					break
-				}
-			}
+		err := r.typeDefCache.Load(context.Background(), r.from)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load type def cache: %w", err)
 		}
+		loc.Path = r.from
 	} else if len(parts) == 2 {
 		pkgName = parts[0]
 		name = parts[1]
-		for _, imp := range file.Imports {
+		for _, imp := range r.file.Imports {
 			if imp.Path == nil {
 				continue
 			}
 			importPath := strings.Trim(imp.Path.Value, `"`)
-			if _, ok := r.loaded[importPath]; !ok {
-				r.loadExternal(importPath)
+			importParts := strings.Split(importPath, "/")
+			importName := importParts[len(importParts)-1]
+			if imp.Name != nil {
+				importName = imp.Name.Name
+			}
+			if importName != pkgName {
+				continue
+			}
+			err := r.typeDefCache.Load(context.Background(), importPath)
+			if err != nil {
+				return nil, fmt.Errorf("failed to load type def cache: %w", err)
 			}
 			if imp.Name != nil && imp.Name.Name == pkgName {
 				loc.Path = importPath
@@ -316,8 +289,4 @@ func (r *resolver) candidates(typeName string, typeParams []string, file *ast.Fi
 	candidates = append(candidates, loc)
 
 	return candidates, nil
-}
-
-func (r *resolver) loadExternal(importPath string) {
-	slog.Debug("loading external package", "importPath", importPath)
 }

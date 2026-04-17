@@ -8,19 +8,19 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/sv-tools/openapi"
+	"go.uber.org/mock/gomock"
 )
 
-func TestParamComment(t *testing.T) {
+func TestParamComment_Success(t *testing.T) {
 	comment := operation.NewParamComment()
 
 	assert.Equal(t, "param", comment.Tag())
 	assert.Equal(t, "@param <name> <type> <in> [description...]", comment.Usage())
 
 	tests := []struct {
-		name        string
-		content     string
-		expectError bool
-		validate    func(t *testing.T, op *openapi.Operation)
+		name     string
+		content  string
+		validate func(t *testing.T, op *openapi.Operation)
 	}{
 		{
 			name:    "a path parameter",
@@ -46,26 +46,26 @@ func TestParamComment(t *testing.T) {
 				require.NotNil(t, param.Schema)
 			},
 		},
-		{
-			name:        "invalid format",
-			content:     "id int",
-			expectError: true,
-		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			op := operation.NewOperation(resolver.NewResolver(nil, resolver.NewSchemaBuilder))
-
+			controller := gomock.NewController(t)
+			resolver := resolver.NewMockResolver(controller)
+			resolver.EXPECT().Resolve("int").Return(openapi.NewSchemaBuilder().Type("number").Build(), nil)
+			op := operation.NewOperation(resolver)
 			err := comment.ParseInto(tt.content, nil, op)
-			if tt.expectError {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-				if tt.validate != nil {
-					tt.validate(t, op.Builder.Build().Spec)
-				}
+			require.NoError(t, err)
+			if tt.validate != nil {
+				tt.validate(t, op.Builder.Build().Spec)
 			}
 		})
 	}
+}
+
+func TestParamComment_InvalidFormat(t *testing.T) {
+	comment := operation.NewParamComment()
+	op := operation.NewOperation(nil)
+	err := comment.ParseInto("id int", nil, op)
+	assert.Error(t, err)
 }
