@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/sv-tools/openapi"
-	"go.uber.org/mock/gomock"
 )
 
 func TestRequestBodyComment_Success(t *testing.T) {
@@ -52,8 +51,7 @@ func TestRequestBodyComment_Success(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			controller := gomock.NewController(t)
-			resolver := resolver.NewMockResolver(controller)
+			resolver := resolver.NewMockResolver(t)
 			resolver.EXPECT().Resolve("string").Return(openapi.NewSchemaBuilder().Type("string").Build(), nil)
 			op := operation.NewOperation(resolver)
 			err := comment.ParseInto(tt.content, nil, op)

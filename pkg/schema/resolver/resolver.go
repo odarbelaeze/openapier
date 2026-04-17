@@ -16,8 +16,6 @@ import (
 	"github.com/sv-tools/openapi"
 )
 
-//go:generate mockgen -destination resolver_mock.go -package resolver . Resolver
-
 var (
 	genericTypeRegex = regexp.MustCompile(`^(((\w+)\.)?(\w+))\[(.+)\]$`)
 	arrayTypeRegex   = regexp.MustCompile(`^\[(\d*)\](.*)$`)
