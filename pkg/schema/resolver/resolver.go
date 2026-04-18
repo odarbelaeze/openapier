@@ -40,7 +40,7 @@ type resolver struct {
 	builderFactory SchemaBuilderFactory
 
 	// typeDefCache is the cache of type definitions.
-	typeDefCache TypeDefCache
+	typeDefCache cache.TypeDefCache
 
 	// definitionsCache is the cache of resolved definitions.
 	definitionsCache cache.DefinitionsCache
@@ -55,7 +55,7 @@ type resolver struct {
 // NewResolver creates a new resolver.
 func NewResolver(
 	validatorRegistry validator.Registry,
-	typeDefCache TypeDefCache,
+	typeDefCache cache.TypeDefCache,
 	definitionsCache cache.DefinitionsCache,
 	builderFactory SchemaBuilderFactory,
 	file *ast.File,

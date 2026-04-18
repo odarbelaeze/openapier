@@ -37,8 +37,8 @@ func (_m *MockParser) EXPECT() *MockParser_Expecter {
 }
 
 // Parse provides a mock function for the type MockParser
-func (_mock *MockParser) Parse(root string, main string) (*openapi.Extendable[openapi.OpenAPI], error) {
-	ret := _mock.Called(root, main)
+func (_mock *MockParser) Parse() (*openapi.Extendable[openapi.OpenAPI], error) {
+	ret := _mock.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for Parse")
@@ -46,18 +46,18 @@ func (_mock *MockParser) Parse(root string, main string) (*openapi.Extendable[op
 
 	var r0 *openapi.Extendable[openapi.OpenAPI]
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(string, string) (*openapi.Extendable[openapi.OpenAPI], error)); ok {
-		return returnFunc(root, main)
+	if returnFunc, ok := ret.Get(0).(func() (*openapi.Extendable[openapi.OpenAPI], error)); ok {
+		return returnFunc()
 	}
-	if returnFunc, ok := ret.Get(0).(func(string, string) *openapi.Extendable[openapi.OpenAPI]); ok {
-		r0 = returnFunc(root, main)
+	if returnFunc, ok := ret.Get(0).(func() *openapi.Extendable[openapi.OpenAPI]); ok {
+		r0 = returnFunc()
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*openapi.Extendable[openapi.OpenAPI])
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(string, string) error); ok {
-		r1 = returnFunc(root, main)
+	if returnFunc, ok := ret.Get(1).(func() error); ok {
+		r1 = returnFunc()
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -70,26 +70,13 @@ type MockParser_Parse_Call struct {
 }
 
 // Parse is a helper method to define mock.On call
-//   - root string
-//   - main string
-func (_e *MockParser_Expecter) Parse(root interface{}, main interface{}) *MockParser_Parse_Call {
-	return &MockParser_Parse_Call{Call: _e.mock.On("Parse", root, main)}
+func (_e *MockParser_Expecter) Parse() *MockParser_Parse_Call {
+	return &MockParser_Parse_Call{Call: _e.mock.On("Parse")}
 }
 
-func (_c *MockParser_Parse_Call) Run(run func(root string, main string)) *MockParser_Parse_Call {
+func (_c *MockParser_Parse_Call) Run(run func()) *MockParser_Parse_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 string
-		if args[0] != nil {
-			arg0 = args[0].(string)
-		}
-		var arg1 string
-		if args[1] != nil {
-			arg1 = args[1].(string)
-		}
-		run(
-			arg0,
-			arg1,
-		)
+		run()
 	})
 	return _c
 }
@@ -99,7 +86,7 @@ func (_c *MockParser_Parse_Call) Return(extendable *openapi.Extendable[openapi.O
 	return _c
 }
 
-func (_c *MockParser_Parse_Call) RunAndReturn(run func(root string, main string) (*openapi.Extendable[openapi.OpenAPI], error)) *MockParser_Parse_Call {
+func (_c *MockParser_Parse_Call) RunAndReturn(run func() (*openapi.Extendable[openapi.OpenAPI], error)) *MockParser_Parse_Call {
 	_c.Call.Return(run)
 	return _c
 }

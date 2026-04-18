@@ -39,8 +39,8 @@ func main() {
 			if c.Bool("debug") {
 				slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelDebug})))
 			}
-			p := parser.NewParser()
-			spec, err := p.Parse(c.String("root"), c.String("main"))
+			p := parser.NewParser(c.String("root"), c.String("main"))
+			spec, err := p.Parse()
 			if err != nil {
 				return fmt.Errorf("failed to parse: %w", err)
 			}

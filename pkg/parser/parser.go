@@ -21,14 +21,17 @@ import (
 )
 
 type Parser interface {
-	Parse(root string, main string) (*openapi.Extendable[openapi.OpenAPI], error)
+	Parse() (*openapi.Extendable[openapi.OpenAPI], error)
 }
 
 type parser struct {
+	root              string
+	main              string
 	operationRegistry operation.Registry
 	specRegistry      spec.Registry
 	validatorRegistry validator.Registry
 	parserCache       cache.ParserCache
+	typeDefCache      cache.TypeDefCache
 	definitionsCache  cache.DefinitionsCache
 }
 
@@ -52,41 +55,42 @@ func WithValidatorRegistry(validatorRegistry validator.Registry) ParserOption {
 	}
 }
 
-func NewParser(opts ...ParserOption) Parser {
+func NewParser(root string, main string, opts ...ParserOption) Parser {
+	parserCache := cache.NewParserCache()
 	p := &parser{
+		root:              root,
+		main:              main,
 		operationRegistry: operation.Default(),
 		specRegistry:      spec.Default(),
 		validatorRegistry: validator.Default(),
-		parserCache:       cache.NewParserCache(),
+		parserCache:       parserCache,
+		typeDefCache:      cache.NewTypeDefCache(root, parserCache),
 		definitionsCache:  cache.NewDefinitionsCache(),
 	}
 
 	for _, opt := range opts {
 		opt(p)
 	}
-
 	return p
 }
 
 // Parse implements [Parser].
-func (p *parser) Parse(root string, main string) (*openapi.Extendable[openapi.OpenAPI], error) {
+func (p *parser) Parse() (*openapi.Extendable[openapi.OpenAPI], error) {
 	spec := openapi.NewOpenAPIBuilder().Build()
-	err := p.parseSpec(path.Join(root, main), spec)
+	err := p.parseSpec(spec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse spec: %w", err)
 	}
 
-	typeDefCache := resolver.NewTypeDefCache(root, p.parserCache)
-
-	err = p.parseOperations(root, typeDefCache, spec)
+	err = p.parseOperations(spec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse operations: %w", err)
 	}
 	return spec, nil
 }
 
-func (p *parser) parseSpec(main string, spec *openapi.Extendable[openapi.OpenAPI]) error {
-	node, err := p.parserCache.Parse(main)
+func (p *parser) parseSpec(spec *openapi.Extendable[openapi.OpenAPI]) error {
+	node, err := p.parserCache.Parse(path.Join(p.root, p.main))
 	if err != nil {
 		return fmt.Errorf("failed to parse main file: %w", err)
 	}
@@ -101,12 +105,8 @@ func (p *parser) parseSpec(main string, spec *openapi.Extendable[openapi.OpenAPI
 	return nil
 }
 
-func (p *parser) parseOperations(
-	root string,
-	typeDefCache resolver.TypeDefCache,
-	spec *openapi.Extendable[openapi.OpenAPI],
-) error {
-	gomodPath := path.Join(root, "go.mod")
+func (p *parser) parseOperations(spec *openapi.Extendable[openapi.OpenAPI]) error {
+	gomodPath := path.Join(p.root, "go.mod")
 	gomodData, err := os.ReadFile(gomodPath)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -121,13 +121,13 @@ func (p *parser) parseOperations(
 	if f.Module == nil {
 		return fmt.Errorf("module declaration not found in go.mod file")
 	}
-	err = p.walkGoFiles(root, func(path string) error {
+	err = p.walkGoFiles(p.root, func(path string) error {
 		node, err := p.parserCache.Parse(path)
 		if err != nil {
 			return fmt.Errorf("failed to parse file: %w", err)
 		}
 		folder := filepath.Dir(path)
-		relativeFolder, err := filepath.Rel(root, folder)
+		relativeFolder, err := filepath.Rel(p.root, folder)
 		if err != nil {
 			return fmt.Errorf("failed to get relative path: %w", err)
 		}
@@ -140,7 +140,7 @@ func (p *parser) parseOperations(
 				}
 				resolver := resolver.NewResolver(
 					p.validatorRegistry,
-					typeDefCache,
+					p.typeDefCache,
 					p.definitionsCache,
 					resolver.NewSchemaBuilder,
 					node,

@@ -1,11 +1,10 @@
-package resolver
+package cache
 
 import (
 	"context"
 	"fmt"
 	"go/ast"
 
-	"github.com/odarbelaeze/openapier/pkg/cache"
 	"github.com/odarbelaeze/openapier/pkg/schema/locator"
 	"golang.org/x/tools/go/packages"
 )
@@ -28,12 +27,12 @@ type TypeDefCache interface {
 
 type typeDefCache struct {
 	root        string
-	parserCache cache.ParserCache
+	parserCache ParserCache
 	cache       map[string]map[string]*TypeDef
 	loaded      map[string]struct{}
 }
 
-func NewTypeDefCache(root string, parserCache cache.ParserCache) TypeDefCache {
+func NewTypeDefCache(root string, parserCache ParserCache) TypeDefCache {
 	return &typeDefCache{
 		root:        root,
 		parserCache: parserCache,
