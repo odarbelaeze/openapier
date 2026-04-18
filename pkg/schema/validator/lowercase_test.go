@@ -1,9 +1,9 @@
 package validator
 
 import (
-	"testing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"testing"
 )
 
 func TestLowercaseTag_Tag(t *testing.T) {

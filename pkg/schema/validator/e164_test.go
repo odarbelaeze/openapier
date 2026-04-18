@@ -1,9 +1,9 @@
 package validator
 
 import (
-	"testing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"testing"
 )
 
 func TestE164Tag_Tag(t *testing.T) {

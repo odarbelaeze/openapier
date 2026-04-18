@@ -1,8 +1,8 @@
 package validator
 
 import (
-	"github.com/sv-tools/openapi"
 	"github.com/odarbelaeze/openapier/pkg/schema/options"
+	"github.com/sv-tools/openapi"
 )
 
 func init() {

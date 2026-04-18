@@ -2,8 +2,8 @@ package validator
 
 import (
 	"fmt"
-	"regexp"
 	"github.com/odarbelaeze/openapier/pkg/schema/options"
+	"regexp"
 )
 
 func init() {
