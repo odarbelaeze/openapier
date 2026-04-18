@@ -105,3 +105,9 @@ func WithUniqueItems() SchemaOption {
 		sb.UniqueItems(true)
 	}
 }
+
+func WithNot(ref *openapi.RefOrSpec[openapi.Schema]) SchemaOption {
+	return func(sb *openapi.SchemaBuilder) {
+		sb.Not(ref)
+	}
+}

@@ -34,20 +34,62 @@ components:
         alpha:
           pattern: ^[a-zA-Z]*$
           type: string
+        alpha_space:
+          pattern: ^[a-zA-Z ]*$
+          type: string
         alphanumeric:
           pattern: ^[a-zA-Z0-9]*$
+          type: string
+        alphanumeric_space:
+          pattern: ^[a-zA-Z0-9 ]*$
+          type: string
+        ascii:
+          pattern: "^[\0-\x7F]*$"
           type: string
         base64:
           format: byte
           type: string
+        base64_raw_url:
+          pattern: ^[0-9a-zA-Z-_]*$
+          type: string
+        base64_url:
+          pattern: ^[0-9a-zA-Z-_]*$
+          type: string
         cidr:
           format: cidr
+          type: string
+        cidrv4:
+          format: cidrv4
+          type: string
+        cidrv6:
+          format: cidrv6
+          type: string
+        cmyk:
+          pattern: ^cmyk\(.*\)$
+          type: string
+        contains:
+          pattern: foo
+          type: string
+        cron:
+          format: cron
+          type: string
+        cve:
+          format: cve
+          type: string
+        data_uri:
+          pattern: ^data:.*
           type: string
         datetime:
           format: date-time
           type: string
+        e164:
+          pattern: ^\+[1-9]\d{1,14}$
+          type: string
         ends_with:
           pattern: ^.*foo$
+          type: string
+        fqdn:
+          format: hostname
           type: string
         hex_color:
           pattern: ^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$
@@ -58,8 +100,32 @@ components:
         hostname:
           format: hostname
           type: string
+        hostname_port:
+          pattern: ^.*:[0-9]+$
+          type: string
+        hsl:
+          pattern: ^hsl\(.*\)$
+          type: string
+        hsla:
+          pattern: ^hsla\(.*\)$
+          type: string
+        http_url:
+          pattern: ^https?://.*
+          type: string
+        https_url:
+          pattern: ^https://.*
+          type: string
         ip:
           format: ip
+          type: string
+        ip_addr:
+          format: ip
+          type: string
+        ip4_addr:
+          format: ipv4
+          type: string
+        ip6_addr:
+          format: ipv6
           type: string
         ipv4:
           format: ipv4
@@ -67,8 +133,23 @@ components:
         ipv6:
           format: ipv6
           type: string
+        isbn:
+          format: isbn
+          type: string
+        iso3166_1_alpha2:
+          pattern: ^[A-Z]{2}$
+          type: string
+        iso3166_1_alpha3:
+          pattern: ^[A-Z]{3}$
+          type: string
+        iso4217:
+          pattern: ^[A-Z]{3}$
+          type: string
         json:
           format: json
+          type: string
+        jwt:
+          pattern: ^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$
           type: string
         latitude:
           format: double
@@ -80,39 +161,125 @@ components:
           maximum: 180
           minimum: -180
           type: number
+        lowercase:
+          pattern: ^[a-z]*$
+          type: string
+        mac:
+          format: mac
+          type: string
+        ne:
+          not:
+            enum:
+              - foo
+          type: string
+        none_of:
+          not:
+            enum:
+              - foo
+              - bar
+          type: string
+        number:
+          pattern: ^[0-9]+$
+          type: string
         numeric:
           pattern: ^[0-9]*$
           type: string
+        port:
+          format: int32
+          maximum: 65535
+          minimum: 1
+          type: integer
+        print_ascii:
+          pattern: ^[ -~]*$
+          type: string
+        rgb:
+          pattern: ^rgb\(.*\)$
+          type: string
+        rgba:
+          pattern: ^rgba\(.*\)$
+          type: string
+        semver:
+          format: semver
+          type: string
+        ssn:
+          pattern: ^\d{3}-\d{2}-\d{4}$
+          type: string
         starts_with:
           pattern: ^foo.*$
+          type: string
+        ulid:
+          format: ulid
           type: string
         unique:
           items:
             type: string
           type: array
           uniqueItems: true
+        uppercase:
+          pattern: ^[A-Z]*$
+          type: string
         uri:
           format: uri
           type: string
       required:
         - alpha
         - alphanumeric
+        - alpha_space
+        - alphanumeric_space
+        - ascii
         - base64
+        - base64_url
+        - base64_raw_url
         - cidr
+        - cidrv4
+        - cidrv6
+        - cmyk
+        - contains
+        - cron
+        - cve
+        - data_uri
         - datetime
+        - e164
         - ends_with
+        - fqdn
         - hexadecimal
         - hex_color
+        - hsl
+        - hsla
         - hostname
+        - hostname_port
+        - http_url
+        - https_url
         - ip
+        - ip_addr
+        - ip4_addr
+        - ip6_addr
         - ipv4
         - ipv6
+        - isbn
+        - iso3166_1_alpha2
+        - iso3166_1_alpha3
+        - iso4217
         - json
+        - jwt
         - latitude
         - longitude
+        - lowercase
+        - mac
+        - ne
+        - none_of
+        - number
         - numeric
+        - port
+        - print_ascii
+        - rgb
+        - rgba
+        - semver
+        - ssn
         - starts_with
+        - ulid
         - unique
+        - uppercase
         - uri
       type: object
 info:
