@@ -1,0 +1,143 @@
+components:
+  schemas:
+    github_com_odarbelaeze_test_formats:main.Base:
+      properties:
+        created_at:
+          type: string
+        id:
+          format: uuid
+          type: string
+        updated_at:
+          type: string
+      required:
+        - id
+        - created_at
+        - updated_at
+      type: object
+    github_com_odarbelaeze_test_formats:main.User:
+      allOf:
+        - $ref: '#/components/schemas/github_com_odarbelaeze_test_formats:main.Base'
+        - properties:
+            email:
+              type: string
+            name:
+              type: string
+            settings:
+              $ref: '#/components/schemas/github_com_odarbelaeze_test_formats:main.UserSettings'
+          required:
+            - name
+            - email
+            - settings
+          type: object
+    github_com_odarbelaeze_test_formats:main.UserSettings:
+      properties:
+        alpha:
+          pattern: ^[a-zA-Z]*$
+          type: string
+        alphanumeric:
+          pattern: ^[a-zA-Z0-9]*$
+          type: string
+        base64:
+          format: byte
+          type: string
+        cidr:
+          format: cidr
+          type: string
+        datetime:
+          format: date-time
+          type: string
+        ends_with:
+          pattern: ^.*foo$
+          type: string
+        hex_color:
+          pattern: ^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$
+          type: string
+        hexadecimal:
+          pattern: ^[0-9a-fA-F]*$
+          type: string
+        hostname:
+          format: hostname
+          type: string
+        ip:
+          format: ip
+          type: string
+        ipv4:
+          format: ipv4
+          type: string
+        ipv6:
+          format: ipv6
+          type: string
+        json:
+          format: json
+          type: string
+        latitude:
+          format: double
+          maximum: 90
+          minimum: -90
+          type: number
+        longitude:
+          format: double
+          maximum: 180
+          minimum: -180
+          type: number
+        numeric:
+          pattern: ^[0-9]*$
+          type: string
+        starts_with:
+          pattern: ^foo.*$
+          type: string
+        unique:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+        uri:
+          format: uri
+          type: string
+      required:
+        - alpha
+        - alphanumeric
+        - base64
+        - cidr
+        - datetime
+        - ends_with
+        - hexadecimal
+        - hex_color
+        - hostname
+        - ip
+        - ipv4
+        - ipv6
+        - json
+        - latitude
+        - longitude
+        - numeric
+        - starts_with
+        - unique
+        - uri
+      type: object
+info:
+  description: This demonstrates embedding.
+  termsOfService: http://swagger.io/terms/
+  title: API that exposes types
+  version: "1.0"
+jsonSchemaDialect: https://spec.openapis.org/oas/3.1/dialect/base
+openapi: 3.1.1
+paths:
+  /user/{id}:
+    get:
+      parameters:
+        - description: User ID
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/github_com_odarbelaeze_test_formats:main.User'
+          description: The user with the given ID
+      summary: Get a user by ID
+

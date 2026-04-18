@@ -66,16 +66,36 @@ These tags are used in Go struct fields within the `validate` tag to define sche
 
 | Tag | Usage |
 | :--- | :--- |
+| `alpha` | `alpha` |
+| `alphanum` | `alphanum` |
+| `base64` | `base64` |
+| `cidr` | `cidr` |
+| `datetime` | `datetime` |
 | `email` | `email` |
+| `endswith` | `endswith=x` |
 | `eq` | `eq=x` |
 | `gt` | `gt=x` |
 | `gte` | `gte=x` |
+| `hexadecimal` | `hexadecimal` |
+| `hexcolor` | `hexcolor` |
+| `hostname` | `hostname` |
+| `hostname_rfc1123` | `hostname_rfc1123` |
+| `ip` | `ip` |
+| `ipv4` | `ipv4` |
+| `ipv6` | `ipv6` |
+| `json` | `json` |
+| `latitude` | `latitude` |
 | `len` | `len=x` |
+| `longitude` | `longitude` |
 | `lt` | `lt=x` |
 | `lte` | `lte=x` |
 | `max` | `max=x` |
 | `min` | `min=x` |
+| `numeric` | `numeric` |
 | `oneof` | `oneof=val1 val2 val3` |
 | `required` | `required` |
+| `startswith` | `startswith=x` |
+| `unique` | `unique` |
+| `uri` | `uri` |
 | `url` | `url` |
 | `uuid` | `uuid` |

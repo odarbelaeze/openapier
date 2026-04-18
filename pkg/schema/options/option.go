@@ -93,3 +93,15 @@ func WithEnum(values ...any) SchemaOption {
 		sb.Enum(values...)
 	}
 }
+
+func WithPattern(pattern string) SchemaOption {
+	return func(sb *openapi.SchemaBuilder) {
+		sb.Pattern(pattern)
+	}
+}
+
+func WithUniqueItems() SchemaOption {
+	return func(sb *openapi.SchemaBuilder) {
+		sb.UniqueItems(true)
+	}
+}

@@ -1,0 +1,29 @@
+package validator
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
+
+func TestUniqueTag(t *testing.T) {
+	tag := UniqueTag{}
+
+	t.Run("Tag", func(t *testing.T) {
+		assert.Equal(t, "unique", tag.Tag())
+	})
+
+	t.Run("Parse", func(t *testing.T) {
+		t.Run("success", func(t *testing.T) {
+			opts, err := tag.Parse("", "array")
+			require.NoError(t, err)
+			assert.Len(t, opts, 1)
+		})
+
+		t.Run("unsupported type", func(t *testing.T) {
+			_, err := tag.Parse("", "string")
+			require.Error(t, err)
+		})
+	})
+}
