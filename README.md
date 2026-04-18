@@ -6,6 +6,8 @@
 
 - **OpenAPI v3.1 Support:** Generates modern OpenAPI specifications.
 - **Go Type Analysis:** Automatically resolves request and response types from your Go structs.
+- **Validation Support:** Automatically translates Go `validate` tags into OpenAPI schema constraints (e.g., `min`, `max`, `pattern`).
+- **Generics Support:** Full support for Go 1.18+ generics in request and response types.
 - **Rich Annotations:** Extensive support for spec-level and operation-level metadata.
 - **Easy Integration:** Simple CLI tool that fits into any CI/CD pipeline.
 
@@ -60,9 +62,9 @@ Annotate your handler functions to define endpoints:
 // @summary Add a new pet to the store
 // @description get string by ID
 // @id get-string-by-int
-// @param   some_id int path "the ID of the string to return"
-// @requestBody application/json Pet "The pet to add"
-// @response 200 application/json Pet "The added pet"
+// @param   some_id int path the ID of the string to return
+// @requestBody application/json Pet The pet to add
+// @response 200 application/json Pet The added pet
 // @router /testapi/get-string-by-int/{some_id} [get]
 func GetStringByInt(w http.ResponseWriter, r *http.Request) {
     // ...

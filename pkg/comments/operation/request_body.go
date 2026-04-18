@@ -37,10 +37,7 @@ func (c *RequestBodyComment) ParseInto(content string, f *ast.File, op *Operatio
 	typ := fields[1]
 	var description string
 	if len(fields) > 2 {
-		// Extract the rest of the string as the description.
-		// Find the index of the second space (after contentType and typ).
-		// We'll use strings.Join for safety or just find the third field start.
-		description = strings.TrimSpace(content[strings.Index(content, typ)+len(typ):])
+		description = strings.Join(fields[2:], " ")
 	}
 
 	s, err := op.Resolver.Resolve(typ)

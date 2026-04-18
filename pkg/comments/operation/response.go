@@ -38,9 +38,7 @@ func (c *ResponseComment) ParseInto(content string, f *ast.File, op *Operation) 
 	typ := fields[2]
 	var description string
 	if len(fields) > 3 {
-		// Extract the rest of the string as the description.
-		// Find the index of the third field (after statusCode, contentType and typ).
-		description = strings.TrimSpace(content[strings.Index(content, typ)+len(typ):])
+		description = strings.Join(fields[3:], " ")
 	}
 
 	s, err := op.Resolver.Resolve(typ)

@@ -32,10 +32,7 @@ func (c *ParamDescriptionComment) ParseInto(content string, f *ast.File, op *Ope
 	}
 
 	name := fields[0]
-	// Extract the rest of the string as the description.
-	// Find the index of the first space after the name.
-	idx := strings.Index(content, name)
-	description := strings.TrimSpace(content[idx+len(name):])
+	description := strings.Join(fields[1:], " ")
 
 	for _, p := range op.Builder.Build().Spec.Parameters {
 		if p.Spec.Spec.Name == name {
