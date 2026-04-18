@@ -3,7 +3,6 @@ package resolver
 import (
 	"fmt"
 	"go/ast"
-	"log/slog"
 	"reflect"
 	"strconv"
 	"strings"
@@ -66,19 +65,34 @@ func (b *schemaBuilder) Build(expr ast.Expr, opts ...options.SchemaOption) (*ope
 		return b.Build(ty.X, opts...)
 	case *ast.SelectorExpr:
 		{
-			pkgIdent, ok := ty.X.(*ast.Ident)
-			if !ok {
-				return nil, fmt.Errorf("unsupported package identifier in selector expression: %T", ty.X)
+			typeName, err := fullSelectorName(ty)
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse selector expression: %w", err)
 			}
-			pkgName := pkgIdent.Name
-			typeName := ty.Sel.Name
-			return b.resolver.Resolve(fmt.Sprintf("%s.%s", pkgName, typeName), opts...)
+			return b.resolver.Resolve(typeName, opts...)
 		}
 	case *ast.MapType:
 		return b.buildMap(ty, opts...)
 	default:
 		return nil, fmt.Errorf("unsupported type: %T", expr)
 	}
+}
+
+func fullSelectorName(expr *ast.SelectorExpr) (string, error) {
+	var parts []string
+	var current ast.Expr = expr
+	for {
+		if sel, ok := current.(*ast.SelectorExpr); ok {
+			parts = append([]string{sel.Sel.Name}, parts...)
+			current = sel.X
+		} else if ident, ok := current.(*ast.Ident); ok {
+			parts = append([]string{ident.Name}, parts...)
+			break
+		} else {
+			return "", fmt.Errorf("unsupported expression type in selector: %T", current)
+		}
+	}
+	return strings.Join(parts, "."), nil
 }
 
 func (b *schemaBuilder) buildMap(ty *ast.MapType, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
@@ -97,25 +111,18 @@ func (b *schemaBuilder) buildMap(ty *ast.MapType, opts ...options.SchemaOption) 
 }
 
 func (b *schemaBuilder) buildStruct(ty *ast.StructType, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
-	builder := openapi.NewSchemaBuilder().AddType("object")
+	propertiesBuilder := openapi.NewSchemaBuilder().AddType("object")
 	required := []string{}
+	var embeds []*openapi.RefOrSpec[openapi.Schema]
+
 	for _, field := range ty.Fields.List {
 		if field.Names == nil {
 			embedSchema, err := b.Build(field.Type)
 			if err != nil {
 				return nil, fmt.Errorf("error resolving embed schema: %w", err)
 			}
-			slog.Info("got an embed schema", "embedSchema", embedSchema)
-			var spec *openapi.Schema
-			if embedSchema.Spec == nil {
-				return nil, fmt.Errorf("embed schema not found: %s", embedSchema.Ref.Ref)
-			} else {
-				spec = embedSchema.Spec
-			}
-			required = append(required, spec.Required...)
-			for name, property := range spec.Properties {
-				builder.AddProperty(name, property)
-			}
+			embeds = append(embeds, embedSchema)
+			continue
 		}
 		for _, fieldName := range field.Names {
 			name := fieldName.Name
@@ -123,6 +130,7 @@ func (b *schemaBuilder) buildStruct(ty *ast.StructType, opts ...options.SchemaOp
 				continue
 			}
 			fieldOptions := []options.SchemaOption{}
+			omitEmpty := false
 			if field.Tag != nil {
 				tag := reflect.StructTag(strings.Trim(field.Tag.Value, "`"))
 				jsonTag := tag.Get(jsonStructTag)
@@ -133,6 +141,11 @@ func (b *schemaBuilder) buildStruct(ty *ast.StructType, opts ...options.SchemaOp
 					parts := strings.Split(jsonTag, ",")
 					if parts[0] != "" {
 						name = parts[0]
+					}
+					for _, part := range parts[1:] {
+						if part == "omitempty" {
+							omitEmpty = true
+						}
 					}
 				}
 				example := tag.Get(exampleStructTag)
@@ -156,21 +169,40 @@ func (b *schemaBuilder) buildStruct(ty *ast.StructType, opts ...options.SchemaOp
 			if field.Doc != nil {
 				fieldOptions = append(fieldOptions, options.WithDescription(field.Doc.Text()))
 			}
-			if _, ok := field.Type.(*ast.StarExpr); !ok {
+			isPointer := false
+			if _, ok := field.Type.(*ast.StarExpr); ok {
+				isPointer = true
+			}
+			if !isPointer && !omitEmpty {
 				required = append(required, name)
 			}
 			schema, err := b.Build(field.Type, fieldOptions...)
 			if err != nil {
 				return nil, fmt.Errorf("unsupported property type %T: %w", field.Type, err)
 			}
-			builder.AddProperty(name, schema)
+			propertiesBuilder.AddProperty(name, schema)
 		}
 	}
-	builder.Required(required...)
-	for _, option := range opts {
-		option(builder)
+	propertiesBuilder.Required(required...)
+
+	var finalBuilder *openapi.SchemaBuilder
+	if len(embeds) > 0 {
+		finalBuilder = openapi.NewSchemaBuilder()
+		for _, embed := range embeds {
+			finalBuilder.AddAllOf(embed)
+		}
+		// Only add the properties as an object if there are properties or required fields
+		if len(required) > 0 || len(ty.Fields.List) > len(embeds) {
+			finalBuilder.AddAllOf(propertiesBuilder.Build())
+		}
+	} else {
+		finalBuilder = propertiesBuilder
 	}
-	return builder.Build(), nil
+
+	for _, option := range opts {
+		option(finalBuilder)
+	}
+	return finalBuilder.Build(), nil
 }
 
 func (b *schemaBuilder) buildArray(ty *ast.ArrayType, opts ...options.SchemaOption) (*openapi.RefOrSpec[openapi.Schema], error) {
@@ -200,13 +232,15 @@ func parseSchemaType(ty ast.Expr) (*string, error) {
 	switch expr := ty.(type) {
 	case *ast.Ident:
 		switch expr.Name {
-		case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
+		case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64", "uintptr", "byte", "rune":
 			return new("integer"), nil
 		case "float32", "float64":
 			return new("number"), nil
 		case "bool":
 			return new("boolean"), nil
 		case "string":
+			return new("string"), nil
+		case "complex64", "complex128":
 			return new("string"), nil
 		default:
 			return nil, fmt.Errorf("unsupported type %s", expr.Name)
@@ -225,7 +259,7 @@ func parseExampleValue(example string, ty ast.Expr) any {
 	switch expr := ty.(type) {
 	case *ast.Ident:
 		switch expr.Name {
-		case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
+		case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64", "uintptr", "byte", "rune":
 			if val, err := strconv.ParseInt(example, 10, 64); err == nil {
 				return int(val)
 			}

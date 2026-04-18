@@ -12,7 +12,6 @@ components:
       required:
         - code
         - message
-        - details
       type: object
 info:
   description: Loads external packages.
