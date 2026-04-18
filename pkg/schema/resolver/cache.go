@@ -4,9 +4,8 @@ import (
 	"context"
 	"fmt"
 	"go/ast"
-	"go/parser"
-	"go/token"
 
+	"github.com/odarbelaeze/openapier/pkg/cache"
 	"github.com/odarbelaeze/openapier/pkg/schema/locator"
 	"golang.org/x/tools/go/packages"
 )
@@ -28,16 +27,18 @@ type TypeDefCache interface {
 }
 
 type typeDefCache struct {
-	root   string
-	cache  map[string]map[string]*TypeDef
-	loaded map[string]struct{}
+	root        string
+	parserCache cache.ParserCache
+	cache       map[string]map[string]*TypeDef
+	loaded      map[string]struct{}
 }
 
-func NewTypeDefCache(root string) TypeDefCache {
+func NewTypeDefCache(root string, parserCache cache.ParserCache) TypeDefCache {
 	return &typeDefCache{
-		root:   root,
-		cache:  make(map[string]map[string]*TypeDef),
-		loaded: make(map[string]struct{}),
+		root:        root,
+		parserCache: parserCache,
+		cache:       make(map[string]map[string]*TypeDef),
+		loaded:      make(map[string]struct{}),
 	}
 }
 
@@ -57,16 +58,16 @@ func (t *typeDefCache) Load(ctx context.Context, pkgName string) error {
 	}
 	packages, err := packages.Load(&packages.Config{
 		Dir: t.root,
-		ParseFile: func(fset *token.FileSet, filename string, src []byte) (*ast.File, error) {
-			return parser.ParseFile(fset, filename, src, parser.ParseComments)
-		},
-		Mode: packages.LoadAllSyntax,
 	}, pkgName)
 	if err != nil {
 		return fmt.Errorf("failed to load package %s: %w", pkgName, err)
 	}
 	for _, pkg := range packages {
-		for _, file := range pkg.Syntax {
+		for _, filename := range pkg.GoFiles {
+			file, err := t.parserCache.Parse(filename)
+			if err != nil {
+				return fmt.Errorf("failed to parse file %s: %w", filename, err)
+			}
 			for _, decl := range file.Decls {
 				if genDecl, ok := decl.(*ast.GenDecl); ok {
 					for _, spec := range genDecl.Specs {

@@ -3,8 +3,6 @@ package parser
 import (
 	"fmt"
 	"go/ast"
-	goparser "go/parser"
-	"go/token"
 	"io/fs"
 	"log/slog"
 	"os"
@@ -12,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/odarbelaeze/openapier/pkg/cache"
 	"github.com/odarbelaeze/openapier/pkg/comments/operation"
 	"github.com/odarbelaeze/openapier/pkg/comments/spec"
 	"github.com/odarbelaeze/openapier/pkg/schema/resolver"
@@ -29,6 +28,7 @@ type parser struct {
 	operationRegistry operation.Registry
 	specRegistry      spec.Registry
 	validatorRegistry validator.Registry
+	parserCache       cache.ParserCache
 }
 
 type ParserOption func(*parser)
@@ -56,6 +56,7 @@ func NewParser(opts ...ParserOption) Parser {
 		operationRegistry: operation.Default(),
 		specRegistry:      spec.Default(),
 		validatorRegistry: validator.Default(),
+		parserCache:       cache.NewParserCache(),
 	}
 
 	for _, opt := range opts {
@@ -73,10 +74,10 @@ func (p *parser) Parse(root string, main string) (*openapi.Extendable[openapi.Op
 		return nil, fmt.Errorf("failed to parse spec: %w", err)
 	}
 
-	cache := resolver.NewTypeDefCache(root)
+	typeDefCache := resolver.NewTypeDefCache(root, p.parserCache)
 	definitions := resolver.NewDefinitionsCache()
 
-	err = p.parseOperations(root, cache, definitions, spec)
+	err = p.parseOperations(root, typeDefCache, definitions, spec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse operations: %w", err)
 	}
@@ -84,8 +85,7 @@ func (p *parser) Parse(root string, main string) (*openapi.Extendable[openapi.Op
 }
 
 func (p *parser) parseSpec(main string, spec *openapi.Extendable[openapi.OpenAPI]) error {
-	fileSet := token.NewFileSet()
-	node, err := goparser.ParseFile(fileSet, main, nil, goparser.ParseComments)
+	node, err := p.parserCache.Parse(main)
 	if err != nil {
 		return fmt.Errorf("failed to parse main file: %w", err)
 	}
@@ -102,7 +102,7 @@ func (p *parser) parseSpec(main string, spec *openapi.Extendable[openapi.OpenAPI
 
 func (p *parser) parseOperations(
 	root string,
-	cache resolver.TypeDefCache,
+	typeDefCache resolver.TypeDefCache,
 	definitionsCache resolver.DefinitionsCache,
 	spec *openapi.Extendable[openapi.OpenAPI],
 ) error {
@@ -121,9 +121,8 @@ func (p *parser) parseOperations(
 	if f.Module == nil {
 		return fmt.Errorf("module declaration not found in go.mod file")
 	}
-	fileSet := token.NewFileSet()
 	err = p.walkGoFiles(root, func(path string) error {
-		node, err := goparser.ParseFile(fileSet, path, nil, goparser.ParseComments)
+		node, err := p.parserCache.Parse(path)
 		if err != nil {
 			return fmt.Errorf("failed to parse file: %w", err)
 		}
@@ -141,7 +140,7 @@ func (p *parser) parseOperations(
 				}
 				resolver := resolver.NewResolver(
 					p.validatorRegistry,
-					cache,
+					typeDefCache,
 					definitionsCache,
 					resolver.NewSchemaBuilder,
 					node,

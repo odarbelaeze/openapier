@@ -8,7 +8,6 @@ snapshots: $(SNAPSHOTS)
 
 # % matches the name of the test folder
 pkg/parser/testdata/%/expected.yaml: $(SOURCES)
-	# $* is the name of the test folder, $@ is the name of the whole rule
 	go run ./cmd/openapier --root pkg/parser/testdata/$* > $@
 
 TAGS.md: $(SOURCES)
@@ -18,6 +17,10 @@ docs: TAGS.md
 	@echo docs are up to date
 .PHONY: docs
 
-test: snapshots
+test: mocks snapshots
 	go test ./...
 .PHONY: test
+
+mocks:
+	mockery --log-level ERROR
+.PHONY: mocks
