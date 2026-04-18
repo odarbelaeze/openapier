@@ -1,4 +1,4 @@
-package resolver
+package cache
 
 import "github.com/sv-tools/openapi"
 

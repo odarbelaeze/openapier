@@ -29,6 +29,7 @@ type parser struct {
 	specRegistry      spec.Registry
 	validatorRegistry validator.Registry
 	parserCache       cache.ParserCache
+	definitionsCache  cache.DefinitionsCache
 }
 
 type ParserOption func(*parser)
@@ -57,6 +58,7 @@ func NewParser(opts ...ParserOption) Parser {
 		specRegistry:      spec.Default(),
 		validatorRegistry: validator.Default(),
 		parserCache:       cache.NewParserCache(),
+		definitionsCache:  cache.NewDefinitionsCache(),
 	}
 
 	for _, opt := range opts {
@@ -75,9 +77,8 @@ func (p *parser) Parse(root string, main string) (*openapi.Extendable[openapi.Op
 	}
 
 	typeDefCache := resolver.NewTypeDefCache(root, p.parserCache)
-	definitions := resolver.NewDefinitionsCache()
 
-	err = p.parseOperations(root, typeDefCache, definitions, spec)
+	err = p.parseOperations(root, typeDefCache, spec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse operations: %w", err)
 	}
@@ -103,7 +104,6 @@ func (p *parser) parseSpec(main string, spec *openapi.Extendable[openapi.OpenAPI
 func (p *parser) parseOperations(
 	root string,
 	typeDefCache resolver.TypeDefCache,
-	definitionsCache resolver.DefinitionsCache,
 	spec *openapi.Extendable[openapi.OpenAPI],
 ) error {
 	gomodPath := path.Join(root, "go.mod")
@@ -141,7 +141,7 @@ func (p *parser) parseOperations(
 				resolver := resolver.NewResolver(
 					p.validatorRegistry,
 					typeDefCache,
-					definitionsCache,
+					p.definitionsCache,
 					resolver.NewSchemaBuilder,
 					node,
 					from,
@@ -174,9 +174,9 @@ func (p *parser) parseOperations(
 	if err != nil {
 		return fmt.Errorf("failed to walk directory: %w", err)
 	}
-	if len(definitionsCache.Definitions()) > 0 {
+	if len(p.definitionsCache.Definitions()) > 0 {
 		spec.Spec.Components = openapi.NewComponents()
-		spec.Spec.Components.Spec.Schemas = definitionsCache.Definitions()
+		spec.Spec.Components.Spec.Schemas = p.definitionsCache.Definitions()
 	}
 	return nil
 }

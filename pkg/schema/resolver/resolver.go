@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/odarbelaeze/openapier/pkg/cache"
 	"github.com/odarbelaeze/openapier/pkg/schema/locator"
 	"github.com/odarbelaeze/openapier/pkg/schema/options"
 	"github.com/odarbelaeze/openapier/pkg/schema/validator"
@@ -42,7 +43,7 @@ type resolver struct {
 	typeDefCache TypeDefCache
 
 	// definitionsCache is the cache of resolved definitions.
-	definitionsCache DefinitionsCache
+	definitionsCache cache.DefinitionsCache
 
 	// file is the AST file being resolved.
 	file *ast.File
@@ -55,7 +56,7 @@ type resolver struct {
 func NewResolver(
 	validatorRegistry validator.Registry,
 	typeDefCache TypeDefCache,
-	definitionsCache DefinitionsCache,
+	definitionsCache cache.DefinitionsCache,
 	builderFactory SchemaBuilderFactory,
 	file *ast.File,
 	from string,
