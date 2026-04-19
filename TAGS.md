@@ -53,6 +53,7 @@ These tags are used to define individual API operations (Paths, Parameters, Resp
 | `@response` | `@response <status_code> <content_type> <type> [description]` |
 | `@router` | `@router <path> [<method>]` |
 | `@security` | `@security <name> [scope1] [scope2] ...` |
+| `@security.none` | `@security.none` |
 | `@server.description` | `@server.description <description>` |
 | `@server.url` | `@server.url <url>` |
 | `@server.variable.default` | `@server.variable.default <variable> <default>` |
