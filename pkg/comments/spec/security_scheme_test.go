@@ -21,12 +21,12 @@ func TestSecuritySchemeComment_Usage(t *testing.T) {
 
 func TestSecuritySchemeComment_ParseInto(t *testing.T) {
 	tests := []struct {
-		name           string
-		line           string
-		expectedName   string
-		expectedType   string
-		expectedDesc   string
-		expectedError  bool
+		name          string
+		line          string
+		expectedName  string
+		expectedType  string
+		expectedDesc  string
+		expectedError bool
 	}{
 		{
 			name:          "too few fields",
