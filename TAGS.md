@@ -14,6 +14,7 @@ These tags are used to define general information about the API (Info, Servers, 
 | `@info.contact.name` | `@info.contact.name <name>` |
 | `@info.contact.url` | `@info.contact.url <url>` |
 | `@info.description` | `@info.description <description>` |
+| `@info.license.identifier` | `@info.license.identifier <identifier>` |
 | `@info.license.name` | `@info.license.name <name>` |
 | `@info.license.url` | `@info.license.url <url>` |
 | `@info.summary` | `@info.summary <summary>` |
