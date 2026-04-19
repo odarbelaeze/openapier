@@ -1,18 +1,20 @@
-package validator
+package validator_test
 
 import (
+	"testing"
+
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestCIDRv6Tag_Tag(t *testing.T) {
-	tag := CIDRv6Tag{}
+	tag := validator.CIDRv6Tag{}
 	assert.Equal(t, "cidrv6", tag.Tag())
 }
 
 func TestCIDRv6Tag_Usage(t *testing.T) {
-	tag := CIDRv6Tag{}
+	tag := validator.CIDRv6Tag{}
 	assert.Equal(t, "cidrv6", tag.Usage())
 }
 
@@ -37,7 +39,7 @@ func TestCIDRv6Tag_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag := CIDRv6Tag{}
+			tag := validator.CIDRv6Tag{}
 			opts, err := tag.Parse(tt.value, tt.as)
 
 			if tt.expectErr {

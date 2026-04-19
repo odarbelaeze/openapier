@@ -1,18 +1,20 @@
-package validator
+package validator_test
 
 import (
+	"testing"
+
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestSemverTag_Tag(t *testing.T) {
-	tag := SemverTag{}
+	tag := validator.SemverTag{}
 	assert.Equal(t, "semver", tag.Tag())
 }
 
 func TestSemverTag_Usage(t *testing.T) {
-	tag := SemverTag{}
+	tag := validator.SemverTag{}
 	assert.Equal(t, "semver", tag.Usage())
 }
 
@@ -37,7 +39,7 @@ func TestSemverTag_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag := SemverTag{}
+			tag := validator.SemverTag{}
 			opts, err := tag.Parse(tt.value, tt.as)
 
 			if tt.expectErr {

@@ -1,14 +1,15 @@
-package validator
+package validator_test
 
 import (
 	"testing"
 
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestEqTag(t *testing.T) {
-	tag := EqTag{}
+	tag := validator.EqTag{}
 
 	t.Run("Tag", func(t *testing.T) {
 		assert.Equal(t, "eq", tag.Tag())

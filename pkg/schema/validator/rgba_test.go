@@ -1,18 +1,20 @@
-package validator
+package validator_test
 
 import (
+	"testing"
+
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestRGBATag_Tag(t *testing.T) {
-	tag := RGBATag{}
+	tag := validator.RGBATag{}
 	assert.Equal(t, "rgba", tag.Tag())
 }
 
 func TestRGBATag_Usage(t *testing.T) {
-	tag := RGBATag{}
+	tag := validator.RGBATag{}
 	assert.Equal(t, "rgba", tag.Usage())
 }
 
@@ -37,7 +39,7 @@ func TestRGBATag_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag := RGBATag{}
+			tag := validator.RGBATag{}
 			opts, err := tag.Parse(tt.value, tt.as)
 
 			if tt.expectErr {

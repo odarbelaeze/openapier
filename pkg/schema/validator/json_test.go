@@ -1,14 +1,15 @@
-package validator
+package validator_test
 
 import (
 	"testing"
 
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestJSONTag(t *testing.T) {
-	tag := JSONTag{}
+	tag := validator.JSONTag{}
 
 	t.Run("Tag", func(t *testing.T) {
 		assert.Equal(t, "json", tag.Tag())

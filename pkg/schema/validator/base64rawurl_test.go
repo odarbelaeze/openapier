@@ -1,18 +1,20 @@
-package validator
+package validator_test
 
 import (
+	"testing"
+
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestBase64RawURLTag_Tag(t *testing.T) {
-	tag := Base64RawURLTag{}
+	tag := validator.Base64RawURLTag{}
 	assert.Equal(t, "base64rawurl", tag.Tag())
 }
 
 func TestBase64RawURLTag_Usage(t *testing.T) {
-	tag := Base64RawURLTag{}
+	tag := validator.Base64RawURLTag{}
 	assert.Equal(t, "base64rawurl", tag.Usage())
 }
 
@@ -37,7 +39,7 @@ func TestBase64RawURLTag_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag := Base64RawURLTag{}
+			tag := validator.Base64RawURLTag{}
 			opts, err := tag.Parse(tt.value, tt.as)
 
 			if tt.expectErr {

@@ -1,18 +1,20 @@
-package validator
+package validator_test
 
 import (
+	"testing"
+
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestJWTTag_Tag(t *testing.T) {
-	tag := JWTTag{}
+	tag := validator.JWTTag{}
 	assert.Equal(t, "jwt", tag.Tag())
 }
 
 func TestJWTTag_Usage(t *testing.T) {
-	tag := JWTTag{}
+	tag := validator.JWTTag{}
 	assert.Equal(t, "jwt", tag.Usage())
 }
 
@@ -37,7 +39,7 @@ func TestJWTTag_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag := JWTTag{}
+			tag := validator.JWTTag{}
 			opts, err := tag.Parse(tt.value, tt.as)
 
 			if tt.expectErr {

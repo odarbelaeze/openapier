@@ -1,18 +1,20 @@
-package validator
+package validator_test
 
 import (
+	"testing"
+
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestIPAddrTag_Tag(t *testing.T) {
-	tag := IPAddrTag{}
+	tag := validator.IPAddrTag{}
 	assert.Equal(t, "ip_addr", tag.Tag())
 }
 
 func TestIPAddrTag_Usage(t *testing.T) {
-	tag := IPAddrTag{}
+	tag := validator.IPAddrTag{}
 	assert.Equal(t, "ip_addr", tag.Usage())
 }
 
@@ -37,7 +39,7 @@ func TestIPAddrTag_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag := IPAddrTag{}
+			tag := validator.IPAddrTag{}
 			opts, err := tag.Parse(tt.value, tt.as)
 
 			if tt.expectErr {

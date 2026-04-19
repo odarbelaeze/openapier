@@ -1,18 +1,20 @@
-package validator
+package validator_test
 
 import (
+	"testing"
+
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestLowercaseTag_Tag(t *testing.T) {
-	tag := LowercaseTag{}
+	tag := validator.LowercaseTag{}
 	assert.Equal(t, "lowercase", tag.Tag())
 }
 
 func TestLowercaseTag_Usage(t *testing.T) {
-	tag := LowercaseTag{}
+	tag := validator.LowercaseTag{}
 	assert.Equal(t, "lowercase", tag.Usage())
 }
 
@@ -37,7 +39,7 @@ func TestLowercaseTag_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag := LowercaseTag{}
+			tag := validator.LowercaseTag{}
 			opts, err := tag.Parse(tt.value, tt.as)
 
 			if tt.expectErr {

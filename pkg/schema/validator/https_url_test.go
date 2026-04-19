@@ -1,18 +1,20 @@
-package validator
+package validator_test
 
 import (
+	"testing"
+
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestHTTPSURLTag_Tag(t *testing.T) {
-	tag := HTTPSURLTag{}
+	tag := validator.HTTPSURLTag{}
 	assert.Equal(t, "https_url", tag.Tag())
 }
 
 func TestHTTPSURLTag_Usage(t *testing.T) {
-	tag := HTTPSURLTag{}
+	tag := validator.HTTPSURLTag{}
 	assert.Equal(t, "https_url", tag.Usage())
 }
 
@@ -37,7 +39,7 @@ func TestHTTPSURLTag_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag := HTTPSURLTag{}
+			tag := validator.HTTPSURLTag{}
 			opts, err := tag.Parse(tt.value, tt.as)
 
 			if tt.expectErr {

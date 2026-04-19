@@ -1,18 +1,20 @@
-package validator
+package validator_test
 
 import (
+	"testing"
+
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestFQDNTag_Tag(t *testing.T) {
-	tag := FQDNTag{}
+	tag := validator.FQDNTag{}
 	assert.Equal(t, "fqdn", tag.Tag())
 }
 
 func TestFQDNTag_Usage(t *testing.T) {
-	tag := FQDNTag{}
+	tag := validator.FQDNTag{}
 	assert.Equal(t, "fqdn", tag.Usage())
 }
 
@@ -37,7 +39,7 @@ func TestFQDNTag_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag := FQDNTag{}
+			tag := validator.FQDNTag{}
 			opts, err := tag.Parse(tt.value, tt.as)
 
 			if tt.expectErr {

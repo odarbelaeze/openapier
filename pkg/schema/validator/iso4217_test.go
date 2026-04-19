@@ -1,18 +1,20 @@
-package validator
+package validator_test
 
 import (
+	"testing"
+
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestISO4217Tag_Tag(t *testing.T) {
-	tag := ISO4217Tag{}
+	tag := validator.ISO4217Tag{}
 	assert.Equal(t, "iso4217", tag.Tag())
 }
 
 func TestISO4217Tag_Usage(t *testing.T) {
-	tag := ISO4217Tag{}
+	tag := validator.ISO4217Tag{}
 	assert.Equal(t, "iso4217", tag.Usage())
 }
 
@@ -37,7 +39,7 @@ func TestISO4217Tag_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag := ISO4217Tag{}
+			tag := validator.ISO4217Tag{}
 			opts, err := tag.Parse(tt.value, tt.as)
 
 			if tt.expectErr {

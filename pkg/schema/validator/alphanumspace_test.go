@@ -1,18 +1,20 @@
-package validator
+package validator_test
 
 import (
+	"testing"
+
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestAlphaNumSpaceTag_Tag(t *testing.T) {
-	tag := AlphaNumSpaceTag{}
+	tag := validator.AlphaNumSpaceTag{}
 	assert.Equal(t, "alphanumspace", tag.Tag())
 }
 
 func TestAlphaNumSpaceTag_Usage(t *testing.T) {
-	tag := AlphaNumSpaceTag{}
+	tag := validator.AlphaNumSpaceTag{}
 	assert.Equal(t, "alphanumspace", tag.Usage())
 }
 
@@ -37,7 +39,7 @@ func TestAlphaNumSpaceTag_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag := AlphaNumSpaceTag{}
+			tag := validator.AlphaNumSpaceTag{}
 			opts, err := tag.Parse(tt.value, tt.as)
 
 			if tt.expectErr {

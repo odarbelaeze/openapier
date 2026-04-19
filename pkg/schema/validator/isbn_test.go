@@ -1,18 +1,20 @@
-package validator
+package validator_test
 
 import (
+	"testing"
+
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestISBNTag_Tag(t *testing.T) {
-	tag := ISBNTag{}
+	tag := validator.ISBNTag{}
 	assert.Equal(t, "isbn", tag.Tag())
 }
 
 func TestISBNTag_Usage(t *testing.T) {
-	tag := ISBNTag{}
+	tag := validator.ISBNTag{}
 	assert.Equal(t, "isbn", tag.Usage())
 }
 
@@ -37,7 +39,7 @@ func TestISBNTag_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag := ISBNTag{}
+			tag := validator.ISBNTag{}
 			opts, err := tag.Parse(tt.value, tt.as)
 
 			if tt.expectErr {

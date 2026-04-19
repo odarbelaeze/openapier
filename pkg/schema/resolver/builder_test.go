@@ -1,9 +1,10 @@
-package resolver
+package resolver_test
 
 import (
 	"go/ast"
 	"testing"
 
+	"github.com/odarbelaeze/openapier/pkg/schema/resolver"
 	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/sv-tools/openapi"
@@ -11,8 +12,8 @@ import (
 
 func TestBuildStruct_Simple(t *testing.T) {
 	registry := validator.NewMockRegistry(t)
-	res := NewMockResolver(t)
-	builder := NewSchemaBuilder(registry, res, nil)
+	res := resolver.NewMockResolver(t)
+	builder := resolver.NewSchemaBuilder(registry, res, nil)
 
 	expr := &ast.StructType{
 		Fields: &ast.FieldList{
@@ -37,8 +38,8 @@ func TestBuildStruct_Simple(t *testing.T) {
 
 func TestBuildStruct_Omitempty(t *testing.T) {
 	registry := validator.NewMockRegistry(t)
-	res := NewMockResolver(t)
-	builder := NewSchemaBuilder(registry, res, nil)
+	res := resolver.NewMockResolver(t)
+	builder := resolver.NewSchemaBuilder(registry, res, nil)
 
 	expr := &ast.StructType{
 		Fields: &ast.FieldList{
@@ -64,8 +65,8 @@ func TestBuildStruct_Omitempty(t *testing.T) {
 
 func TestBuildStruct_Embedded(t *testing.T) {
 	registry := validator.NewMockRegistry(t)
-	res := NewMockResolver(t)
-	builder := NewSchemaBuilder(registry, res, nil)
+	res := resolver.NewMockResolver(t)
+	builder := resolver.NewSchemaBuilder(registry, res, nil)
 
 	// type Base struct { ID string }
 	// type Derived struct { Base }

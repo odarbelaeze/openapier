@@ -1,9 +1,10 @@
-package resolver
+package resolver_test
 
 import (
 	"testing"
 
 	"github.com/odarbelaeze/openapier/pkg/cache"
+	"github.com/odarbelaeze/openapier/pkg/schema/resolver"
 	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 )
@@ -12,11 +13,11 @@ func TestResolve_BasicTypes(t *testing.T) {
 	registry := validator.NewMockRegistry(t)
 	typeDefCache := cache.NewMockTypeDefCache(t)
 	definitionsCache := cache.NewMockDefinitionsCache(t)
-	factory := func(validatorRegistry validator.Registry, resolver Resolver, aliases map[string]string) SchemaBuilder {
+	factory := func(validatorRegistry validator.Registry, resolver resolver.Resolver, aliases map[string]string) resolver.SchemaBuilder {
 		return nil
 	}
 
-	r := NewResolver(registry, typeDefCache, definitionsCache, factory, nil, "")
+	r := resolver.NewResolver(registry, typeDefCache, definitionsCache, factory, nil, "")
 
 	tests := []struct {
 		typeName string

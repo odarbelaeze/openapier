@@ -1,18 +1,20 @@
-package validator
+package validator_test
 
 import (
+	"testing"
+
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestE164Tag_Tag(t *testing.T) {
-	tag := E164Tag{}
+	tag := validator.E164Tag{}
 	assert.Equal(t, "e164", tag.Tag())
 }
 
 func TestE164Tag_Usage(t *testing.T) {
-	tag := E164Tag{}
+	tag := validator.E164Tag{}
 	assert.Equal(t, "e164", tag.Usage())
 }
 
@@ -37,7 +39,7 @@ func TestE164Tag_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag := E164Tag{}
+			tag := validator.E164Tag{}
 			opts, err := tag.Parse(tt.value, tt.as)
 
 			if tt.expectErr {

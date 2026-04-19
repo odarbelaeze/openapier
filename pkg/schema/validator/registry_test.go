@@ -1,10 +1,11 @@
-package validator
+package validator_test
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/odarbelaeze/openapier/pkg/schema/options"
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -24,7 +25,7 @@ func (m *mockTag) Parse(string, string) ([]options.SchemaOption, error) {
 
 func TestRegistry_Parse(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
-		r := NewRegistry()
+		r := validator.NewRegistry()
 		r.Register(&mockTag{tag: "required", opts: []options.SchemaOption{options.WithRequired()}})
 
 		opts, err := r.Parse("required", "object")
@@ -33,14 +34,14 @@ func TestRegistry_Parse(t *testing.T) {
 	})
 
 	t.Run("invalid tag format", func(t *testing.T) {
-		r := NewRegistry()
+		r := validator.NewRegistry()
 		_, err := r.Parse("foo=bar=baz", "object")
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "invalid validator tag")
 	})
 
 	t.Run("tag parse error", func(t *testing.T) {
-		r := NewRegistry()
+		r := validator.NewRegistry()
 		r.Register(&mockTag{tag: "fail", err: fmt.Errorf("boom")})
 
 		_, err := r.Parse("fail", "object")
@@ -49,14 +50,14 @@ func TestRegistry_Parse(t *testing.T) {
 	})
 
 	t.Run("unknown tag ignored", func(t *testing.T) {
-		r := NewRegistry()
+		r := validator.NewRegistry()
 		opts, err := r.Parse("unknown", "object")
 		require.NoError(t, err)
 		assert.Empty(t, opts)
 	})
 
 	t.Run("multiple tags", func(t *testing.T) {
-		r := NewRegistry()
+		r := validator.NewRegistry()
 		r.Register(&mockTag{tag: "t1", opts: []options.SchemaOption{options.WithRequired()}})
 		r.Register(&mockTag{tag: "t2", opts: []options.SchemaOption{options.WithRequired()}})
 
@@ -66,7 +67,7 @@ func TestRegistry_Parse(t *testing.T) {
 	})
 
 	t.Run("validators", func(t *testing.T) {
-		r := NewRegistry()
+		r := validator.NewRegistry()
 		r.Register(&mockTag{tag: "t1"})
 		r.Register(&mockTag{tag: "t2"})
 

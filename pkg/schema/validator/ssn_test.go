@@ -1,18 +1,20 @@
-package validator
+package validator_test
 
 import (
+	"testing"
+
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestSSNTag_Tag(t *testing.T) {
-	tag := SSNTag{}
+	tag := validator.SSNTag{}
 	assert.Equal(t, "ssn", tag.Tag())
 }
 
 func TestSSNTag_Usage(t *testing.T) {
-	tag := SSNTag{}
+	tag := validator.SSNTag{}
 	assert.Equal(t, "ssn", tag.Usage())
 }
 
@@ -37,7 +39,7 @@ func TestSSNTag_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag := SSNTag{}
+			tag := validator.SSNTag{}
 			opts, err := tag.Parse(tt.value, tt.as)
 
 			if tt.expectErr {

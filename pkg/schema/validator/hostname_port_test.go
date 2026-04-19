@@ -1,18 +1,20 @@
-package validator
+package validator_test
 
 import (
+	"testing"
+
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestHostnamePortTag_Tag(t *testing.T) {
-	tag := HostnamePortTag{}
+	tag := validator.HostnamePortTag{}
 	assert.Equal(t, "hostname_port", tag.Tag())
 }
 
 func TestHostnamePortTag_Usage(t *testing.T) {
-	tag := HostnamePortTag{}
+	tag := validator.HostnamePortTag{}
 	assert.Equal(t, "hostname_port", tag.Usage())
 }
 
@@ -37,7 +39,7 @@ func TestHostnamePortTag_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag := HostnamePortTag{}
+			tag := validator.HostnamePortTag{}
 			opts, err := tag.Parse(tt.value, tt.as)
 
 			if tt.expectErr {

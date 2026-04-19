@@ -1,18 +1,20 @@
-package validator
+package validator_test
 
 import (
+	"testing"
+
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestUppercaseTag_Tag(t *testing.T) {
-	tag := UppercaseTag{}
+	tag := validator.UppercaseTag{}
 	assert.Equal(t, "uppercase", tag.Tag())
 }
 
 func TestUppercaseTag_Usage(t *testing.T) {
-	tag := UppercaseTag{}
+	tag := validator.UppercaseTag{}
 	assert.Equal(t, "uppercase", tag.Usage())
 }
 
@@ -37,7 +39,7 @@ func TestUppercaseTag_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag := UppercaseTag{}
+			tag := validator.UppercaseTag{}
 			opts, err := tag.Parse(tt.value, tt.as)
 
 			if tt.expectErr {

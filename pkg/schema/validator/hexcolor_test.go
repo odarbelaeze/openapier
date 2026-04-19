@@ -1,14 +1,15 @@
-package validator
+package validator_test
 
 import (
 	"testing"
 
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestHexColorTag(t *testing.T) {
-	tag := HexColorTag{}
+	tag := validator.HexColorTag{}
 
 	t.Run("Tag", func(t *testing.T) {
 		assert.Equal(t, "hexcolor", tag.Tag())

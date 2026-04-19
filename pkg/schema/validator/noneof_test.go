@@ -1,18 +1,20 @@
-package validator
+package validator_test
 
 import (
+	"testing"
+
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestNoneOfTag_Tag(t *testing.T) {
-	tag := NoneOfTag{}
+	tag := validator.NoneOfTag{}
 	assert.Equal(t, "noneof", tag.Tag())
 }
 
 func TestNoneOfTag_Usage(t *testing.T) {
-	tag := NoneOfTag{}
+	tag := validator.NoneOfTag{}
 	assert.Equal(t, "noneof=value1 value2", tag.Usage())
 }
 
@@ -33,7 +35,7 @@ func TestNoneOfTag_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag := NoneOfTag{}
+			tag := validator.NoneOfTag{}
 			opts, err := tag.Parse(tt.value, tt.as)
 
 			if tt.expectErr {

@@ -1,14 +1,15 @@
-package validator
+package validator_test
 
 import (
 	"testing"
 
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestIPv6Tag(t *testing.T) {
-	tag := IPv6Tag{}
+	tag := validator.IPv6Tag{}
 
 	t.Run("Tag", func(t *testing.T) {
 		assert.Equal(t, "ipv6", tag.Tag())

@@ -1,18 +1,20 @@
-package validator
+package validator_test
 
 import (
+	"testing"
+
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestISO31661Alpha3Tag_Tag(t *testing.T) {
-	tag := ISO31661Alpha3Tag{}
+	tag := validator.ISO31661Alpha3Tag{}
 	assert.Equal(t, "iso3166_1_alpha3", tag.Tag())
 }
 
 func TestISO31661Alpha3Tag_Usage(t *testing.T) {
-	tag := ISO31661Alpha3Tag{}
+	tag := validator.ISO31661Alpha3Tag{}
 	assert.Equal(t, "iso3166_1_alpha3", tag.Usage())
 }
 
@@ -37,7 +39,7 @@ func TestISO31661Alpha3Tag_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag := ISO31661Alpha3Tag{}
+			tag := validator.ISO31661Alpha3Tag{}
 			opts, err := tag.Parse(tt.value, tt.as)
 
 			if tt.expectErr {

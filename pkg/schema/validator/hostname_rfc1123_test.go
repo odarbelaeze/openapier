@@ -1,14 +1,15 @@
-package validator
+package validator_test
 
 import (
 	"testing"
 
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestHostnameRFC1123Tag(t *testing.T) {
-	tag := HostnameRFC1123Tag{}
+	tag := validator.HostnameRFC1123Tag{}
 
 	t.Run("Tag", func(t *testing.T) {
 		assert.Equal(t, "hostname_rfc1123", tag.Tag())

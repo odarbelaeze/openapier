@@ -1,18 +1,20 @@
-package validator
+package validator_test
 
 import (
+	"testing"
+
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestCVETag_Tag(t *testing.T) {
-	tag := CVETag{}
+	tag := validator.CVETag{}
 	assert.Equal(t, "cve", tag.Tag())
 }
 
 func TestCVETag_Usage(t *testing.T) {
-	tag := CVETag{}
+	tag := validator.CVETag{}
 	assert.Equal(t, "cve", tag.Usage())
 }
 
@@ -37,7 +39,7 @@ func TestCVETag_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag := CVETag{}
+			tag := validator.CVETag{}
 			opts, err := tag.Parse(tt.value, tt.as)
 
 			if tt.expectErr {

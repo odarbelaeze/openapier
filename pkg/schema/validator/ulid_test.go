@@ -1,18 +1,20 @@
-package validator
+package validator_test
 
 import (
+	"testing"
+
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestULIDTag_Tag(t *testing.T) {
-	tag := ULIDTag{}
+	tag := validator.ULIDTag{}
 	assert.Equal(t, "ulid", tag.Tag())
 }
 
 func TestULIDTag_Usage(t *testing.T) {
-	tag := ULIDTag{}
+	tag := validator.ULIDTag{}
 	assert.Equal(t, "ulid", tag.Usage())
 }
 
@@ -37,7 +39,7 @@ func TestULIDTag_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag := ULIDTag{}
+			tag := validator.ULIDTag{}
 			opts, err := tag.Parse(tt.value, tt.as)
 
 			if tt.expectErr {

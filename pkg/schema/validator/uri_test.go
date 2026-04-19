@@ -1,14 +1,15 @@
-package validator
+package validator_test
 
 import (
 	"testing"
 
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestURITag(t *testing.T) {
-	tag := URITag{}
+	tag := validator.URITag{}
 
 	t.Run("Tag", func(t *testing.T) {
 		assert.Equal(t, "uri", tag.Tag())

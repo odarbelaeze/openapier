@@ -1,18 +1,20 @@
-package validator
+package validator_test
 
 import (
+	"testing"
+
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestHSLTag_Tag(t *testing.T) {
-	tag := HSLTag{}
+	tag := validator.HSLTag{}
 	assert.Equal(t, "hsl", tag.Tag())
 }
 
 func TestHSLTag_Usage(t *testing.T) {
-	tag := HSLTag{}
+	tag := validator.HSLTag{}
 	assert.Equal(t, "hsl", tag.Usage())
 }
 
@@ -37,7 +39,7 @@ func TestHSLTag_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tag := HSLTag{}
+			tag := validator.HSLTag{}
 			opts, err := tag.Parse(tt.value, tt.as)
 
 			if tt.expectErr {
