@@ -25,14 +25,18 @@ func (l Locator) Prefix() string {
 	return prefix
 }
 
+func (l Locator) Namespace() string {
+	return l.Package
+}
+
 func (l Locator) TypeName() string {
 	typeParams := ""
 	if len(l.TypeParams) > 0 {
 		typeParams = fmt.Sprintf("[%s]", strings.Join(l.TypeParams, ","))
 	}
-	return fmt.Sprintf("%s.%s%s", l.Package, l.Name, typeParams)
+	return fmt.Sprintf("%s%s", l.Name, typeParams)
 }
 
 func (l Locator) String() string {
-	return fmt.Sprintf("%s:%s", l.Prefix(), l.TypeName())
+	return fmt.Sprintf("%s:%s.%s", l.Prefix(), l.Namespace(), l.TypeName())
 }

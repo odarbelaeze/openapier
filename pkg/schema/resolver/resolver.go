@@ -110,9 +110,7 @@ func (r *resolver) Resolve(typeName string, opts ...options.SchemaOption) (*open
 		return nil, fmt.Errorf("failed to find any candidates: %w", err)
 	}
 	for _, loc := range candidates {
-		schemaPath := fmt.Sprintf("#/components/schemas/%s", loc)
-		if _, ok := r.definitionsCache.Get(loc); ok {
-			ref := openapi.NewRefOrSpec[openapi.Schema](schemaPath)
+		if ref, ok := r.definitionsCache.Get(loc); ok {
 			return ref, nil
 		}
 		if t, ok := r.typeDefCache.Get(loc.Path, loc.Name); ok {
@@ -139,8 +137,7 @@ func (r *resolver) Resolve(typeName string, opts ...options.SchemaOption) (*open
 			if err != nil {
 				return nil, fmt.Errorf("failed to build spec: %w", err)
 			}
-			r.definitionsCache.Put(loc, spec)
-			ref := openapi.NewRefOrSpec[openapi.Schema](schemaPath)
+			ref := r.definitionsCache.Put(loc, spec)
 			return ref, nil
 		}
 	}

@@ -146,9 +146,22 @@ func (_c *MockDefinitionsCache_Get_Call) RunAndReturn(run func(locator1 *locator
 }
 
 // Put provides a mock function for the type MockDefinitionsCache
-func (_mock *MockDefinitionsCache) Put(locator1 *locator.Locator, refOrSpec *openapi.RefOrSpec[openapi.Schema]) {
-	_mock.Called(locator1, refOrSpec)
-	return
+func (_mock *MockDefinitionsCache) Put(locator1 *locator.Locator, refOrSpec *openapi.RefOrSpec[openapi.Schema]) *openapi.RefOrSpec[openapi.Schema] {
+	ret := _mock.Called(locator1, refOrSpec)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Put")
+	}
+
+	var r0 *openapi.RefOrSpec[openapi.Schema]
+	if returnFunc, ok := ret.Get(0).(func(*locator.Locator, *openapi.RefOrSpec[openapi.Schema]) *openapi.RefOrSpec[openapi.Schema]); ok {
+		r0 = returnFunc(locator1, refOrSpec)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*openapi.RefOrSpec[openapi.Schema])
+		}
+	}
+	return r0
 }
 
 // MockDefinitionsCache_Put_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Put'
@@ -181,12 +194,12 @@ func (_c *MockDefinitionsCache_Put_Call) Run(run func(locator1 *locator.Locator,
 	return _c
 }
 
-func (_c *MockDefinitionsCache_Put_Call) Return() *MockDefinitionsCache_Put_Call {
-	_c.Call.Return()
+func (_c *MockDefinitionsCache_Put_Call) Return(refOrSpec1 *openapi.RefOrSpec[openapi.Schema]) *MockDefinitionsCache_Put_Call {
+	_c.Call.Return(refOrSpec1)
 	return _c
 }
 
-func (_c *MockDefinitionsCache_Put_Call) RunAndReturn(run func(locator1 *locator.Locator, refOrSpec *openapi.RefOrSpec[openapi.Schema])) *MockDefinitionsCache_Put_Call {
-	_c.Run(run)
+func (_c *MockDefinitionsCache_Put_Call) RunAndReturn(run func(locator1 *locator.Locator, refOrSpec *openapi.RefOrSpec[openapi.Schema]) *openapi.RefOrSpec[openapi.Schema]) *MockDefinitionsCache_Put_Call {
+	_c.Call.Return(run)
 	return _c
 }

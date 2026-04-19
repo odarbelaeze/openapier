@@ -1,14 +1,6 @@
 components:
   schemas:
-    github_com_odarbelaeze_test_simple_api:api.Pet3:
-      properties:
-        id:
-          format: int32
-          type: integer
-      required:
-        - id
-      type: object
-    github_com_odarbelaeze_test_simple_cross:cross.Cross:
+    Cross:
       properties:
         Array:
           items:
@@ -19,6 +11,14 @@ components:
       required:
         - Array
         - String
+      type: object
+    Pet3:
+      properties:
+        id:
+          format: int32
+          type: integer
+      required:
+        - id
       type: object
 externalDocs:
   description: Find more info here
@@ -53,7 +53,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/github_com_odarbelaeze_test_simple_api:api.Pet3'
+              $ref: '#/components/schemas/Pet3'
         description: The request body
         required: true
   /GetPet5b:
@@ -63,7 +63,7 @@ paths:
           application/json:
             schema:
               items:
-                $ref: '#/components/schemas/github_com_odarbelaeze_test_simple_api:api.Pet3'
+                $ref: '#/components/schemas/Pet3'
               type: array
         description: The request body
         required: true
@@ -74,7 +74,7 @@ paths:
           application/json:
             schema:
               items:
-                $ref: '#/components/schemas/github_com_odarbelaeze_test_simple_cross:cross.Cross'
+                $ref: '#/components/schemas/Cross'
               type: array
         description: The request body
         required: true

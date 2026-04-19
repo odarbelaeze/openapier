@@ -1,21 +1,21 @@
 components:
   schemas:
-    github_com_odarbelaeze_test_validator:main.PaginatedTodos:
+    PaginatedTodos:
       properties:
         meta:
-          $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.Pagination'
+          $ref: '#/components/schemas/Pagination'
         todos:
           description: |
             Todos is the list of todos
           items:
-            $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.Todo'
+            $ref: '#/components/schemas/Todo'
           maxItems: 100
           type: array
       required:
         - todos
         - meta
       type: object
-    github_com_odarbelaeze_test_validator:main.Pagination:
+    Pagination:
       description: |
         Meta is the pagination metadata
       properties:
@@ -36,7 +36,7 @@ components:
         - cursor
         - hasMore
       type: object
-    github_com_odarbelaeze_test_validator:main.RestError:
+    RestError:
       properties:
         code:
           description: |
@@ -60,7 +60,7 @@ components:
         - code
         - message
       type: object
-    github_com_odarbelaeze_test_validator:main.Todo:
+    Todo:
       properties:
         attributes:
           additionalProperties:
@@ -152,7 +152,7 @@ components:
         - created
         - updated
       type: object
-    github_com_odarbelaeze_test_validator:main.TodoCreatePayload:
+    TodoCreatePayload:
       properties:
         title:
           description: |
@@ -161,7 +161,7 @@ components:
       required:
         - title
       type: object
-    github_com_odarbelaeze_test_validator:main.TodoPatchPayload:
+    TodoPatchPayload:
       properties:
         completed:
           description: |
@@ -172,7 +172,7 @@ components:
             Optional field for patching a todo's title
           type: string
       type: object
-    github_com_odarbelaeze_test_validator:main.TodoUpdatePayload:
+    TodoUpdatePayload:
       properties:
         completed:
           description: |
@@ -201,13 +201,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.PaginatedTodos'
+                $ref: '#/components/schemas/PaginatedTodos'
           description: Paginated list of todos
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.RestError'
+                $ref: '#/components/schemas/RestError'
           description: Internal server error
       summary: List todos
     post:
@@ -215,7 +215,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.TodoCreatePayload'
+              $ref: '#/components/schemas/TodoCreatePayload'
         description: The payload to create the todo
         required: true
       responses:
@@ -223,13 +223,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.Todo'
+                $ref: '#/components/schemas/Todo'
           description: The recently created todo
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.RestError'
+                $ref: '#/components/schemas/RestError'
           description: Internal server error
       summary: Create a todo
   /todos/{id}:
@@ -247,19 +247,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.Todo'
+                $ref: '#/components/schemas/Todo'
           description: The requested todo
         "404":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.RestError'
+                $ref: '#/components/schemas/RestError'
           description: Todo not found
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.RestError'
+                $ref: '#/components/schemas/RestError'
           description: Internal server error
       summary: Get a todo
     patch:
@@ -275,7 +275,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.TodoPatchPayload'
+              $ref: '#/components/schemas/TodoPatchPayload'
         description: The payload to update the todo
         required: true
       responses:
@@ -283,14 +283,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.Todo'
+                $ref: '#/components/schemas/Todo'
           description: The updated todo
         "201":
           content:
             application/json:
               schema:
                 additionalProperties:
-                  $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.Todo'
+                  $ref: '#/components/schemas/Todo'
                 type: object
           description: A map of the updated todo
         "202":
@@ -298,7 +298,7 @@ paths:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.Todo'
+                  $ref: '#/components/schemas/Todo'
                 maxItems: 2
                 minItems: 2
                 type: array
@@ -307,13 +307,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.RestError'
+                $ref: '#/components/schemas/RestError'
           description: Todo not found
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.RestError'
+                $ref: '#/components/schemas/RestError'
           description: Internal server error
       summary: Patch a todo
     put:
@@ -329,7 +329,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.TodoUpdatePayload'
+              $ref: '#/components/schemas/TodoUpdatePayload'
         description: The payload to update the todo
         required: true
       responses:
@@ -337,19 +337,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.Todo'
+                $ref: '#/components/schemas/Todo'
           description: The updated todo
         "404":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.RestError'
+                $ref: '#/components/schemas/RestError'
           description: Todo not found
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/github_com_odarbelaeze_test_validator:main.RestError'
+                $ref: '#/components/schemas/RestError'
           description: Internal server error
       summary: Update a todo
 

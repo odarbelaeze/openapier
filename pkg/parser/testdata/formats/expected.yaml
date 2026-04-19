@@ -1,6 +1,6 @@
 components:
   schemas:
-    github_com_odarbelaeze_test_formats:main.Base:
+    Base:
       properties:
         created_at:
           type: string
@@ -14,22 +14,22 @@ components:
         - created_at
         - updated_at
       type: object
-    github_com_odarbelaeze_test_formats:main.User:
+    User:
       allOf:
-        - $ref: '#/components/schemas/github_com_odarbelaeze_test_formats:main.Base'
+        - $ref: '#/components/schemas/Base'
         - properties:
             email:
               type: string
             name:
               type: string
             settings:
-              $ref: '#/components/schemas/github_com_odarbelaeze_test_formats:main.UserSettings'
+              $ref: '#/components/schemas/UserSettings'
           required:
             - name
             - email
             - settings
           type: object
-    github_com_odarbelaeze_test_formats:main.UserSettings:
+    UserSettings:
       properties:
         alpha:
           pattern: ^[a-zA-Z]*$
@@ -304,7 +304,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/github_com_odarbelaeze_test_formats:main.User'
+                $ref: '#/components/schemas/User'
           description: The user with the given ID
       summary: Get a user by ID
 

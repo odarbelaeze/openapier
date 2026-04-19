@@ -1,6 +1,6 @@
 components:
   schemas:
-    github_com_odarbelaeze_rest:rest.Error:
+    Error:
       properties:
         code:
           format: int32
@@ -35,7 +35,7 @@ paths:
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/github_com_odarbelaeze_rest:rest.Error'
+                $ref: '#/components/schemas/Error'
           description: Bad Request
       summary: Hello World handler
       tags:

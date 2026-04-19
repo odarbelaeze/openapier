@@ -1,6 +1,6 @@
 components:
   schemas:
-    github_com_odarbelaeze_test_embed:main.Base:
+    Base:
       properties:
         created_at:
           type: string
@@ -14,9 +14,9 @@ components:
         - created_at
         - updated_at
       type: object
-    github_com_odarbelaeze_test_embed:main.User:
+    User:
       allOf:
-        - $ref: '#/components/schemas/github_com_odarbelaeze_test_embed:main.Base'
+        - $ref: '#/components/schemas/Base'
         - properties:
             email:
               type: string
@@ -48,7 +48,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/github_com_odarbelaeze_test_embed:main.User'
+                $ref: '#/components/schemas/User'
           description: The user with the given ID
       summary: Get a user by ID
 

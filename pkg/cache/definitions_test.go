@@ -26,15 +26,31 @@ func TestDefinitionsCache(t *testing.T) {
 	assert.Nil(t, val)
 
 	// Test Put
-	c.Put(l, spec)
+	ref := c.Put(l, spec)
+	assert.NotNil(t, ref)
+	// The first alias should just be the TypeName
+	expectedRef := "#/components/schemas/" + l.TypeName()
+	assert.Equal(t, expectedRef, ref.Ref.Ref)
 
 	// Test Get after Put
 	val, ok = c.Get(l)
 	assert.True(t, ok)
-	assert.Equal(t, spec, val)
+	assert.Equal(t, ref, val)
+
+	// Test collision
+	l2 := &locator.Locator{
+		Path:    "github.com/other/pkg",
+		Package: "other",
+		Name:    "TestSchema",
+	}
+	ref2 := c.Put(l2, spec)
+	// Since "TestSchema" is taken, it should be "other.TestSchema"
+	expectedRef2 := "#/components/schemas/other.TestSchema"
+	assert.Equal(t, expectedRef2, ref2.Ref.Ref)
 
 	// Test Definitions
 	defs := c.Definitions()
-	assert.Len(t, defs, 1)
-	assert.Equal(t, spec, defs[l.String()])
+	assert.Len(t, defs, 2)
+	assert.Equal(t, spec, defs[l.TypeName()])
+	assert.Equal(t, spec, defs[l2.Namespace()+"."+l2.TypeName()])
 }

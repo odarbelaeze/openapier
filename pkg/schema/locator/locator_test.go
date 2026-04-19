@@ -33,33 +33,34 @@ func TestLocator_Prefix(t *testing.T) {
 	}
 }
 
+func TestLocator_Namespace(t *testing.T) {
+	l := locator.Locator{Package: "schema"}
+	assert.Equal(t, "schema", l.Namespace())
+}
+
 func TestLocator_TypeName(t *testing.T) {
 	tests := []struct {
 		name       string
-		pkg        string
 		typeName   string
 		typeParams []string
 		expected   string
 	}{
 		{
 			name:     "simple type",
-			pkg:      "schema",
 			typeName: "Locator",
-			expected: "schema.Locator",
+			expected: "Locator",
 		},
 		{
 			name:       "generic type",
-			pkg:        "models",
 			typeName:   "Response",
 			typeParams: []string{"T", "K"},
-			expected:   "models.Response[T,K]",
+			expected:   "Response[T,K]",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			l := locator.Locator{
-				Package:    tt.pkg,
 				Name:       tt.typeName,
 				TypeParams: tt.typeParams,
 			}
