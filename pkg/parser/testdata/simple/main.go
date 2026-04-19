@@ -37,6 +37,17 @@ type Unused int
 // @tag.externalDocs.url http://swagger.io/petstore
 // @tag.externalDocs.description Find more info here
 
+// @securityScheme auth apiKey An api key auth
+// @securityScheme.in auth header
+// @securityScheme.name auth X-API-Key
+
+// @securityScheme queryApiKey apiKey An api key auth
+// @securityScheme.in queryApiKey query
+// @securityScheme.name queryApiKey access_token
+
+// @security auth list get create update
+// @security something foo bar
+
 // @tag.name users
 // @tag.description These are some sample users
 func main() {

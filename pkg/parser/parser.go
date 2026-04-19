@@ -175,7 +175,9 @@ func (p *parser) parseOperations(spec *openapi.Extendable[openapi.OpenAPI]) erro
 		return fmt.Errorf("failed to walk directory: %w", err)
 	}
 	if len(p.definitionsCache.Definitions()) > 0 {
-		spec.Spec.Components = openapi.NewComponents()
+		if spec.Spec.Components == nil {
+			spec.Spec.Components = openapi.NewComponents()
+		}
 		spec.Spec.Components.Spec.Schemas = p.definitionsCache.Definitions()
 	}
 	return nil

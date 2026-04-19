@@ -11,6 +11,7 @@ import (
 // @id get-string-by-int
 // @param   some_id int path
 // @param.description some_id the ID of the string to return
+// @security.none
 // @router /testapi/get-string-by-int/{some_id} [get]
 func GetStringByInt(w http.ResponseWriter, r *http.Request) {
 	//write your code
@@ -27,7 +28,7 @@ func GetStringByInt(w http.ResponseWriter, r *http.Request) {
 // @param limit int query
 // @param.required limit
 // @param q string query
-// @security ApiKeyAuth scope1 scope2
+// @security auth scope1 scope2
 // @security BasicAuth scope1 scope2
 // @security OAuth2Application write scope3
 // @security OAuth2Implicit read admin scope4

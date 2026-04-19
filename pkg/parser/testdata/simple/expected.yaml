@@ -20,6 +20,17 @@ components:
       required:
         - id
       type: object
+  securitySchemes:
+    auth:
+      description: An api key auth
+      in: header
+      name: X-API-Key
+      type: apiKey
+    queryApiKey:
+      description: An api key auth
+      in: query
+      name: access_token
+      type: apiKey
 externalDocs:
   description: Find more info here
   url: http://www.swagger.io/support
@@ -159,7 +170,7 @@ paths:
           schema:
             type: string
       security:
-        - ApiKeyAuth:
+        - auth:
             - scope1
             - scope2
         - BasicAuth:
@@ -184,6 +195,15 @@ paths:
             - scope7
         - Firebase:
             - scope8
+security:
+  - auth:
+      - list
+      - get
+      - create
+      - update
+  - something:
+      - foo
+      - bar
 servers:
   - url: https://petstore.swagger.io/v2
   - description: Production Server

@@ -22,6 +22,9 @@ These tags are used to define general information about the API (Info, Servers, 
 | `@info.title` | `@info.title <title>` |
 | `@info.version` | `@info.version <version>` |
 | `@security` | `@security <name> [scope1] [scope2] ...` |
+| `@securityScheme` | `@securityScheme <name> <type> [<description>...]` |
+| `@securityScheme.in` | `@securityScheme.in <securitySchemeName> <in>` |
+| `@securityScheme.name` | `@securityScheme.name <securitySchemeName> <name>` |
 | `@server.description` | `@server.description <description>` |
 | `@server.url` | `@server.url <url>` |
 | `@server.variable.default` | `@server.variable.default <variable> <default>` |
