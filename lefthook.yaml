@@ -1,26 +1,26 @@
 pre-commit:
-    parallel: true
-    commands:
-        # 1. Format code using gofumpt (or gofmt)
-        format:
-            glob: "*.go"
-            run: gofmt -s -w ./
+  parallel: true
+  commands:
+    # 1. Format code using gofumpt (or gofmt)
+    format:
+      glob: "*.go"
+      run: gofmt -s -w ./
 
-        # 2. Lint using golangci-lint
-        lint:
-            tags: backend style
-            glob: "*.go"
-            run: golangci-lint run
+    # 2. Lint using golangci-lint
+    lint:
+      tags: backend style
+      glob: "*.go"
+      run: golangci-lint run
 
-        # 3. Tidy up modules
-        mod-tidy:
-            run: go mod tidy
+    # 3. Tidy up modules
+    mod-tidy:
+      run: go mod tidy
 
-        docs:
-            run: make docs
+    docs:
+      run: make docs
 
 pre-push:
-    commands:
-        # Run all tests to ensure no regressions
-        tests:
-            run: go test ./... -short
+  commands:
+    # Run all tests to ensure no regressions
+    tests:
+      run: go test ./... -short

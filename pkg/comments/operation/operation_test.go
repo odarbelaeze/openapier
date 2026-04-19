@@ -85,6 +85,44 @@ func TestOperation_Attach(t *testing.T) {
 			},
 			expectedError: "unsupported method: INVALID",
 		},
+		{
+			name: "attach all methods",
+			routes: operation.Routes{
+				{Path: "/get", Method: http.MethodGet},
+				{Path: "/head", Method: http.MethodHead},
+				{Path: "/post", Method: http.MethodPost},
+				{Path: "/put", Method: http.MethodPut},
+				{Path: "/patch", Method: http.MethodPatch},
+				{Path: "/delete", Method: http.MethodDelete},
+				{Path: "/options", Method: http.MethodOptions},
+				{Path: "/trace", Method: http.MethodTrace},
+			},
+			expectedPaths: []string{"/get", "/head", "/post", "/put", "/patch", "/delete", "/options", "/trace"},
+			expectedCheck: func(t *testing.T, spec *openapi.OpenAPI) {
+				assert.NotNil(t, spec.Paths.Spec.Paths["/get"].Spec.Spec.Get)
+				assert.NotNil(t, spec.Paths.Spec.Paths["/head"].Spec.Spec.Head)
+				assert.NotNil(t, spec.Paths.Spec.Paths["/post"].Spec.Spec.Post)
+				assert.NotNil(t, spec.Paths.Spec.Paths["/put"].Spec.Spec.Put)
+				assert.NotNil(t, spec.Paths.Spec.Paths["/patch"].Spec.Spec.Patch)
+				assert.NotNil(t, spec.Paths.Spec.Paths["/delete"].Spec.Spec.Delete)
+				assert.NotNil(t, spec.Paths.Spec.Paths["/options"].Spec.Spec.Options)
+				assert.NotNil(t, spec.Paths.Spec.Paths["/trace"].Spec.Spec.Trace)
+			},
+		},
+		{
+			name: "attach with responses",
+			routes: operation.Routes{
+				{Path: "/test", Method: http.MethodGet},
+			},
+			expectedPaths: []string{"/test"},
+		},
+		{
+			name: "nil paths in spec",
+			routes: operation.Routes{
+				{Path: "/test", Method: http.MethodGet},
+			},
+			expectedPaths: []string{"/test"},
+		},
 	}
 
 	for _, tt := range tests {

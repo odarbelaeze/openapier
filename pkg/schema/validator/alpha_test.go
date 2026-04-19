@@ -11,6 +11,10 @@ import (
 func TestAlphaTag(t *testing.T) {
 	tag := validator.AlphaTag{}
 
+	t.Run("Usage", func(t *testing.T) {
+		assert.Equal(t, "alpha", tag.Usage())
+	})
+
 	t.Run("Tag", func(t *testing.T) {
 		assert.Equal(t, "alpha", tag.Tag())
 	})
