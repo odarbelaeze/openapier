@@ -18,7 +18,9 @@ type HelloHandler struct{}
 
 // @summary Hello World handler
 // @description Returns a greeting message.
-// @response 200 text/plain rest.Error Hello, World!
+// @response 200 text/plain string Hello, World!
+// @response 400 text/plain rest.Error Bad Request
+// @router /hello [get]
 // @tags hello
 func (h *HelloHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
