@@ -78,8 +78,6 @@ func TestTypeDefCache(t *testing.T) {
 		// packages.Load doesn't always return an error if the dir is missing,
 		// it might just return empty packages or errors within packages.
 		// But let's see what happens.
-		if err != nil {
-			assert.Error(t, err)
-		}
+		assert.Error(t, err)
 	})
 }
