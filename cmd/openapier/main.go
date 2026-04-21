@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os"
@@ -30,6 +31,11 @@ func main() {
 				DefaultText: "current working directory",
 				TakesFile:   false,
 			},
+			&cli.StringFlag{
+				Name:  "format",
+				Usage: "Output format (yaml or json)",
+				Value: "yaml",
+			},
 			&cli.BoolFlag{
 				Name:  "debug",
 				Usage: "Enable debug logging",
@@ -44,14 +50,29 @@ func main() {
 			if err != nil {
 				return fmt.Errorf("failed to parse: %w", err)
 			}
-			var buff bytes.Buffer
-			encoder := yaml.NewEncoder(&buff)
-			encoder.SetIndent(2)
-			err = encoder.Encode(spec)
-			if err != nil {
-				return fmt.Errorf("failed to marshal spec: %w", err)
+
+			format := c.String("format")
+			var output []byte
+			switch format {
+			case "json":
+				output, err = json.MarshalIndent(spec, "", "  ")
+				if err != nil {
+					return fmt.Errorf("failed to marshal spec to JSON: %w", err)
+				}
+			case "yaml":
+				var buff bytes.Buffer
+				encoder := yaml.NewEncoder(&buff)
+				encoder.SetIndent(2)
+				err = encoder.Encode(spec)
+				if err != nil {
+					return fmt.Errorf("failed to marshal spec to YAML: %w", err)
+				}
+				output = buff.Bytes()
+			default:
+				return fmt.Errorf("unsupported format: %s", format)
 			}
-			fmt.Println(buff.String())
+
+			fmt.Println(string(output))
 			return nil
 		},
 	}

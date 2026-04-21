@@ -31,6 +31,7 @@ openapier --main cmd/server/main.go --root . > openapi.yaml
 
 - `--main`: Path to the file containing the root spec definition (e.g., `main.go`). Default: `main.go`.
 - `--root`: Path to the root directory of the Go code to parse. Default: `./`.
+- `--format`: Output format (`yaml` or `json`). Default: `yaml`.
 - `--debug`: Enable debug logging for troubleshooting.
 
 ## Example
