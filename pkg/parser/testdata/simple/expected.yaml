@@ -26,6 +26,10 @@ components:
       in: header
       name: X-API-Key
       type: apiKey
+    bearer:
+      description: A bearer token auth
+      scheme: Bearer
+      type: http
     queryApiKey:
       description: An api key auth
       in: query

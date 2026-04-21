@@ -45,6 +45,10 @@ type Unused int
 // @securityScheme.in queryApiKey query
 // @securityScheme.name queryApiKey access_token
 
+// @securityScheme bearer http A bearer token auth
+// @securityScheme.scheme bearer Bearer
+// @securityScheme.format bearer JWT
+
 // @security auth list get create update
 // @security something foo bar
 
