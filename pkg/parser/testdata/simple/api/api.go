@@ -9,8 +9,7 @@ import (
 // @summary Add a new pet to the store
 // @description get string by ID
 // @id get-string-by-int
-// @param   some_id int path
-// @param.description some_id the ID of the string to return
+// @param   some_id int path the ID of the string to return
 // @security.none
 // @router /testapi/get-string-by-int/{some_id} [get]
 func GetStringByInt(w http.ResponseWriter, r *http.Request) {
