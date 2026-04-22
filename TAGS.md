@@ -52,7 +52,6 @@ These tags are used to define individual API operations (Paths, Parameters, Resp
 | `@param.allowEmptyValue` | `@param.allowEmptyValue <param> [param]...` |
 | `@param.allowReserved` | `@param.allowReserved <param> [param]...` |
 | `@param.deprecated` | `@param.deprecated <param> [param]...` |
-| `@param.description` | `@param.description <name> <description>` |
 | `@param.required` | `@param.required <param> [param]...` |
 | `@requestBody` | `@requestBody <content_type> <type> [description]` |
 | `@response` | `@response <status_code> <content_type> <type> [description]` |
