@@ -30,3 +30,11 @@ jobs:
         uses: golangci/golangci-lint-action@v9
         with:
           version: v2.11
+
+      - name: Tidy
+        run: go mod tidy -diff
+
+      - name: Check docs
+        run: |
+          make docs
+          git diff --exit-code
