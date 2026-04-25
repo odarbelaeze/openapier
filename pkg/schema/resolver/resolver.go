@@ -131,6 +131,9 @@ func (r *resolver) Resolve(typeName string, opts ...options.SchemaOption) (*open
 					}
 				}
 			}
+			if t.EnumValues != nil {
+				opts = append(opts, options.WithEnum(t.EnumValues...))
+			}
 			slog.Debug("finding spec for", "typeName", t.TypeSpec.Name.Name)
 			b := r.builderFactory(r.validatorRegistry, r.From(t.File, t.Locator.Path), aliases)
 			spec, err := b.Build(t.TypeSpec.Type, opts...)
