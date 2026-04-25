@@ -1,6 +1,10 @@
 # openapier
 
-`openapier` is a tool for Go that generates OpenAPI v3.1 specifications from code comments. Heavily inspired by [swaggo/swag][swag], it aims to provide a modern, spec-compliant alternative for documenting your Go APIs.
+[![Go](https://github.com/odarbelaeze/openapier/actions/workflows/go.yml/badge.svg?branch=main)](https://github.com/odarbelaeze/openapier/actions/workflows/go.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/odarbelaeze/openapier.svg)](https://pkg.go.dev/github.com/odarbelaeze/openapier)
+
+`openapier` is a tool for Go that generates OpenAPI v3.1 specifications from code comments.
+ Heavily inspired by [swaggo/swag][swag], it aims to provide a modern, spec-compliant alternative for documenting your Go APIs.
 
 ## Features
 
