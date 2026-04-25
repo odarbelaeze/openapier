@@ -84,12 +84,10 @@ components:
         - message
       type: object
     Something:
-      description: |
-        Something is a thing
       enum:
-        - 1
-        - 2
-      format: int32
+        - 1000
+        - 2000
+      format: int64
       type: integer
     Status:
       enum:
@@ -97,8 +95,6 @@ components:
         - closed
       type: string
     WithSkipped:
-      description: |
-        WithSkipped is a thing with skipped values
       enum:
         - 1
         - 3
@@ -125,6 +121,16 @@ paths:
           name: priority
           schema:
             $ref: '#/components/schemas/Priority'
+        - description: Item something
+          in: query
+          name: something
+          schema:
+            $ref: '#/components/schemas/Something'
+        - description: Item with skipped values
+          in: query
+          name: withSkipped
+          schema:
+            $ref: '#/components/schemas/WithSkipped'
       responses:
         "200":
           content:

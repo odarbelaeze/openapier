@@ -8,7 +8,7 @@ import (
 type (
 	Status      string
 	Priority    int
-	Something   int
+	Something   int64
 	WithSkipped int
 )
 
@@ -24,8 +24,8 @@ const (
 )
 
 const (
-	SomethingSomething Something = 1
-	SomethingElse      Something = 2
+	SomethingSomething Something = 1_000
+	SomethingElse      Something = 2_000
 )
 
 const (
@@ -102,6 +102,8 @@ type Paginated[T any] struct {
 // @summary List items
 // @param status Status query Item status
 // @param priority Priority query Item priority
+// @param something Something query Item something
+// @param withSkipped WithSkipped query Item with skipped values
 // @response 200 application/json Paginated[Item] Paginated list of items
 // @response 500 application/json RestError Internal server error
 // @router /items [get]

@@ -168,11 +168,12 @@ func (t *typeDefCache) evaluate(expr ast.Expr, iotaValue int) (any, bool) {
 	case *ast.BasicLit:
 		switch e.Kind {
 		case token.INT:
-			v, err := strconv.Atoi(e.Value)
+			v, err := strconv.ParseInt(e.Value, 0, 0)
 			if err != nil {
 				return nil, false
 			}
-			return v, true
+			// TODO: handle overflow
+			return int(v), true
 		case token.STRING:
 			v, err := strconv.Unquote(e.Value)
 			if err != nil {
