@@ -119,7 +119,7 @@ func (t *typeDefCache) Load(ctx context.Context, pkgPath string) error {
 
 					// Only process exported types
 					if prevType != "" && ast.IsExported(prevType) {
-						t.processEnumValues(pkgPath, prevType, valueSpec, prevValues, iotaCounter)
+						t.addEnumValues(pkgPath, prevType, valueSpec, prevValues, iotaCounter)
 					}
 
 					// Increment iota counter for each const declaration
@@ -134,7 +134,7 @@ func (t *typeDefCache) Load(ctx context.Context, pkgPath string) error {
 	return nil
 }
 
-func (t *typeDefCache) processEnumValues(pkgPath string, prevType string, valueSpec *ast.ValueSpec, prevValues []ast.Expr, iotaCounter int) {
+func (t *typeDefCache) addEnumValues(pkgPath string, prevType string, valueSpec *ast.ValueSpec, prevValues []ast.Expr, iotaCounter int) {
 	if typeDef, ok := t.Get(pkgPath, prevType); ok {
 		for i, name := range valueSpec.Names {
 			if name != nil && name.Name == "_" {
