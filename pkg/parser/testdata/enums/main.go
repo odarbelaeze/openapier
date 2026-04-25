@@ -6,9 +6,10 @@ import (
 )
 
 type (
-	Status    string
-	Priority  int
-	Something int
+	Status      string
+	Priority    int
+	Something   int
+	WithSkipped int
 )
 
 const (
@@ -25,6 +26,13 @@ const (
 const (
 	SomethingSomething Something = 1
 	SomethingElse      Something = 2
+)
+
+const (
+	_ WithSkipped = iota
+	WithSkippedFirst
+	_
+	WithSkippedThird
 )
 
 // @info.title API that exposes types
@@ -65,6 +73,9 @@ type Item struct {
 
 	// Something is a thing
 	Something Something `json:"something"`
+
+	// WithSkipped is a thing with skipped values
+	WithSkipped WithSkipped `json:"with_skipped"`
 }
 
 // Pagination is a model for cursors and pages

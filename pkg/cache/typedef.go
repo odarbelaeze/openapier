@@ -76,8 +76,6 @@ func (t *typeDefCache) Load(ctx context.Context, pkgPath string) error {
 				return fmt.Errorf("failed to parse file %s: %w", filename, err)
 			}
 			files = append(files, file)
-
-			// First pass: collect all types
 			for _, decl := range file.Decls {
 				if genDecl, ok := decl.(*ast.GenDecl); ok && genDecl.Tok == token.TYPE {
 					for _, spec := range genDecl.Specs {
@@ -133,7 +131,11 @@ func (t *typeDefCache) Load(ctx context.Context, pkgPath string) error {
 							if pkgCache, ok := t.cache[pkgPath]; ok {
 								if typeDef, ok := pkgCache[prevType]; ok {
 									// We have a candidate for an enum value
-									for i := range valueSpec.Names {
+									for i, name := range valueSpec.Names {
+										if name != nil && name.Name == "_" {
+											// Skip iota placeholder values
+											continue
+										}
 										var valExpr ast.Expr
 										if i < len(prevValues) {
 											valExpr = prevValues[i]
