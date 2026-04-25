@@ -6,6 +6,7 @@
 
 - **OpenAPI v3.1 Support:** Generates modern OpenAPI specifications.
 - **Go Type Analysis:** Automatically resolves request and response types from your Go structs.
+- **User-defined Enums:** Automatically discovers enum values from your `const` blocks and `iota` expressions.
 - **Validation Support:** Automatically translates Go `validate` tags into OpenAPI schema constraints (e.g., `min`, `max`, `pattern`).
 - **Generics Support:** Full support for Go 1.18+ generics in request and response types.
 - **Rich Annotations:** Extensive support for spec-level and operation-level metadata.

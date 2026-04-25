@@ -60,12 +60,12 @@ func TestTypeDefCache(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("Parser error", func(t *testing.T) {
-		mpc := cache.NewMockParserCache(t)
-		tc2 := cache.NewTypeDefCache(tmpDir, mpc)
+		parserCache := cache.NewMockParserCache(t)
+		tc2 := cache.NewTypeDefCache(tmpDir, parserCache)
 
 		// We need to trigger packages.Load to return some files
 		// but make the mock parser return an error for them.
-		mpc.EXPECT().Parse(mock.Anything).Return(nil, assert.AnError)
+		parserCache.EXPECT().Parse(mock.Anything).Return(nil, assert.AnError)
 
 		err := tc2.Load(ctx, "./pkg1")
 		assert.Error(t, err)
@@ -79,5 +79,95 @@ func TestTypeDefCache(t *testing.T) {
 		// it might just return empty packages or errors within packages.
 		// But let's see what happens.
 		assert.Error(t, err)
+	})
+
+	t.Run("Enums", func(t *testing.T) {
+		pkgDir := filepath.Join(tmpDir, "enums")
+		err = os.Mkdir(pkgDir, 0755)
+		require.NoError(t, err)
+
+		goFile := filepath.Join(pkgDir, "enums.go")
+		content := []byte(`package enums
+type Status string
+const (
+	StatusOpen   Status = "open"
+	StatusClosed Status = "closed"
+)
+type Priority int
+const (
+	PriorityLow Priority = iota
+	PriorityMedium
+	PriorityHigh
+)
+const (
+	PriorityVeryHigh Priority = 100
+)
+`)
+		err = os.WriteFile(goFile, content, 0644)
+		require.NoError(t, err)
+
+		err = tc.Load(ctx, "./enums")
+		require.NoError(t, err)
+
+		t.Run("Status enum", func(t *testing.T) {
+			def, ok := tc.Get("./enums", "Status")
+			assert.True(t, ok)
+			assert.ElementsMatch(t, []any{"open", "closed"}, def.EnumValues)
+		})
+
+		t.Run("Priority enum", func(t *testing.T) {
+			def, ok := tc.Get("./enums", "Priority")
+			assert.True(t, ok)
+			assert.ElementsMatch(t, []any{0, 1, 2, 100}, def.EnumValues)
+		})
+	})
+
+	t.Run("Enums Out of order", func(t *testing.T) {
+		pkgDir := filepath.Join(tmpDir, "order")
+		err = os.Mkdir(pkgDir, 0755)
+		require.NoError(t, err)
+
+		goFile := filepath.Join(pkgDir, "order.go")
+		content := []byte(`package order
+const (
+	OrderA Order = "a"
+	OrderB Order = "b"
+)
+type Order string
+`)
+		err = os.WriteFile(goFile, content, 0644)
+		require.NoError(t, err)
+
+		err = tc.Load(ctx, "./order")
+		require.NoError(t, err)
+
+		def, ok := tc.Get("./order", "Order")
+		assert.True(t, ok)
+		assert.ElementsMatch(t, []any{"a", "b"}, def.EnumValues)
+	})
+
+	t.Run("Enums Complex iota", func(t *testing.T) {
+		pkgDir := filepath.Join(tmpDir, "iota")
+		err = os.Mkdir(pkgDir, 0755)
+		require.NoError(t, err)
+
+		goFile := filepath.Join(pkgDir, "iota.go")
+		content := []byte(`package complexiota
+type Flag int
+const (
+	FlagA Flag = 1 << iota
+	FlagB
+	FlagC
+)
+`)
+		err = os.WriteFile(goFile, content, 0644)
+		require.NoError(t, err)
+
+		err = tc.Load(ctx, "./iota")
+		require.NoError(t, err)
+
+		def, ok := tc.Get("./iota", "Flag")
+		assert.True(t, ok)
+		assert.ElementsMatch(t, []any{1, 2, 4}, def.EnumValues)
 	})
 }

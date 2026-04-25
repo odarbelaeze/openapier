@@ -54,6 +54,11 @@ func TestParser_Parse(t *testing.T) {
 			root: "./testdata/formats",
 			main: "main.go",
 		},
+		{
+			name: "should grab enum values from constants",
+			root: "./testdata/enums",
+			main: "main.go",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

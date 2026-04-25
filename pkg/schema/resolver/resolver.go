@@ -131,9 +131,13 @@ func (r *resolver) Resolve(typeName string, opts ...options.SchemaOption) (*open
 					}
 				}
 			}
+			allOpts := append([]options.SchemaOption{}, opts...)
+			if len(t.EnumValues) > 0 {
+				allOpts = append(allOpts, options.WithEnum(t.EnumValues...))
+			}
 			slog.Debug("finding spec for", "typeName", t.TypeSpec.Name.Name)
 			b := r.builderFactory(r.validatorRegistry, r.From(t.File, t.Locator.Path), aliases)
-			spec, err := b.Build(t.TypeSpec.Type, opts...)
+			spec, err := b.Build(t.TypeSpec.Type, allOpts...)
 			if err != nil {
 				return nil, fmt.Errorf("failed to build spec: %w", err)
 			}
