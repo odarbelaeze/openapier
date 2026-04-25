@@ -160,60 +160,78 @@ func enumValues(valueSpec *ast.ValueSpec, prevValues []ast.Expr, iotaCounter int
 func evaluate(expr ast.Expr, iotaValue int) (any, bool) {
 	switch e := expr.(type) {
 	case *ast.BasicLit:
-		switch e.Kind {
-		case token.INT:
-			v, err := strconv.ParseInt(e.Value, 0, 0)
-			if err != nil {
-				return nil, false
-			}
-			// TODO: handle overflow
-			return int(v), true
-		case token.STRING:
-			v, err := strconv.Unquote(e.Value)
-			if err != nil {
-				return nil, false
-			}
-			return v, true
-		}
+		return evaluateBasicLit(e)
 	case *ast.Ident:
 		if e.Name == "iota" {
 			return iotaValue, true
 		}
 	case *ast.BinaryExpr:
-		left, okL := evaluate(e.X, iotaValue)
-		right, okR := evaluate(e.Y, iotaValue)
-		if !okL || !okR {
-			return nil, false
-		}
-		l, okLi := left.(int)
-		r, okRi := right.(int)
-		if !okLi || !okRi {
-			return nil, false
-		}
-		switch e.Op {
-		case token.SHL:
-			return l << uint(r), true
-		case token.ADD:
-			return l + r, true
-		case token.SUB:
-			return l - r, true
-		case token.MUL:
-			return l * r, true
-		}
+		return evaluateBinaryExpr(e, iotaValue)
 	case *ast.ParenExpr:
 		return evaluate(e.X, iotaValue)
 	case *ast.UnaryExpr:
-		val, ok := evaluate(e.X, iotaValue)
-		if !ok {
+		return evaluateUnaryExpr(e, iotaValue)
+	}
+	return nil, false
+}
+
+func evaluateBasicLit(e *ast.BasicLit) (any, bool) {
+	switch e.Kind {
+	case token.INT:
+		v, err := strconv.ParseInt(e.Value, 0, 0)
+		if err != nil {
 			return nil, false
 		}
-		if v, ok := val.(int); ok {
-			switch e.Op {
-			case token.SUB:
-				return -v, true
-			case token.ADD:
-				return v, true
-			}
+		// TODO: handle overflow
+		return int(v), true
+	case token.STRING:
+		v, err := strconv.Unquote(e.Value)
+		if err != nil {
+			return nil, false
+		}
+		return v, true
+	default:
+		return nil, false
+	}
+}
+
+func evaluateBinaryExpr(e *ast.BinaryExpr, iotaValue int) (any, bool) {
+	left, okL := evaluate(e.X, iotaValue)
+	right, okR := evaluate(e.Y, iotaValue)
+	if !okL || !okR {
+		return nil, false
+	}
+	l, okLi := left.(int)
+	r, okRi := right.(int)
+	if !okLi || !okRi {
+		return nil, false
+	}
+	switch e.Op {
+	case token.SHL:
+		return l << uint(r), true
+	case token.ADD:
+		return l + r, true
+	case token.SUB:
+		return l - r, true
+	case token.MUL:
+		return l * r, true
+	}
+	return nil, false
+}
+
+func evaluateUnaryExpr(e *ast.UnaryExpr, iotaValue int) (any, bool) {
+	val, ok := evaluate(e.X, iotaValue)
+	if !ok {
+		return nil, false
+	}
+	if v, ok := val.(int); ok {
+		switch e.Op {
+		case token.SUB:
+			return -v, true
+		case token.ADD:
+			return v, true
+		default:
+			return nil, false
 		}
 	}
 	return nil, false

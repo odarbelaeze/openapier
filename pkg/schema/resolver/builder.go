@@ -133,38 +133,17 @@ func (b *schemaBuilder) buildStruct(ty *ast.StructType, opts ...options.SchemaOp
 			omitEmpty := false
 			if field.Tag != nil {
 				tag := reflect.StructTag(strings.Trim(field.Tag.Value, "`"))
-				jsonTag := tag.Get(jsonStructTag)
-				if jsonTag == "-" {
+				var ok bool
+				name, omitEmpty, ok = parseJSONTag(tag, name)
+				if !ok {
 					continue
 				}
-				if jsonTag != "" {
-					parts := strings.Split(jsonTag, ",")
-					if parts[0] != "" {
-						name = parts[0]
-					}
-					for _, part := range parts[1:] {
-						if part == "omitempty" {
-							omitEmpty = true
-						}
-					}
+				fieldOptions = append(fieldOptions, parseExample(tag, field.Type)...)
+				validateOpts, err := parseValidate(tag, field.Type, b.validatorRegistry)
+				if err != nil {
+					return nil, fmt.Errorf("failed to parse validate tag for field %s: %w", name, err)
 				}
-				example := tag.Get(exampleStructTag)
-				if example != "" {
-					fieldOptions = append(fieldOptions, options.WithExample(parseExampleValue(example, field.Type)))
-				}
-
-				validate := tag.Get(validateStructTag)
-				if validate != "" {
-					schemaType, err := parseSchemaType(field.Type)
-					if err != nil {
-						return nil, fmt.Errorf("failed to parse schema type for field %s: %w", name, err)
-					}
-					validateOpts, err := b.validatorRegistry.Parse(validate, *schemaType)
-					if err != nil {
-						return nil, fmt.Errorf("failed to parse validate tag for field %s: %w", name, err)
-					}
-					fieldOptions = append(fieldOptions, validateOpts...)
-				}
+				fieldOptions = append(fieldOptions, validateOpts...)
 			}
 			if field.Doc != nil {
 				fieldOptions = append(fieldOptions, options.WithDescription(field.Doc.Text()))
@@ -276,4 +255,53 @@ func parseExampleValue(example string, ty ast.Expr) any {
 		return parseExampleValue(example, expr.X)
 	}
 	return example
+}
+
+func parseJSONTag(tag reflect.StructTag, originalName string) (name string, omitEmpty bool, ok bool) {
+	name = originalName
+	jsonTag := tag.Get(jsonStructTag)
+	if jsonTag == "-" {
+		return "", false, false
+	}
+	if jsonTag == "" {
+		return name, false, true
+	}
+	if jsonTag != "" {
+		parts := strings.Split(jsonTag, ",")
+		if parts[0] != "" {
+			name = parts[0]
+		}
+		for _, part := range parts[1:] {
+			if part == "omitempty" {
+				omitEmpty = true
+			}
+		}
+		return name, omitEmpty, true
+	}
+	return "", false, false
+}
+
+func parseExample(tag reflect.StructTag, fieldType ast.Expr) []options.SchemaOption {
+	exampleTag := tag.Get(exampleStructTag)
+	if exampleTag == "" {
+		return nil
+	}
+	example := parseExampleValue(exampleTag, fieldType)
+	return []options.SchemaOption{options.WithExample(example)}
+}
+
+func parseValidate(tag reflect.StructTag, fieldType ast.Expr, registry validator.Registry) ([]options.SchemaOption, error) {
+	validateTag := tag.Get(validateStructTag)
+	if validateTag == "" {
+		return nil, nil
+	}
+	schemaType, err := parseSchemaType(fieldType)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse schema type: %w", err)
+	}
+	validateOpts, err := registry.Parse(validateTag, *schemaType)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse validate tag: %w", err)
+	}
+	return validateOpts, nil
 }
