@@ -119,7 +119,10 @@ func (t *typeDefCache) Load(ctx context.Context, pkgPath string) error {
 
 					// Only process exported types
 					if prevType != "" && ast.IsExported(prevType) {
-						t.addEnumValues(pkgPath, prevType, valueSpec, prevValues, iotaCounter)
+						if typeDef, ok := t.Get(pkgPath, prevType); ok {
+							values := enumValues(valueSpec, prevValues, iotaCounter)
+							typeDef.EnumValues = append(typeDef.EnumValues, values...)
+						}
 					}
 
 					// Increment iota counter for each const declaration
@@ -134,83 +137,101 @@ func (t *typeDefCache) Load(ctx context.Context, pkgPath string) error {
 	return nil
 }
 
-func (t *typeDefCache) addEnumValues(pkgPath string, prevType string, valueSpec *ast.ValueSpec, prevValues []ast.Expr, iotaCounter int) {
-	if typeDef, ok := t.Get(pkgPath, prevType); ok {
-		for i, name := range valueSpec.Names {
-			if name != nil && name.Name == "_" {
-				// Skip iota placeholder values
-				continue
-			}
-			var valExpr ast.Expr
-			if i < len(prevValues) {
-				valExpr = prevValues[i]
-			}
-			if valExpr != nil {
-				if val, ok := t.evaluate(valExpr, iotaCounter); ok {
-					typeDef.EnumValues = append(typeDef.EnumValues, val)
-				}
+func enumValues(valueSpec *ast.ValueSpec, prevValues []ast.Expr, iotaCounter int) []any {
+	result := make([]any, 0, len(valueSpec.Names))
+	for i, name := range valueSpec.Names {
+		if name != nil && name.Name == "_" {
+			// Skip iota placeholder values
+			continue
+		}
+		var valExpr ast.Expr
+		if i < len(prevValues) {
+			valExpr = prevValues[i]
+		}
+		if valExpr != nil {
+			if val, ok := evaluate(valExpr, iotaCounter); ok {
+				result = append(result, val)
 			}
 		}
 	}
+	return result
 }
 
-func (t *typeDefCache) evaluate(expr ast.Expr, iotaValue int) (any, bool) {
+func evaluate(expr ast.Expr, iotaValue int) (any, bool) {
 	switch e := expr.(type) {
 	case *ast.BasicLit:
-		switch e.Kind {
-		case token.INT:
-			v, err := strconv.ParseInt(e.Value, 0, 0)
-			if err != nil {
-				return nil, false
-			}
-			// TODO: handle overflow
-			return int(v), true
-		case token.STRING:
-			v, err := strconv.Unquote(e.Value)
-			if err != nil {
-				return nil, false
-			}
-			return v, true
-		}
+		return evaluateBasicLit(e)
 	case *ast.Ident:
 		if e.Name == "iota" {
 			return iotaValue, true
 		}
 	case *ast.BinaryExpr:
-		left, okL := t.evaluate(e.X, iotaValue)
-		right, okR := t.evaluate(e.Y, iotaValue)
-		if !okL || !okR {
-			return nil, false
-		}
-		l, okLi := left.(int)
-		r, okRi := right.(int)
-		if !okLi || !okRi {
-			return nil, false
-		}
-		switch e.Op {
-		case token.SHL:
-			return l << uint(r), true
-		case token.ADD:
-			return l + r, true
-		case token.SUB:
-			return l - r, true
-		case token.MUL:
-			return l * r, true
-		}
+		return evaluateBinaryExpr(e, iotaValue)
 	case *ast.ParenExpr:
-		return t.evaluate(e.X, iotaValue)
+		return evaluate(e.X, iotaValue)
 	case *ast.UnaryExpr:
-		val, ok := t.evaluate(e.X, iotaValue)
-		if !ok {
+		return evaluateUnaryExpr(e, iotaValue)
+	}
+	return nil, false
+}
+
+func evaluateBasicLit(e *ast.BasicLit) (any, bool) {
+	switch e.Kind {
+	case token.INT:
+		v, err := strconv.ParseInt(e.Value, 0, 0)
+		if err != nil {
 			return nil, false
 		}
-		if v, ok := val.(int); ok {
-			switch e.Op {
-			case token.SUB:
-				return -v, true
-			case token.ADD:
-				return v, true
-			}
+		// TODO: handle overflow
+		return int(v), true
+	case token.STRING:
+		v, err := strconv.Unquote(e.Value)
+		if err != nil {
+			return nil, false
+		}
+		return v, true
+	default:
+		return nil, false
+	}
+}
+
+func evaluateBinaryExpr(e *ast.BinaryExpr, iotaValue int) (any, bool) {
+	left, okL := evaluate(e.X, iotaValue)
+	right, okR := evaluate(e.Y, iotaValue)
+	if !okL || !okR {
+		return nil, false
+	}
+	l, okLi := left.(int)
+	r, okRi := right.(int)
+	if !okLi || !okRi {
+		return nil, false
+	}
+	switch e.Op {
+	case token.SHL:
+		return l << uint(r), true
+	case token.ADD:
+		return l + r, true
+	case token.SUB:
+		return l - r, true
+	case token.MUL:
+		return l * r, true
+	}
+	return nil, false
+}
+
+func evaluateUnaryExpr(e *ast.UnaryExpr, iotaValue int) (any, bool) {
+	val, ok := evaluate(e.X, iotaValue)
+	if !ok {
+		return nil, false
+	}
+	if v, ok := val.(int); ok {
+		switch e.Op {
+		case token.SUB:
+			return -v, true
+		case token.ADD:
+			return v, true
+		default:
+			return nil, false
 		}
 	}
 	return nil, false
