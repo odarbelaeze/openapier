@@ -60,12 +60,12 @@ func TestTypeDefCache(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("Parser error", func(t *testing.T) {
-		mpc := cache.NewMockParserCache(t)
-		tc2 := cache.NewTypeDefCache(tmpDir, mpc)
+		parserCache := cache.NewMockParserCache(t)
+		tc2 := cache.NewTypeDefCache(tmpDir, parserCache)
 
 		// We need to trigger packages.Load to return some files
 		// but make the mock parser return an error for them.
-		mpc.EXPECT().Parse(mock.Anything).Return(nil, assert.AnError)
+		parserCache.EXPECT().Parse(mock.Anything).Return(nil, assert.AnError)
 
 		err := tc2.Load(ctx, "./pkg1")
 		assert.Error(t, err)

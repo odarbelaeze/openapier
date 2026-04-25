@@ -26,8 +26,8 @@ type TypeDef struct {
 }
 
 type TypeDefCache interface {
-	Load(ctx context.Context, pkgName string) error
-	Get(pkgName string, typeName string) (*TypeDef, bool)
+	Load(ctx context.Context, pkgPath string) error
+	Get(pkgPath string, typeName string) (*TypeDef, bool)
 }
 
 type typeDefCache struct {
@@ -47,24 +47,24 @@ func NewTypeDefCache(root string, parserCache ParserCache) TypeDefCache {
 }
 
 // Get implements [TypeDefCache].
-func (t *typeDefCache) Get(pkgName string, typeName string) (*TypeDef, bool) {
-	if _, ok := t.cache[pkgName]; !ok {
+func (t *typeDefCache) Get(pkgPath string, typeName string) (*TypeDef, bool) {
+	if _, ok := t.cache[pkgPath]; !ok {
 		return nil, false
 	}
-	def, ok := t.cache[pkgName][typeName]
+	def, ok := t.cache[pkgPath][typeName]
 	return def, ok
 }
 
 // Load implements [TypeDefCache].
-func (t *typeDefCache) Load(ctx context.Context, pkgName string) error {
-	if _, ok := t.loaded[pkgName]; ok {
+func (t *typeDefCache) Load(ctx context.Context, pkgPath string) error {
+	if _, ok := t.loaded[pkgPath]; ok {
 		return nil
 	}
 	packages, err := packages.Load(&packages.Config{
 		Dir: t.root,
-	}, pkgName)
+	}, pkgPath)
 	if err != nil {
-		return fmt.Errorf("failed to load package %s: %w", pkgName, err)
+		return fmt.Errorf("failed to load package %s: %w", pkgPath, err)
 	}
 
 	// First pass: collect all types
@@ -82,10 +82,10 @@ func (t *typeDefCache) Load(ctx context.Context, pkgName string) error {
 				if genDecl, ok := decl.(*ast.GenDecl); ok && genDecl.Tok == token.TYPE {
 					for _, spec := range genDecl.Specs {
 						if typeSpec, ok := spec.(*ast.TypeSpec); ok {
-							if _, ok := t.cache[pkgName]; !ok {
-								t.cache[pkgName] = make(map[string]*TypeDef)
+							if _, ok := t.cache[pkgPath]; !ok {
+								t.cache[pkgPath] = make(map[string]*TypeDef)
 							}
-							t.cache[pkgName][typeSpec.Name.Name] = &TypeDef{
+							t.cache[pkgPath][typeSpec.Name.Name] = &TypeDef{
 								TypeSpec: typeSpec,
 								File:     file,
 								Locator: &locator.Locator{
@@ -130,7 +130,7 @@ func (t *typeDefCache) Load(ctx context.Context, pkgName string) error {
 						}
 
 						if prevType != "" && ast.IsExported(prevType) {
-							if pkgCache, ok := t.cache[pkgName]; ok {
+							if pkgCache, ok := t.cache[pkgPath]; ok {
 								if typeDef, ok := pkgCache[prevType]; ok {
 									// We have a candidate for an enum value
 									for i := range valueSpec.Names {
@@ -157,7 +157,7 @@ func (t *typeDefCache) Load(ctx context.Context, pkgName string) error {
 	}
 
 	// Tag the package as loaded
-	t.loaded[pkgName] = struct{}{}
+	t.loaded[pkgPath] = struct{}{}
 	return nil
 }
 

@@ -38,8 +38,8 @@ func (_m *MockTypeDefCache) EXPECT() *MockTypeDefCache_Expecter {
 }
 
 // Get provides a mock function for the type MockTypeDefCache
-func (_mock *MockTypeDefCache) Get(pkgName string, typeName string) (*TypeDef, bool) {
-	ret := _mock.Called(pkgName, typeName)
+func (_mock *MockTypeDefCache) Get(pkgPath string, typeName string) (*TypeDef, bool) {
+	ret := _mock.Called(pkgPath, typeName)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Get")
@@ -48,17 +48,17 @@ func (_mock *MockTypeDefCache) Get(pkgName string, typeName string) (*TypeDef, b
 	var r0 *TypeDef
 	var r1 bool
 	if returnFunc, ok := ret.Get(0).(func(string, string) (*TypeDef, bool)); ok {
-		return returnFunc(pkgName, typeName)
+		return returnFunc(pkgPath, typeName)
 	}
 	if returnFunc, ok := ret.Get(0).(func(string, string) *TypeDef); ok {
-		r0 = returnFunc(pkgName, typeName)
+		r0 = returnFunc(pkgPath, typeName)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*TypeDef)
 		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(string, string) bool); ok {
-		r1 = returnFunc(pkgName, typeName)
+		r1 = returnFunc(pkgPath, typeName)
 	} else {
 		r1 = ret.Get(1).(bool)
 	}
@@ -71,13 +71,13 @@ type MockTypeDefCache_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//   - pkgName string
+//   - pkgPath string
 //   - typeName string
-func (_e *MockTypeDefCache_Expecter) Get(pkgName interface{}, typeName interface{}) *MockTypeDefCache_Get_Call {
-	return &MockTypeDefCache_Get_Call{Call: _e.mock.On("Get", pkgName, typeName)}
+func (_e *MockTypeDefCache_Expecter) Get(pkgPath interface{}, typeName interface{}) *MockTypeDefCache_Get_Call {
+	return &MockTypeDefCache_Get_Call{Call: _e.mock.On("Get", pkgPath, typeName)}
 }
 
-func (_c *MockTypeDefCache_Get_Call) Run(run func(pkgName string, typeName string)) *MockTypeDefCache_Get_Call {
+func (_c *MockTypeDefCache_Get_Call) Run(run func(pkgPath string, typeName string)) *MockTypeDefCache_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 string
 		if args[0] != nil {
@@ -100,14 +100,14 @@ func (_c *MockTypeDefCache_Get_Call) Return(typeDef *TypeDef, b bool) *MockTypeD
 	return _c
 }
 
-func (_c *MockTypeDefCache_Get_Call) RunAndReturn(run func(pkgName string, typeName string) (*TypeDef, bool)) *MockTypeDefCache_Get_Call {
+func (_c *MockTypeDefCache_Get_Call) RunAndReturn(run func(pkgPath string, typeName string) (*TypeDef, bool)) *MockTypeDefCache_Get_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Load provides a mock function for the type MockTypeDefCache
-func (_mock *MockTypeDefCache) Load(ctx context.Context, pkgName string) error {
-	ret := _mock.Called(ctx, pkgName)
+func (_mock *MockTypeDefCache) Load(ctx context.Context, pkgPath string) error {
+	ret := _mock.Called(ctx, pkgPath)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Load")
@@ -115,7 +115,7 @@ func (_mock *MockTypeDefCache) Load(ctx context.Context, pkgName string) error {
 
 	var r0 error
 	if returnFunc, ok := ret.Get(0).(func(context.Context, string) error); ok {
-		r0 = returnFunc(ctx, pkgName)
+		r0 = returnFunc(ctx, pkgPath)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -129,12 +129,12 @@ type MockTypeDefCache_Load_Call struct {
 
 // Load is a helper method to define mock.On call
 //   - ctx context.Context
-//   - pkgName string
-func (_e *MockTypeDefCache_Expecter) Load(ctx interface{}, pkgName interface{}) *MockTypeDefCache_Load_Call {
-	return &MockTypeDefCache_Load_Call{Call: _e.mock.On("Load", ctx, pkgName)}
+//   - pkgPath string
+func (_e *MockTypeDefCache_Expecter) Load(ctx interface{}, pkgPath interface{}) *MockTypeDefCache_Load_Call {
+	return &MockTypeDefCache_Load_Call{Call: _e.mock.On("Load", ctx, pkgPath)}
 }
 
-func (_c *MockTypeDefCache_Load_Call) Run(run func(ctx context.Context, pkgName string)) *MockTypeDefCache_Load_Call {
+func (_c *MockTypeDefCache_Load_Call) Run(run func(ctx context.Context, pkgPath string)) *MockTypeDefCache_Load_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -157,7 +157,7 @@ func (_c *MockTypeDefCache_Load_Call) Return(err error) *MockTypeDefCache_Load_C
 	return _c
 }
 
-func (_c *MockTypeDefCache_Load_Call) RunAndReturn(run func(ctx context.Context, pkgName string) error) *MockTypeDefCache_Load_Call {
+func (_c *MockTypeDefCache_Load_Call) RunAndReturn(run func(ctx context.Context, pkgPath string) error) *MockTypeDefCache_Load_Call {
 	_c.Call.Return(run)
 	return _c
 }
