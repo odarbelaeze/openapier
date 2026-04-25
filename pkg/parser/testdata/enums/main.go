@@ -35,9 +35,9 @@ const (
 	WithSkippedThird
 )
 
-// @info.title API that exposes types
+// @info.title API that exposes enums
 // @info.version 1.0
-// @info.description This is a sample API that exposes types.
+// @info.description This is a sample API that exposes enums.
 // @info.termsOfService http://swagger.io/terms/
 func main() {
 	http.HandleFunc("GET /items", ItemList)

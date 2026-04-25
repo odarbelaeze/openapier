@@ -101,9 +101,9 @@ components:
       format: int32
       type: integer
 info:
-  description: This is a sample API that exposes types.
+  description: This is a sample API that exposes enums.
   termsOfService: http://swagger.io/terms/
-  title: API that exposes types
+  title: API that exposes enums
   version: "1.0"
 jsonSchemaDialect: https://spec.openapis.org/oas/3.1/dialect/base
 openapi: 3.1.1
