@@ -131,9 +131,9 @@ func (r *resolver) Resolve(typeName string, opts ...options.SchemaOption) (*open
 					}
 				}
 			}
-			allOpts := opts[:]
-			if t.EnumValues != nil {
-				allOpts = append(opts, options.WithEnum(t.EnumValues...))
+			allOpts := append([]options.SchemaOption{}, opts...)
+			if len(t.EnumValues) > 0 {
+				allOpts = append(allOpts, options.WithEnum(t.EnumValues...))
 			}
 			slog.Debug("finding spec for", "typeName", t.TypeSpec.Name.Name)
 			b := r.builderFactory(r.validatorRegistry, r.From(t.File, t.Locator.Path), aliases)
