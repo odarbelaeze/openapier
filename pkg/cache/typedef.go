@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
+	"iter"
 	"strconv"
 
 	"github.com/odarbelaeze/openapier/pkg/schema/locator"
@@ -76,23 +77,19 @@ func (t *typeDefCache) Load(ctx context.Context, pkgPath string) error {
 				return fmt.Errorf("failed to parse file %s: %w", filename, err)
 			}
 			files = append(files, file)
-			for _, decl := range file.Decls {
-				if genDecl, ok := decl.(*ast.GenDecl); ok && genDecl.Tok == token.TYPE {
-					for _, spec := range genDecl.Specs {
-						if typeSpec, ok := spec.(*ast.TypeSpec); ok {
-							if _, ok := t.cache[pkgPath]; !ok {
-								t.cache[pkgPath] = make(map[string]*TypeDef)
-							}
-							t.cache[pkgPath][typeSpec.Name.Name] = &TypeDef{
-								TypeSpec: typeSpec,
-								File:     file,
-								Locator: &locator.Locator{
-									Path:    pkg.PkgPath,
-									Package: pkg.Name,
-									Name:    typeSpec.Name.Name,
-								},
-							}
-						}
+			for decl := range genericDeclarations(file, token.TYPE) {
+				for typeSpec := range typeSpecs(decl) {
+					if _, ok := t.cache[pkgPath]; !ok {
+						t.cache[pkgPath] = make(map[string]*TypeDef)
+					}
+					t.cache[pkgPath][typeSpec.Name.Name] = &TypeDef{
+						TypeSpec: typeSpec,
+						File:     file,
+						Locator: &locator.Locator{
+							Path:    pkg.PkgPath,
+							Package: pkg.Name,
+							Name:    typeSpec.Name.Name,
+						},
 					}
 				}
 			}
@@ -100,59 +97,33 @@ func (t *typeDefCache) Load(ctx context.Context, pkgPath string) error {
 
 		// Second pass: collect all constants
 		for _, file := range files {
-			for _, decl := range file.Decls {
-				// Only process const declarations; never var
-				if genDecl, ok := decl.(*ast.GenDecl); ok && genDecl.Tok == token.CONST {
-					var prevType string
-					var prevValues []ast.Expr
-					iotaCounter := 0
+			for decl := range genericDeclarations(file, token.CONST) {
+				var prevType string
+				var prevValues []ast.Expr
+				iotaCounter := 0
 
-					for _, spec := range genDecl.Specs {
-						valueSpec, ok := spec.(*ast.ValueSpec)
-						if !ok {
-							continue
+				for valueSpec := range valueSpecs(decl) {
+					// Update type if present
+					if valueSpec.Type != nil {
+						if typeIdent, ok := valueSpec.Type.(*ast.Ident); ok {
+							prevType = typeIdent.Name
+						} else {
+							prevType = ""
 						}
-
-						// Update type if present
-						if valueSpec.Type != nil {
-							if typeIdent, ok := valueSpec.Type.(*ast.Ident); ok {
-								prevType = typeIdent.Name
-							} else {
-								prevType = ""
-							}
-						}
-
-						// Update values if present
-						if len(valueSpec.Values) > 0 {
-							prevValues = valueSpec.Values
-						}
-
-						if prevType != "" && ast.IsExported(prevType) {
-							if pkgCache, ok := t.cache[pkgPath]; ok {
-								if typeDef, ok := pkgCache[prevType]; ok {
-									// We have a candidate for an enum value
-									for i, name := range valueSpec.Names {
-										if name != nil && name.Name == "_" {
-											// Skip iota placeholder values
-											continue
-										}
-										var valExpr ast.Expr
-										if i < len(prevValues) {
-											valExpr = prevValues[i]
-										}
-										if valExpr != nil {
-											if val, ok := t.evaluate(valExpr, iotaCounter); ok {
-												typeDef.EnumValues = append(typeDef.EnumValues, val)
-											}
-										}
-									}
-								}
-							}
-						}
-
-						// Increment iota counter for each const declaration
-						iotaCounter++
 					}
+
+					// Update values if present
+					if len(valueSpec.Values) > 0 {
+						prevValues = valueSpec.Values
+					}
+
+					// Only process exported types
+					if prevType != "" && ast.IsExported(prevType) {
+						t.processEnumValues(pkgPath, prevType, valueSpec, prevValues, iotaCounter)
+					}
+
+					// Increment iota counter for each const declaration
+					iotaCounter++
 				}
 			}
 		}
@@ -161,6 +132,26 @@ func (t *typeDefCache) Load(ctx context.Context, pkgPath string) error {
 	// Tag the package as loaded
 	t.loaded[pkgPath] = struct{}{}
 	return nil
+}
+
+func (t *typeDefCache) processEnumValues(pkgPath string, prevType string, valueSpec *ast.ValueSpec, prevValues []ast.Expr, iotaCounter int) {
+	if typeDef, ok := t.Get(pkgPath, prevType); ok {
+		for i, name := range valueSpec.Names {
+			if name != nil && name.Name == "_" {
+				// Skip iota placeholder values
+				continue
+			}
+			var valExpr ast.Expr
+			if i < len(prevValues) {
+				valExpr = prevValues[i]
+			}
+			if valExpr != nil {
+				if val, ok := t.evaluate(valExpr, iotaCounter); ok {
+					typeDef.EnumValues = append(typeDef.EnumValues, val)
+				}
+			}
+		}
+	}
 }
 
 func (t *typeDefCache) evaluate(expr ast.Expr, iotaValue int) (any, bool) {
@@ -223,4 +214,40 @@ func (t *typeDefCache) evaluate(expr ast.Expr, iotaValue int) (any, bool) {
 		}
 	}
 	return nil, false
+}
+
+func genericDeclarations(file *ast.File, ofType token.Token) iter.Seq[*ast.GenDecl] {
+	return func(yield func(*ast.GenDecl) bool) {
+		for _, decl := range file.Decls {
+			if genDecl, ok := decl.(*ast.GenDecl); ok && genDecl.Tok == ofType {
+				if !yield(genDecl) {
+					return
+				}
+			}
+		}
+	}
+}
+
+func typeSpecs(decl *ast.GenDecl) iter.Seq[*ast.TypeSpec] {
+	return func(yield func(*ast.TypeSpec) bool) {
+		for _, spec := range decl.Specs {
+			if typeSpec, ok := spec.(*ast.TypeSpec); ok {
+				if !yield(typeSpec) {
+					return
+				}
+			}
+		}
+	}
+}
+
+func valueSpecs(decl *ast.GenDecl) iter.Seq[*ast.ValueSpec] {
+	return func(yield func(*ast.ValueSpec) bool) {
+		for _, spec := range decl.Specs {
+			if valueSpec, ok := spec.(*ast.ValueSpec); ok {
+				if !yield(valueSpec) {
+					return
+				}
+			}
+		}
+	}
 }
