@@ -266,19 +266,16 @@ func parseJSONTag(tag reflect.StructTag, originalName string) (name string, omit
 	if jsonTag == "" {
 		return name, false, true
 	}
-	if jsonTag != "" {
-		parts := strings.Split(jsonTag, ",")
-		if parts[0] != "" {
-			name = parts[0]
-		}
-		for _, part := range parts[1:] {
-			if part == "omitempty" {
-				omitEmpty = true
-			}
-		}
-		return name, omitEmpty, true
+	parts := strings.Split(jsonTag, ",")
+	if parts[0] != "" {
+		name = parts[0]
 	}
-	return "", false, false
+	for _, part := range parts[1:] {
+		if part == "omitempty" {
+			omitEmpty = true
+		}
+	}
+	return name, omitEmpty, true
 }
 
 func parseExample(tag reflect.StructTag, fieldType ast.Expr) []options.SchemaOption {
