@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/odarbelaeze/openapier/pkg/comments/operation"
-	"github.com/odarbelaeze/openapier/pkg/schema/resolver"
+	resolvermocks "github.com/odarbelaeze/openapier/pkg/schema/resolver/generated_mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/sv-tools/openapi"
@@ -49,8 +49,7 @@ func TestResponseComment_Success(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// TODO: Mock resolver
-			resolver := resolver.NewMockResolver(t)
+			resolver := resolvermocks.NewMockResolver(t)
 			resolver.EXPECT().Resolve("string").Return(openapi.NewSchemaBuilder().Type("string").Build(), nil)
 			op := operation.NewOperation(resolver)
 			err := comment.ParseInto(tt.content, nil, op)

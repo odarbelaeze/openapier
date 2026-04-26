@@ -2,7 +2,7 @@
 // github.com/vektra/mockery
 // template: testify
 
-package resolver
+package resolvermocks
 
 import (
 	"go/ast"

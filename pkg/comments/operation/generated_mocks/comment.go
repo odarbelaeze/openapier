@@ -2,11 +2,12 @@
 // github.com/vektra/mockery
 // template: testify
 
-package operation
+package operationmocks
 
 import (
 	"go/ast"
 
+	"github.com/odarbelaeze/openapier/pkg/comments/operation"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -38,7 +39,7 @@ func (_m *MockComment) EXPECT() *MockComment_Expecter {
 }
 
 // ParseInto provides a mock function for the type MockComment
-func (_mock *MockComment) ParseInto(c string, f *ast.File, op *Operation) error {
+func (_mock *MockComment) ParseInto(c string, f *ast.File, op *operation.Operation) error {
 	ret := _mock.Called(c, f, op)
 
 	if len(ret) == 0 {
@@ -46,7 +47,7 @@ func (_mock *MockComment) ParseInto(c string, f *ast.File, op *Operation) error 
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(string, *ast.File, *Operation) error); ok {
+	if returnFunc, ok := ret.Get(0).(func(string, *ast.File, *operation.Operation) error); ok {
 		r0 = returnFunc(c, f, op)
 	} else {
 		r0 = ret.Error(0)
@@ -62,12 +63,12 @@ type MockComment_ParseInto_Call struct {
 // ParseInto is a helper method to define mock.On call
 //   - c string
 //   - f *ast.File
-//   - op *Operation
+//   - op *operation.Operation
 func (_e *MockComment_Expecter) ParseInto(c interface{}, f interface{}, op interface{}) *MockComment_ParseInto_Call {
 	return &MockComment_ParseInto_Call{Call: _e.mock.On("ParseInto", c, f, op)}
 }
 
-func (_c *MockComment_ParseInto_Call) Run(run func(c string, f *ast.File, op *Operation)) *MockComment_ParseInto_Call {
+func (_c *MockComment_ParseInto_Call) Run(run func(c string, f *ast.File, op *operation.Operation)) *MockComment_ParseInto_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 string
 		if args[0] != nil {
@@ -77,9 +78,9 @@ func (_c *MockComment_ParseInto_Call) Run(run func(c string, f *ast.File, op *Op
 		if args[1] != nil {
 			arg1 = args[1].(*ast.File)
 		}
-		var arg2 *Operation
+		var arg2 *operation.Operation
 		if args[2] != nil {
-			arg2 = args[2].(*Operation)
+			arg2 = args[2].(*operation.Operation)
 		}
 		run(
 			arg0,
@@ -95,7 +96,7 @@ func (_c *MockComment_ParseInto_Call) Return(err error) *MockComment_ParseInto_C
 	return _c
 }
 
-func (_c *MockComment_ParseInto_Call) RunAndReturn(run func(c string, f *ast.File, op *Operation) error) *MockComment_ParseInto_Call {
+func (_c *MockComment_ParseInto_Call) RunAndReturn(run func(c string, f *ast.File, op *operation.Operation) error) *MockComment_ParseInto_Call {
 	_c.Call.Return(run)
 	return _c
 }

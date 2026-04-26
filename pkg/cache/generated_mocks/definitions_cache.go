@@ -2,7 +2,7 @@
 // github.com/vektra/mockery
 // template: testify
 
-package cache
+package cachemocks
 
 import (
 	"github.com/odarbelaeze/openapier/pkg/schema/locator"

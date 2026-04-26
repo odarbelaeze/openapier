@@ -2,10 +2,11 @@
 // github.com/vektra/mockery
 // template: testify
 
-package validator
+package validatormocks
 
 import (
 	"github.com/odarbelaeze/openapier/pkg/schema/options"
+	"github.com/odarbelaeze/openapier/pkg/schema/validator"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -105,7 +106,7 @@ func (_c *MockRegistry_Parse_Call) RunAndReturn(run func(s string, s1 string) ([
 }
 
 // Register provides a mock function for the type MockRegistry
-func (_mock *MockRegistry) Register(tag ValidatorTag) {
+func (_mock *MockRegistry) Register(tag validator.ValidatorTag) {
 	_mock.Called(tag)
 	return
 }
@@ -116,16 +117,16 @@ type MockRegistry_Register_Call struct {
 }
 
 // Register is a helper method to define mock.On call
-//   - tag ValidatorTag
+//   - tag validator.ValidatorTag
 func (_e *MockRegistry_Expecter) Register(tag interface{}) *MockRegistry_Register_Call {
 	return &MockRegistry_Register_Call{Call: _e.mock.On("Register", tag)}
 }
 
-func (_c *MockRegistry_Register_Call) Run(run func(tag ValidatorTag)) *MockRegistry_Register_Call {
+func (_c *MockRegistry_Register_Call) Run(run func(tag validator.ValidatorTag)) *MockRegistry_Register_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 ValidatorTag
+		var arg0 validator.ValidatorTag
 		if args[0] != nil {
-			arg0 = args[0].(ValidatorTag)
+			arg0 = args[0].(validator.ValidatorTag)
 		}
 		run(
 			arg0,
@@ -139,25 +140,25 @@ func (_c *MockRegistry_Register_Call) Return() *MockRegistry_Register_Call {
 	return _c
 }
 
-func (_c *MockRegistry_Register_Call) RunAndReturn(run func(tag ValidatorTag)) *MockRegistry_Register_Call {
+func (_c *MockRegistry_Register_Call) RunAndReturn(run func(tag validator.ValidatorTag)) *MockRegistry_Register_Call {
 	_c.Run(run)
 	return _c
 }
 
 // Validators provides a mock function for the type MockRegistry
-func (_mock *MockRegistry) Validators() []ValidatorTag {
+func (_mock *MockRegistry) Validators() []validator.ValidatorTag {
 	ret := _mock.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for Validators")
 	}
 
-	var r0 []ValidatorTag
-	if returnFunc, ok := ret.Get(0).(func() []ValidatorTag); ok {
+	var r0 []validator.ValidatorTag
+	if returnFunc, ok := ret.Get(0).(func() []validator.ValidatorTag); ok {
 		r0 = returnFunc()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]ValidatorTag)
+			r0 = ret.Get(0).([]validator.ValidatorTag)
 		}
 	}
 	return r0
@@ -180,12 +181,12 @@ func (_c *MockRegistry_Validators_Call) Run(run func()) *MockRegistry_Validators
 	return _c
 }
 
-func (_c *MockRegistry_Validators_Call) Return(validatorTags []ValidatorTag) *MockRegistry_Validators_Call {
+func (_c *MockRegistry_Validators_Call) Return(validatorTags []validator.ValidatorTag) *MockRegistry_Validators_Call {
 	_c.Call.Return(validatorTags)
 	return _c
 }
 
-func (_c *MockRegistry_Validators_Call) RunAndReturn(run func() []ValidatorTag) *MockRegistry_Validators_Call {
+func (_c *MockRegistry_Validators_Call) RunAndReturn(run func() []validator.ValidatorTag) *MockRegistry_Validators_Call {
 	_c.Call.Return(run)
 	return _c
 }

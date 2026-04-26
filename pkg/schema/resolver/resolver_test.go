@@ -3,16 +3,17 @@ package resolver_test
 import (
 	"testing"
 
-	"github.com/odarbelaeze/openapier/pkg/cache"
+	cachemocks "github.com/odarbelaeze/openapier/pkg/cache/generated_mocks"
 	"github.com/odarbelaeze/openapier/pkg/schema/resolver"
 	"github.com/odarbelaeze/openapier/pkg/schema/validator"
+	validatormocks "github.com/odarbelaeze/openapier/pkg/schema/validator/generated_mocks"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestResolve_BasicTypes(t *testing.T) {
-	registry := validator.NewMockRegistry(t)
-	typeDefCache := cache.NewMockTypeDefCache(t)
-	definitionsCache := cache.NewMockDefinitionsCache(t)
+	registry := validatormocks.NewMockRegistry(t)
+	typeDefCache := cachemocks.NewMockTypeDefCache(t)
+	definitionsCache := cachemocks.NewMockDefinitionsCache(t)
 	factory := func(validatorRegistry validator.Registry, resolver resolver.Resolver, aliases map[string]string) resolver.SchemaBuilder {
 		return nil
 	}

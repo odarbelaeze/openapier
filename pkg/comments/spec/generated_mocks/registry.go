@@ -2,12 +2,12 @@
 // github.com/vektra/mockery
 // template: testify
 
-package operation
+package specmocks
 
 import (
-	"go/ast"
-
+	"github.com/odarbelaeze/openapier/pkg/comments/spec"
 	mock "github.com/stretchr/testify/mock"
+	"github.com/sv-tools/openapi"
 )
 
 // NewMockRegistry creates a new instance of MockRegistry. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
@@ -38,19 +38,19 @@ func (_m *MockRegistry) EXPECT() *MockRegistry_Expecter {
 }
 
 // Comments provides a mock function for the type MockRegistry
-func (_mock *MockRegistry) Comments() []Comment {
+func (_mock *MockRegistry) Comments() []spec.Comment {
 	ret := _mock.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for Comments")
 	}
 
-	var r0 []Comment
-	if returnFunc, ok := ret.Get(0).(func() []Comment); ok {
+	var r0 []spec.Comment
+	if returnFunc, ok := ret.Get(0).(func() []spec.Comment); ok {
 		r0 = returnFunc()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]Comment)
+			r0 = ret.Get(0).([]spec.Comment)
 		}
 	}
 	return r0
@@ -73,27 +73,27 @@ func (_c *MockRegistry_Comments_Call) Run(run func()) *MockRegistry_Comments_Cal
 	return _c
 }
 
-func (_c *MockRegistry_Comments_Call) Return(comments []Comment) *MockRegistry_Comments_Call {
+func (_c *MockRegistry_Comments_Call) Return(comments []spec.Comment) *MockRegistry_Comments_Call {
 	_c.Call.Return(comments)
 	return _c
 }
 
-func (_c *MockRegistry_Comments_Call) RunAndReturn(run func() []Comment) *MockRegistry_Comments_Call {
+func (_c *MockRegistry_Comments_Call) RunAndReturn(run func() []spec.Comment) *MockRegistry_Comments_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Parse provides a mock function for the type MockRegistry
-func (_mock *MockRegistry) Parse(line string, f *ast.File, op *Operation) error {
-	ret := _mock.Called(line, f, op)
+func (_mock *MockRegistry) Parse(line string, spec1 *openapi.Extendable[openapi.OpenAPI]) error {
+	ret := _mock.Called(line, spec1)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Parse")
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(string, *ast.File, *Operation) error); ok {
-		r0 = returnFunc(line, f, op)
+	if returnFunc, ok := ret.Get(0).(func(string, *openapi.Extendable[openapi.OpenAPI]) error); ok {
+		r0 = returnFunc(line, spec1)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -107,30 +107,24 @@ type MockRegistry_Parse_Call struct {
 
 // Parse is a helper method to define mock.On call
 //   - line string
-//   - f *ast.File
-//   - op *Operation
-func (_e *MockRegistry_Expecter) Parse(line interface{}, f interface{}, op interface{}) *MockRegistry_Parse_Call {
-	return &MockRegistry_Parse_Call{Call: _e.mock.On("Parse", line, f, op)}
+//   - spec1 *openapi.Extendable[openapi.OpenAPI]
+func (_e *MockRegistry_Expecter) Parse(line interface{}, spec1 interface{}) *MockRegistry_Parse_Call {
+	return &MockRegistry_Parse_Call{Call: _e.mock.On("Parse", line, spec1)}
 }
 
-func (_c *MockRegistry_Parse_Call) Run(run func(line string, f *ast.File, op *Operation)) *MockRegistry_Parse_Call {
+func (_c *MockRegistry_Parse_Call) Run(run func(line string, spec1 *openapi.Extendable[openapi.OpenAPI])) *MockRegistry_Parse_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 string
 		if args[0] != nil {
 			arg0 = args[0].(string)
 		}
-		var arg1 *ast.File
+		var arg1 *openapi.Extendable[openapi.OpenAPI]
 		if args[1] != nil {
-			arg1 = args[1].(*ast.File)
-		}
-		var arg2 *Operation
-		if args[2] != nil {
-			arg2 = args[2].(*Operation)
+			arg1 = args[1].(*openapi.Extendable[openapi.OpenAPI])
 		}
 		run(
 			arg0,
 			arg1,
-			arg2,
 		)
 	})
 	return _c
@@ -141,13 +135,13 @@ func (_c *MockRegistry_Parse_Call) Return(err error) *MockRegistry_Parse_Call {
 	return _c
 }
 
-func (_c *MockRegistry_Parse_Call) RunAndReturn(run func(line string, f *ast.File, op *Operation) error) *MockRegistry_Parse_Call {
+func (_c *MockRegistry_Parse_Call) RunAndReturn(run func(line string, spec1 *openapi.Extendable[openapi.OpenAPI]) error) *MockRegistry_Parse_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Register provides a mock function for the type MockRegistry
-func (_mock *MockRegistry) Register(c Comment) {
+func (_mock *MockRegistry) Register(c spec.Comment) {
 	_mock.Called(c)
 	return
 }
@@ -158,16 +152,16 @@ type MockRegistry_Register_Call struct {
 }
 
 // Register is a helper method to define mock.On call
-//   - c Comment
+//   - c spec.Comment
 func (_e *MockRegistry_Expecter) Register(c interface{}) *MockRegistry_Register_Call {
 	return &MockRegistry_Register_Call{Call: _e.mock.On("Register", c)}
 }
 
-func (_c *MockRegistry_Register_Call) Run(run func(c Comment)) *MockRegistry_Register_Call {
+func (_c *MockRegistry_Register_Call) Run(run func(c spec.Comment)) *MockRegistry_Register_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 Comment
+		var arg0 spec.Comment
 		if args[0] != nil {
-			arg0 = args[0].(Comment)
+			arg0 = args[0].(spec.Comment)
 		}
 		run(
 			arg0,
@@ -181,7 +175,7 @@ func (_c *MockRegistry_Register_Call) Return() *MockRegistry_Register_Call {
 	return _c
 }
 
-func (_c *MockRegistry_Register_Call) RunAndReturn(run func(c Comment)) *MockRegistry_Register_Call {
+func (_c *MockRegistry_Register_Call) RunAndReturn(run func(c spec.Comment)) *MockRegistry_Register_Call {
 	_c.Run(run)
 	return _c
 }

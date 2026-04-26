@@ -1,6 +1,6 @@
 all: false
-dir: "{{.InterfaceDir}}"
-filename: "{{.InterfaceName | snakecase}}_mock.go"
+dir: "{{.InterfaceDir}}/generated_mocks/"
+filename: "{{.InterfaceName | snakecase}}.go"
 force-file-write: true
 formatter: goimports
 formatter-options:
@@ -16,7 +16,7 @@ generate: true
 include-auto-generated: false
 log-level: info
 structname: "{{.Mock}}{{.InterfaceName}}"
-pkgname: "{{.SrcPackageName}}"
+pkgname: "{{.SrcPackageName}}mocks"
 recursive: true
 require-template-schema-exists: true
 template: testify
