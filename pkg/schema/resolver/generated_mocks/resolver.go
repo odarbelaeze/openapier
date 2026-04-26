@@ -2,12 +2,13 @@
 // github.com/vektra/mockery
 // template: testify
 
-package resolver
+package resolvermocks
 
 import (
 	"go/ast"
 
 	"github.com/odarbelaeze/openapier/pkg/schema/options"
+	"github.com/odarbelaeze/openapier/pkg/schema/resolver"
 	mock "github.com/stretchr/testify/mock"
 	"github.com/sv-tools/openapi"
 )
@@ -40,19 +41,19 @@ func (_m *MockResolver) EXPECT() *MockResolver_Expecter {
 }
 
 // From provides a mock function for the type MockResolver
-func (_mock *MockResolver) From(file *ast.File, from string) Resolver {
+func (_mock *MockResolver) From(file *ast.File, from string) resolver.Resolver {
 	ret := _mock.Called(file, from)
 
 	if len(ret) == 0 {
 		panic("no return value specified for From")
 	}
 
-	var r0 Resolver
-	if returnFunc, ok := ret.Get(0).(func(*ast.File, string) Resolver); ok {
+	var r0 resolver.Resolver
+	if returnFunc, ok := ret.Get(0).(func(*ast.File, string) resolver.Resolver); ok {
 		r0 = returnFunc(file, from)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(Resolver)
+			r0 = ret.Get(0).(resolver.Resolver)
 		}
 	}
 	return r0
@@ -88,12 +89,12 @@ func (_c *MockResolver_From_Call) Run(run func(file *ast.File, from string)) *Mo
 	return _c
 }
 
-func (_c *MockResolver_From_Call) Return(resolver Resolver) *MockResolver_From_Call {
-	_c.Call.Return(resolver)
+func (_c *MockResolver_From_Call) Return(resolver1 resolver.Resolver) *MockResolver_From_Call {
+	_c.Call.Return(resolver1)
 	return _c
 }
 
-func (_c *MockResolver_From_Call) RunAndReturn(run func(file *ast.File, from string) Resolver) *MockResolver_From_Call {
+func (_c *MockResolver_From_Call) RunAndReturn(run func(file *ast.File, from string) resolver.Resolver) *MockResolver_From_Call {
 	_c.Call.Return(run)
 	return _c
 }

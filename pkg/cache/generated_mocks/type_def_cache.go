@@ -2,11 +2,12 @@
 // github.com/vektra/mockery
 // template: testify
 
-package cache
+package cachemocks
 
 import (
 	"context"
 
+	"github.com/odarbelaeze/openapier/pkg/cache"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -38,23 +39,23 @@ func (_m *MockTypeDefCache) EXPECT() *MockTypeDefCache_Expecter {
 }
 
 // Get provides a mock function for the type MockTypeDefCache
-func (_mock *MockTypeDefCache) Get(pkgPath string, typeName string) (*TypeDef, bool) {
+func (_mock *MockTypeDefCache) Get(pkgPath string, typeName string) (*cache.TypeDef, bool) {
 	ret := _mock.Called(pkgPath, typeName)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Get")
 	}
 
-	var r0 *TypeDef
+	var r0 *cache.TypeDef
 	var r1 bool
-	if returnFunc, ok := ret.Get(0).(func(string, string) (*TypeDef, bool)); ok {
+	if returnFunc, ok := ret.Get(0).(func(string, string) (*cache.TypeDef, bool)); ok {
 		return returnFunc(pkgPath, typeName)
 	}
-	if returnFunc, ok := ret.Get(0).(func(string, string) *TypeDef); ok {
+	if returnFunc, ok := ret.Get(0).(func(string, string) *cache.TypeDef); ok {
 		r0 = returnFunc(pkgPath, typeName)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*TypeDef)
+			r0 = ret.Get(0).(*cache.TypeDef)
 		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(string, string) bool); ok {
@@ -95,12 +96,12 @@ func (_c *MockTypeDefCache_Get_Call) Run(run func(pkgPath string, typeName strin
 	return _c
 }
 
-func (_c *MockTypeDefCache_Get_Call) Return(typeDef *TypeDef, b bool) *MockTypeDefCache_Get_Call {
+func (_c *MockTypeDefCache_Get_Call) Return(typeDef *cache.TypeDef, b bool) *MockTypeDefCache_Get_Call {
 	_c.Call.Return(typeDef, b)
 	return _c
 }
 
-func (_c *MockTypeDefCache_Get_Call) RunAndReturn(run func(pkgPath string, typeName string) (*TypeDef, bool)) *MockTypeDefCache_Get_Call {
+func (_c *MockTypeDefCache_Get_Call) RunAndReturn(run func(pkgPath string, typeName string) (*cache.TypeDef, bool)) *MockTypeDefCache_Get_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -2,7 +2,7 @@
 // github.com/vektra/mockery
 // template: testify
 
-package cache
+package cachemocks
 
 import (
 	"go/ast"

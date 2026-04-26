@@ -5,14 +5,15 @@ import (
 	"testing"
 
 	"github.com/odarbelaeze/openapier/pkg/schema/resolver"
-	"github.com/odarbelaeze/openapier/pkg/schema/validator"
+	resolvermocks "github.com/odarbelaeze/openapier/pkg/schema/resolver/generated_mocks"
+	validatormocks "github.com/odarbelaeze/openapier/pkg/schema/validator/generated_mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/sv-tools/openapi"
 )
 
 func TestBuildStruct_Simple(t *testing.T) {
-	registry := validator.NewMockRegistry(t)
-	res := resolver.NewMockResolver(t)
+	registry := validatormocks.NewMockRegistry(t)
+	res := resolvermocks.NewMockResolver(t)
 	builder := resolver.NewSchemaBuilder(registry, res, nil)
 
 	expr := &ast.StructType{
@@ -37,8 +38,8 @@ func TestBuildStruct_Simple(t *testing.T) {
 }
 
 func TestBuildStruct_Omitempty(t *testing.T) {
-	registry := validator.NewMockRegistry(t)
-	res := resolver.NewMockResolver(t)
+	registry := validatormocks.NewMockRegistry(t)
+	res := resolvermocks.NewMockResolver(t)
 	builder := resolver.NewSchemaBuilder(registry, res, nil)
 
 	expr := &ast.StructType{
@@ -64,8 +65,8 @@ func TestBuildStruct_Omitempty(t *testing.T) {
 }
 
 func TestBuildStruct_Embedded(t *testing.T) {
-	registry := validator.NewMockRegistry(t)
-	res := resolver.NewMockResolver(t)
+	registry := validatormocks.NewMockRegistry(t)
+	res := resolvermocks.NewMockResolver(t)
 	builder := resolver.NewSchemaBuilder(registry, res, nil)
 
 	// type Base struct { ID string }

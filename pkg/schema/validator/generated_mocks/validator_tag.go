@@ -2,7 +2,7 @@
 // github.com/vektra/mockery
 // template: testify
 
-package validator
+package validatormocks
 
 import (
 	"github.com/odarbelaeze/openapier/pkg/schema/options"

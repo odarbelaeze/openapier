@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/odarbelaeze/openapier/pkg/cache"
+	cachemocks "github.com/odarbelaeze/openapier/pkg/cache/generated_mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -60,7 +61,7 @@ func TestTypeDefCache(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("Parser error", func(t *testing.T) {
-		parserCache := cache.NewMockParserCache(t)
+		parserCache := cachemocks.NewMockParserCache(t)
 		tc2 := cache.NewTypeDefCache(tmpDir, parserCache)
 
 		// We need to trigger packages.Load to return some files
