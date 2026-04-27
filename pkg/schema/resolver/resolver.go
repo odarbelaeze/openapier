@@ -101,7 +101,7 @@ func (r *resolver) Resolve(typeName string, opts ...options.SchemaOption) (*open
 	var typeParams []string
 	if len(matches) == 6 {
 		typeName = matches[1]
-		typeParams = strings.Split(matches[5], ",")
+		typeParams = splitTypeParams(matches[5])
 		slog.Debug("resolving generic type", "typeName", typeName, "typeArgs", typeParams)
 	}
 
@@ -136,6 +136,7 @@ func (r *resolver) Resolve(typeName string, opts ...options.SchemaOption) (*open
 				allOpts = append(allOpts, options.WithEnum(t.EnumValues...))
 			}
 			slog.Debug("finding spec for", "typeName", t.TypeSpec.Name.Name)
+			r.definitionsCache.MarkResolving(loc)
 			b := r.builderFactory(r.validatorRegistry, r.From(t.File, t.Locator.Path), aliases)
 			spec, err := b.Build(t.TypeSpec.Type, allOpts...)
 			if err != nil {
@@ -146,6 +147,33 @@ func (r *resolver) Resolve(typeName string, opts ...options.SchemaOption) (*open
 		}
 	}
 	return nil, fmt.Errorf("failed to resolve type: %s", typeName)
+}
+
+func splitTypeParams(s string) []string {
+	var result []string
+	var current strings.Builder
+	depth := 0
+	for _, r := range s {
+		switch r {
+		case '[':
+			depth++
+			current.WriteRune(r)
+		case ']':
+			depth--
+			current.WriteRune(r)
+		case ',':
+			if depth == 0 {
+				result = append(result, strings.TrimSpace(current.String()))
+				current.Reset()
+			} else {
+				current.WriteRune(r)
+			}
+		default:
+			current.WriteRune(r)
+		}
+	}
+	result = append(result, strings.TrimSpace(current.String()))
+	return result
 }
 
 func (r *resolver) resolveBasicType(typeName string, opts ...options.SchemaOption) *openapi.RefOrSpec[openapi.Schema] {

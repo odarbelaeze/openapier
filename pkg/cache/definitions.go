@@ -13,12 +13,15 @@ type DefinitionsCache interface {
 	Get(*locator.Locator) (*openapi.RefOrSpec[openapi.Schema], bool)
 	Put(*locator.Locator, *openapi.RefOrSpec[openapi.Schema]) *openapi.RefOrSpec[openapi.Schema]
 	Definitions() map[string]*openapi.RefOrSpec[openapi.Schema]
+	IsResolving(*locator.Locator) bool
+	MarkResolving(*locator.Locator)
 }
 
 type definitionsCache struct {
 	definitions map[string]*openapi.RefOrSpec[openapi.Schema]
 	aliases     map[string]string
 	taken       map[string]struct{}
+	resolving   map[string]struct{}
 }
 
 func NewDefinitionsCache() DefinitionsCache {
@@ -26,6 +29,7 @@ func NewDefinitionsCache() DefinitionsCache {
 		definitions: make(map[string]*openapi.RefOrSpec[openapi.Schema]),
 		aliases:     make(map[string]string),
 		taken:       make(map[string]struct{}),
+		resolving:   make(map[string]struct{}),
 	}
 }
 
@@ -33,6 +37,11 @@ func NewDefinitionsCache() DefinitionsCache {
 func (d *definitionsCache) Get(l *locator.Locator) (*openapi.RefOrSpec[openapi.Schema], bool) {
 	alias := d.alias(l)
 	if _, ok := d.definitions[alias]; ok {
+		schemaPath := fmt.Sprintf("#/components/schemas/%s", alias)
+		ref := openapi.NewRefOrSpec[openapi.Schema](schemaPath)
+		return ref, true
+	}
+	if _, ok := d.resolving[l.String()]; ok {
 		schemaPath := fmt.Sprintf("#/components/schemas/%s", alias)
 		ref := openapi.NewRefOrSpec[openapi.Schema](schemaPath)
 		return ref, true
@@ -47,6 +56,7 @@ func (d *definitionsCache) Put(
 ) *openapi.RefOrSpec[openapi.Schema] {
 	alias := d.alias(l)
 	d.definitions[alias] = value
+	delete(d.resolving, l.String())
 	schemaPath := fmt.Sprintf("#/components/schemas/%s", alias)
 	ref := openapi.NewRefOrSpec[openapi.Schema](schemaPath)
 	return ref
@@ -55,6 +65,15 @@ func (d *definitionsCache) Put(
 // Definitions implements [DefinitionsCache].
 func (d *definitionsCache) Definitions() map[string]*openapi.RefOrSpec[openapi.Schema] {
 	return d.definitions
+}
+
+func (d *definitionsCache) IsResolving(l *locator.Locator) bool {
+	_, ok := d.resolving[l.String()]
+	return ok
+}
+
+func (d *definitionsCache) MarkResolving(l *locator.Locator) {
+	d.resolving[l.String()] = struct{}{}
 }
 
 func (d *definitionsCache) alias(l *locator.Locator) string {

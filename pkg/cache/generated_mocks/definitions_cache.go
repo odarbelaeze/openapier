@@ -145,6 +145,97 @@ func (_c *MockDefinitionsCache_Get_Call) RunAndReturn(run func(locator1 *locator
 	return _c
 }
 
+// IsResolving provides a mock function for the type MockDefinitionsCache
+func (_mock *MockDefinitionsCache) IsResolving(locator1 *locator.Locator) bool {
+	ret := _mock.Called(locator1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for IsResolving")
+	}
+
+	var r0 bool
+	if returnFunc, ok := ret.Get(0).(func(*locator.Locator) bool); ok {
+		r0 = returnFunc(locator1)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+	return r0
+}
+
+// MockDefinitionsCache_IsResolving_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'IsResolving'
+type MockDefinitionsCache_IsResolving_Call struct {
+	*mock.Call
+}
+
+// IsResolving is a helper method to define mock.On call
+//   - locator1 *locator.Locator
+func (_e *MockDefinitionsCache_Expecter) IsResolving(locator1 interface{}) *MockDefinitionsCache_IsResolving_Call {
+	return &MockDefinitionsCache_IsResolving_Call{Call: _e.mock.On("IsResolving", locator1)}
+}
+
+func (_c *MockDefinitionsCache_IsResolving_Call) Run(run func(locator1 *locator.Locator)) *MockDefinitionsCache_IsResolving_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 *locator.Locator
+		if args[0] != nil {
+			arg0 = args[0].(*locator.Locator)
+		}
+		run(
+			arg0,
+		)
+	})
+	return _c
+}
+
+func (_c *MockDefinitionsCache_IsResolving_Call) Return(b bool) *MockDefinitionsCache_IsResolving_Call {
+	_c.Call.Return(b)
+	return _c
+}
+
+func (_c *MockDefinitionsCache_IsResolving_Call) RunAndReturn(run func(locator1 *locator.Locator) bool) *MockDefinitionsCache_IsResolving_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// MarkResolving provides a mock function for the type MockDefinitionsCache
+func (_mock *MockDefinitionsCache) MarkResolving(locator1 *locator.Locator) {
+	_mock.Called(locator1)
+	return
+}
+
+// MockDefinitionsCache_MarkResolving_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'MarkResolving'
+type MockDefinitionsCache_MarkResolving_Call struct {
+	*mock.Call
+}
+
+// MarkResolving is a helper method to define mock.On call
+//   - locator1 *locator.Locator
+func (_e *MockDefinitionsCache_Expecter) MarkResolving(locator1 interface{}) *MockDefinitionsCache_MarkResolving_Call {
+	return &MockDefinitionsCache_MarkResolving_Call{Call: _e.mock.On("MarkResolving", locator1)}
+}
+
+func (_c *MockDefinitionsCache_MarkResolving_Call) Run(run func(locator1 *locator.Locator)) *MockDefinitionsCache_MarkResolving_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 *locator.Locator
+		if args[0] != nil {
+			arg0 = args[0].(*locator.Locator)
+		}
+		run(
+			arg0,
+		)
+	})
+	return _c
+}
+
+func (_c *MockDefinitionsCache_MarkResolving_Call) Return() *MockDefinitionsCache_MarkResolving_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *MockDefinitionsCache_MarkResolving_Call) RunAndReturn(run func(locator1 *locator.Locator)) *MockDefinitionsCache_MarkResolving_Call {
+	_c.Run(run)
+	return _c
+}
+
 // Put provides a mock function for the type MockDefinitionsCache
 func (_mock *MockDefinitionsCache) Put(locator1 *locator.Locator, refOrSpec *openapi.RefOrSpec[openapi.Schema]) *openapi.RefOrSpec[openapi.Schema] {
 	ret := _mock.Called(locator1, refOrSpec)
