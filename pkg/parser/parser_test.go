@@ -59,6 +59,11 @@ func TestParser_Parse(t *testing.T) {
 			root: "./testdata/enums",
 			main: "main.go",
 		},
+		{
+			name: "should parse recursive structs",
+			root: "./testdata/recursive",
+			main: "main.go",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
