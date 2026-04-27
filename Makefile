@@ -1,5 +1,5 @@
 SOURCES := $(filter %.go, $(shell git ls-files --cached --others --exclude-standard pkg cmd))
-TEST_DIRS := $(wildcard pkg/parser/testdata/*/)
+TEST_DIRS := $(wildcard parser/testdata/*/)
 SNAPSHOTS := $(addsuffix expected.yaml, $(TEST_DIRS))
 
 snapshots: $(SNAPSHOTS)
@@ -7,8 +7,8 @@ snapshots: $(SNAPSHOTS)
 .PHONY: snapshots
 
 # % matches the name of the test folder
-pkg/parser/testdata/%/expected.yaml: $(SOURCES)
-	go run ./cmd/openapier --root pkg/parser/testdata/$* > $@
+parser/testdata/%/expected.yaml: $(SOURCES)
+	go run ./cmd/openapier --root parser/testdata/$* > $@
 
 TAGS.md: $(SOURCES)
 	go run ./cmd/docs > TAGS.md

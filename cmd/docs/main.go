@@ -5,9 +5,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/odarbelaeze/openapier/pkg/comments/operation"
-	"github.com/odarbelaeze/openapier/pkg/comments/spec"
-	"github.com/odarbelaeze/openapier/pkg/schema/validator"
+	"github.com/odarbelaeze/openapier/comments/operation"
+	"github.com/odarbelaeze/openapier/comments/spec"
+	"github.com/odarbelaeze/openapier/schema/validator"
 )
 
 func main() {

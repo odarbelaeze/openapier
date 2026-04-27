@@ -8,7 +8,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/odarbelaeze/openapier/pkg/parser"
+	"github.com/odarbelaeze/openapier/parser"
 	"github.com/urfave/cli/v3"
 	"go.yaml.in/yaml/v4"
 )
