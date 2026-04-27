@@ -209,12 +209,32 @@ func evaluateBinaryExpr(e *ast.BinaryExpr, iotaValue int) (any, bool) {
 	switch e.Op {
 	case token.SHL:
 		return l << uint(r), true
+	case token.SHR:
+		return l >> uint(r), true
+	case token.AND:
+		return l & r, true
+	case token.OR:
+		return l | r, true
+	case token.XOR:
+		return l ^ r, true
+	case token.AND_NOT:
+		return l &^ r, true
 	case token.ADD:
 		return l + r, true
 	case token.SUB:
 		return l - r, true
 	case token.MUL:
 		return l * r, true
+	case token.QUO:
+		if r == 0 {
+			return nil, false
+		}
+		return l / r, true
+	case token.REM:
+		if r == 0 {
+			return nil, false
+		}
+		return l % r, true
 	}
 	return nil, false
 }
