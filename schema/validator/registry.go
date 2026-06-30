@@ -10,13 +10,13 @@ import (
 var defaultRegistry = NewRegistry()
 
 type Registry interface {
-	Register(tag ValidatorTag)
+	Register(tag Tag)
 	Parse(string, string) ([]options.SchemaOption, error)
-	Validators() []ValidatorTag
+	Validators() []Tag
 }
 
 type registry struct {
-	tags map[string]ValidatorTag
+	tags map[string]Tag
 }
 
 func Default() Registry {
@@ -25,16 +25,16 @@ func Default() Registry {
 
 func NewRegistry() Registry {
 	return &registry{
-		tags: make(map[string]ValidatorTag),
+		tags: make(map[string]Tag),
 	}
 }
 
-func (r *registry) Register(tag ValidatorTag) {
+func (r *registry) Register(tag Tag) {
 	r.tags[tag.Tag()] = tag
 }
 
-func (r *registry) Validators() []ValidatorTag {
-	validators := make([]ValidatorTag, 0, len(r.tags))
+func (r *registry) Validators() []Tag {
+	validators := make([]Tag, 0, len(r.tags))
 	for _, v := range r.tags {
 		validators = append(validators, v)
 	}
