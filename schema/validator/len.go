@@ -38,10 +38,9 @@ func (t LenTag) Parse(value string, as string) ([]options.SchemaOption, error) {
 			options.WithMaxLength(l),
 			options.WithMinLength(l),
 		}, nil
-	case "integer", "number":
+	default:
 		return nil, fmt.Errorf("len is not supported for %s", as)
 	}
-	return nil, fmt.Errorf("invalid schema type: %s", as)
 }
 
 func (t LenTag) Usage() string {

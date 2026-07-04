@@ -63,6 +63,24 @@ func TestOneOfTag(t *testing.T) {
 			as:      "integer",
 			wantErr: true,
 		},
+		{
+			name:    "empty value",
+			value:   "",
+			as:      "string",
+			wantErr: true,
+		},
+		{
+			name:    "invalid number",
+			value:   "1.1 foo 3.3",
+			as:      "number",
+			wantErr: true,
+		},
+		{
+			name:    "invalid boolean",
+			value:   "true foo",
+			as:      "boolean",
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {

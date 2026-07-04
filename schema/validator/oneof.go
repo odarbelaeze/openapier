@@ -20,8 +20,10 @@ func (t OneOfTag) Tag() string {
 
 func (t OneOfTag) Parse(value string, as string) ([]options.SchemaOption, error) {
 	parts := strings.Fields(value)
-	vals := make([]any, 0, len(parts))
-
+	if len(parts) == 0 {
+		return nil, fmt.Errorf("oneof requires at least one value")
+	}
+	values := make([]any, 0, len(parts))
 	for _, part := range parts {
 		var val any
 		var err error
@@ -42,11 +44,12 @@ func (t OneOfTag) Parse(value string, as string) ([]options.SchemaOption, error)
 		if err != nil {
 			return nil, fmt.Errorf("invalid oneof value for %s: %s", as, part)
 		}
-		vals = append(vals, val)
+
+		values = append(values, val)
 	}
 
 	return []options.SchemaOption{
-		options.WithEnum(vals...),
+		options.WithEnum(values...),
 	}, nil
 }
 
