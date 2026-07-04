@@ -22,6 +22,8 @@ require-template-schema-exists: true
 template: testify
 template-schema: "{{.Template}}.schema.json"
 packages:
-  github.com/odarbelaeze/openapier/pkg:
+  github.com/odarbelaeze/openapier:
     config:
       all: true
+      exclude-subpkg-regex:
+        - ".*cmd.*"

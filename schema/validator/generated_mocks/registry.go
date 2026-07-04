@@ -117,7 +117,7 @@ type MockRegistry_Register_Call struct {
 }
 
 // Register is a helper method to define mock.On call
-//   - tag validator.ValidatorTag
+//   - tag validator.Tag
 func (_e *MockRegistry_Expecter) Register(tag interface{}) *MockRegistry_Register_Call {
 	return &MockRegistry_Register_Call{Call: _e.mock.On("Register", tag)}
 }
@@ -181,8 +181,8 @@ func (_c *MockRegistry_Validators_Call) Run(run func()) *MockRegistry_Validators
 	return _c
 }
 
-func (_c *MockRegistry_Validators_Call) Return(validatorTags []validator.Tag) *MockRegistry_Validators_Call {
-	_c.Call.Return(validatorTags)
+func (_c *MockRegistry_Validators_Call) Return(tags []validator.Tag) *MockRegistry_Validators_Call {
+	_c.Call.Return(tags)
 	return _c
 }
 
