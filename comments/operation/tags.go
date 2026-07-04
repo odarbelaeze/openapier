@@ -1,6 +1,7 @@
 package operation
 
 import (
+	"fmt"
 	"go/ast"
 	"strings"
 )
@@ -26,8 +27,9 @@ func (c *TagsComment) Usage() string {
 
 func (c *TagsComment) ParseInto(content string, f *ast.File, op *Operation) error {
 	fields := strings.Fields(content)
-	if len(fields) > 0 {
-		op.Builder.AddTags(fields...)
+	if len(fields) == 0 {
+		return fmt.Errorf("invalid format for @%s, expected: %s", c.Tag(), c.Usage())
 	}
+	op.Builder.AddTags(fields...)
 	return nil
 }

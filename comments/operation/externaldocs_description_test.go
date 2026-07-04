@@ -21,6 +21,7 @@ func TestExternalDocsDescriptionComment(t *testing.T) {
 		setupDocs           bool
 		expectedDescription string
 		expectedURL         string
+		expectErr           string
 	}{
 		{
 			name:                "valid description",
@@ -35,10 +36,10 @@ func TestExternalDocsDescriptionComment(t *testing.T) {
 			expectedDescription: "More detailed docs",
 		},
 		{
-			name:                "empty content",
-			content:             "",
-			setupDocs:           false,
-			expectedDescription: "",
+			name:      "empty content",
+			content:   "",
+			setupDocs: false,
+			expectErr: "externalDocs.description comment must have a description",
 		},
 		{
 			name:                "existing external docs",
@@ -60,6 +61,10 @@ func TestExternalDocsDescriptionComment(t *testing.T) {
 			}
 
 			err := comment.ParseInto(tt.content, nil, op)
+			if tt.expectErr != "" {
+				require.EqualError(t, err, tt.expectErr)
+				return
+			}
 			require.NoError(t, err)
 
 			actual := op.Builder.Build().Spec.ExternalDocs

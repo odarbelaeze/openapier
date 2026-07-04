@@ -26,7 +26,7 @@ func TestParamBoolFlags_Errors(t *testing.T) {
 				op.Builder.AddParameters(openapi.NewParameterBuilder().Name("id").Build())
 				return op
 			},
-			expectError: "parameter \"missing_param\" not found, use @param missing_param ... to define it first",
+			expectError: "parameters not found for @param.allowReserved: [missing_param], use @param <name> ... to define them first",
 		},
 		{
 			name:    "invalid format empty",

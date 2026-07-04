@@ -1,6 +1,7 @@
 package operation
 
 import (
+	"errors"
 	"go/ast"
 	"strings"
 
@@ -28,12 +29,13 @@ func (c *ExternalDocsDescriptionComment) Usage() string {
 
 func (c *ExternalDocsDescriptionComment) ParseInto(content string, f *ast.File, op *Operation) error {
 	desc := strings.TrimSpace(content)
-	if desc != "" {
-		if op.Builder.Build().Spec.ExternalDocs == nil {
-			op.Builder.ExternalDocs(openapi.NewExternalDocsBuilder().Description(desc).Build())
-		} else {
-			op.Builder.Build().Spec.ExternalDocs.Spec.Description = desc
-		}
+	if desc == "" {
+		return errors.New("externalDocs.description comment must have a description")
+	}
+	if op.Builder.Build().Spec.ExternalDocs == nil {
+		op.Builder.ExternalDocs(openapi.NewExternalDocsBuilder().Description(desc).Build())
+	} else {
+		op.Builder.Build().Spec.ExternalDocs.Spec.Description = desc
 	}
 	return nil
 }

@@ -16,9 +16,10 @@ func TestTagsComment(t *testing.T) {
 	assert.Equal(t, "@tags <tag1> [tag2]...", comment.Usage())
 
 	tests := []struct {
-		name     string
-		content  string
-		expected []string
+		name      string
+		content   string
+		expected  []string
+		expectErr string
 	}{
 		{
 			name:     "single tag",
@@ -36,9 +37,9 @@ func TestTagsComment(t *testing.T) {
 			expected: []string{"roles", "permissions"},
 		},
 		{
-			name:     "empty content",
-			content:  "",
-			expected: nil,
+			name:      "empty content",
+			content:   "",
+			expectErr: "invalid format for @tags, expected: @tags <tag1> [tag2]...",
 		},
 	}
 
@@ -49,6 +50,10 @@ func TestTagsComment(t *testing.T) {
 			}
 
 			err := comment.ParseInto(tt.content, nil, op)
+			if tt.expectErr != "" {
+				require.EqualError(t, err, tt.expectErr)
+				return
+			}
 			require.NoError(t, err)
 
 			actual := op.Builder.Build().Spec.Tags

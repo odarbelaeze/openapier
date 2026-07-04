@@ -21,6 +21,7 @@ func TestExternalDocsURLComment(t *testing.T) {
 		setupDocs           bool
 		expectedURL         string
 		expectedDescription string
+		expectErr           string
 	}{
 		{
 			name:        "valid url",
@@ -35,10 +36,10 @@ func TestExternalDocsURLComment(t *testing.T) {
 			expectedURL: "https://example.com/api-docs",
 		},
 		{
-			name:        "empty content",
-			content:     "",
-			setupDocs:   false,
-			expectedURL: "",
+			name:      "empty content",
+			content:   "",
+			setupDocs: false,
+			expectErr: "externalDocs.url comment must have a URL",
 		},
 		{
 			name:                "existing external docs",
@@ -60,6 +61,10 @@ func TestExternalDocsURLComment(t *testing.T) {
 			}
 
 			err := comment.ParseInto(tt.content, nil, op)
+			if tt.expectErr != "" {
+				require.EqualError(t, err, tt.expectErr)
+				return
+			}
 			require.NoError(t, err)
 
 			actual := op.Builder.Build().Spec.ExternalDocs
