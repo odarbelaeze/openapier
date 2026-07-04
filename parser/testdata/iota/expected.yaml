@@ -1,0 +1,147 @@
+components:
+  schemas:
+    EnumThing:
+      description: |
+        EnumThing is an enum field for the todo
+      enum:
+        - 1
+        - 2
+        - 3
+      examples:
+        - "1"
+      format: int32
+      type: integer
+    ExponentialEnumThing:
+      description: |
+        ExponentialEnumThing is an exponential enum field for the todo
+      enum:
+        - 2
+        - 4
+        - 8
+      examples:
+        - "2"
+      format: int32
+      type: integer
+    MixedEnumThing:
+      description: |
+        MixedEnumThing is a mixed enum field for the todo
+      enum:
+        - 1
+        - 4
+        - 9
+      examples:
+        - "4"
+      format: int32
+      type: integer
+    OnePlusExponentialEnumThing:
+      description: |
+        OnePlusExponentialEnumThing is a one plus exponential enum field for the todo
+      enum:
+        - 3
+        - 5
+        - 9
+      examples:
+        - "3"
+      format: int32
+      type: integer
+    PaginatedTodos:
+      properties:
+        meta:
+          $ref: '#/components/schemas/Pagination'
+        todos:
+          description: |
+            Todos is the list of todos
+          items:
+            $ref: '#/components/schemas/Todo'
+          type: array
+      required:
+        - todos
+        - meta
+      type: object
+    Pagination:
+      description: |
+        Meta is the pagination metadata
+      properties:
+        cursor:
+          description: |
+            Cursor is the cursor for the next page
+          type: string
+        hasMore:
+          description: |
+            HasMore indicates if there are more pages
+          type: boolean
+      required:
+        - cursor
+        - hasMore
+      type: object
+    RestError:
+      properties:
+        code:
+          description: |
+            Code is the HTTP status code
+          examples:
+            - 500
+          format: int32
+          type: integer
+        message:
+          description: |
+            Message is the error message
+          type: string
+      required:
+        - code
+        - message
+      type: object
+    Todo:
+      properties:
+        enumThing:
+          $ref: '#/components/schemas/EnumThing'
+        exponentialEnumThing:
+          $ref: '#/components/schemas/ExponentialEnumThing'
+        id:
+          description: |
+            ID is the unique identifier for the todo
+          format: uuid
+          type: string
+        mixedEnumThing:
+          $ref: '#/components/schemas/MixedEnumThing'
+        onePlusExponentialEnumThing:
+          $ref: '#/components/schemas/OnePlusExponentialEnumThing'
+        title:
+          description: |
+            Title is the title of the todo
+          examples:
+            - Buy milk
+          type: string
+      required:
+        - id
+        - title
+        - enumThing
+        - exponentialEnumThing
+        - onePlusExponentialEnumThing
+        - mixedEnumThing
+      type: object
+info:
+  description: This is a sample API that exposes iota expressions.
+  termsOfService: http://swagger.io/terms/
+  title: API that exposes iota expressions
+  version: "1.0"
+jsonSchemaDialect: https://spec.openapis.org/oas/3.1/dialect/base
+openapi: 3.1.1
+paths:
+  /todos:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTodos'
+          description: Paginated list of todos
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: Internal server error
+      summary: List todos
+
