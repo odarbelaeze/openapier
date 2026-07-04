@@ -38,9 +38,9 @@ func (d *SecurityComment) ParseInto(content string, f *ast.File, op *Operation) 
 		scopes = parts[1:]
 	}
 
-	req := *openapi.NewSecurityRequirementBuilder().Add(name, scopes...).Build()
+	requirement := *openapi.NewSecurityRequirementBuilder().Add(name, scopes...).Build()
 
-	op.Builder.AddSecurity(req)
+	op.Builder.AddSecurity(requirement)
 
 	return nil
 }

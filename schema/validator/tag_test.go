@@ -8,6 +8,6 @@ import (
 )
 
 func TestValidatorTagInterface(t *testing.T) {
-	var _ validator.ValidatorTag
+	var _ validator.Tag
 	assert.True(t, true)
 }

@@ -1,6 +1,7 @@
 package operation
 
 import (
+	"errors"
 	"go/ast"
 	"strings"
 )
@@ -26,8 +27,9 @@ func (c *IDComment) Usage() string {
 
 func (c *IDComment) ParseInto(content string, f *ast.File, op *Operation) error {
 	id := strings.TrimSpace(content)
-	if id != "" {
-		op.Builder.OperationID(id)
+	if id == "" {
+		return errors.New("id comment must have an operationId")
 	}
+	op.Builder.OperationID(id)
 	return nil
 }

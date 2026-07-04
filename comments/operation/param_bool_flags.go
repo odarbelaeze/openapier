@@ -27,20 +27,23 @@ func (c *paramBoolComment) ParseInto(content string, f *ast.File, op *Operation)
 	if len(fields) == 0 {
 		return fmt.Errorf("invalid @%s format, expected: %s", c.tag, c.Usage())
 	}
-
+	names := make(map[string]struct{})
 	for _, name := range fields {
-		found := false
-		for _, p := range op.Builder.Build().Spec.Parameters {
-			if p.Spec.Spec.Name == name {
-				c.setter(p.Spec.Spec)
-				found = true
-				break
-			}
-		}
-		if !found {
-			return fmt.Errorf("parameter %q not found, use @param %s ... to define it first", name, name)
+		names[name] = struct{}{}
+	}
+	for _, p := range op.Builder.Build().Spec.Parameters {
+		name := p.Spec.Spec.Name
+		if _, ok := names[name]; ok {
+			c.setter(p.Spec.Spec)
+			delete(names, name)
 		}
 	}
-
+	if len(names) > 0 {
+		var missing []string
+		for name := range names {
+			missing = append(missing, name)
+		}
+		return fmt.Errorf("parameters not found for @%s: %v, use @param <name> ... to define them first", c.tag, missing)
+	}
 	return nil
 }

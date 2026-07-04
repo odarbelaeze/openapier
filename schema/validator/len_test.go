@@ -29,16 +29,25 @@ func TestLenTag(t *testing.T) {
 		t.Run("failure", func(t *testing.T) {
 			_, err := tag.Parse("abc", "object")
 			require.Error(t, err)
+			assert.Contains(t, err.Error(), "invalid len value")
 		})
 
 		t.Run("integers are not supported", func(t *testing.T) {
 			_, err := tag.Parse("3", "integer")
 			require.Error(t, err)
+			assert.Contains(t, err.Error(), "len is not supported for integer")
 		})
 
 		t.Run("numbers are not supported", func(t *testing.T) {
 			_, err := tag.Parse("3", "number")
 			require.Error(t, err)
+			assert.Contains(t, err.Error(), "len is not supported for number")
+		})
+
+		t.Run("booleans are not supported", func(t *testing.T) {
+			_, err := tag.Parse("3", "boolean")
+			require.Error(t, err)
+			assert.Contains(t, err.Error(), "len is not supported for boolean")
 		})
 	})
 }

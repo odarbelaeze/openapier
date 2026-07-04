@@ -16,9 +16,10 @@ func TestIDComment(t *testing.T) {
 	assert.Equal(t, "@id <operationId>", comment.Usage())
 
 	tests := []struct {
-		name     string
-		content  string
-		expected string
+		name      string
+		content   string
+		expected  string
+		expectErr string
 	}{
 		{
 			name:     "valid id",
@@ -31,9 +32,9 @@ func TestIDComment(t *testing.T) {
 			expected: "GetUsers",
 		},
 		{
-			name:     "empty id",
-			content:  "",
-			expected: "",
+			name:      "empty id",
+			content:   "",
+			expectErr: "id comment must have an operationId",
 		},
 	}
 
@@ -44,6 +45,10 @@ func TestIDComment(t *testing.T) {
 			}
 
 			err := comment.ParseInto(tt.content, nil, op)
+			if tt.expectErr != "" {
+				require.EqualError(t, err, tt.expectErr)
+				return
+			}
 			require.NoError(t, err)
 
 			assert.Equal(t, tt.expected, op.Builder.Build().Spec.OperationID)

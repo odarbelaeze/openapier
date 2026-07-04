@@ -1,6 +1,7 @@
 package operation
 
 import (
+	"errors"
 	"go/ast"
 	"strings"
 
@@ -28,12 +29,13 @@ func (c *ExternalDocsURLComment) Usage() string {
 
 func (c *ExternalDocsURLComment) ParseInto(content string, f *ast.File, op *Operation) error {
 	url := strings.TrimSpace(content)
-	if url != "" {
-		if op.Builder.Build().Spec.ExternalDocs == nil {
-			op.Builder.ExternalDocs(openapi.NewExternalDocsBuilder().URL(url).Build())
-		} else {
-			op.Builder.Build().Spec.ExternalDocs.Spec.URL = url
-		}
+	if url == "" {
+		return errors.New("externalDocs.url comment must have a URL")
+	}
+	if op.Builder.Build().Spec.ExternalDocs == nil {
+		op.Builder.ExternalDocs(openapi.NewExternalDocsBuilder().URL(url).Build())
+	} else {
+		op.Builder.Build().Spec.ExternalDocs.Spec.URL = url
 	}
 	return nil
 }
